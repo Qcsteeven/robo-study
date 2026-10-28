@@ -56,13 +56,18 @@ def _tess(cfg: OcrConfig):
 
 def crop_ink(arr: np.ndarray, box: tuple[int, int, int, int], inset: int, dark: np.ndarray | None = None,
              min_ink: float = 0.003) -> np.ndarray | None:
-    """Ячейка без линий сетки, обрезанная по содержимому; None — пустая ячейка."""
+    """Ячейка без линий сетки, обрезанная по содержимому; None — пустая ячейка.
+
+    Линии реального скана неровные и после выравнивания наклона бывают толщиной 5–10 px, поэтому
+    ячейка отступает от рамки немного, а остатки линий срезаются по краям отдельно (_trim_lines):
+    большой отступ срезал бы и текст низких строк шапки."""
     x0, y0, x1, y1 = box
-    x0, y0, x1, y1 = x0 + inset, y0 + inset, x1 - inset, y1 - inset
+    small = min(inset, 2)
+    x0, y0, x1, y1 = x0 + small, y0 + small, x1 - small, y1 - small
     if x1 - x0 < 4 or y1 - y0 < 4:
         return None
-    d = (dark if dark is not None else binarize(arr))[y0:y1, x0:x1]
-    if d.mean() < min_ink:
+    d = _trim_lines((dark if dark is not None else binarize(arr))[y0:y1, x0:x1], max(inset, 12))
+    if d.shape[0] < 4 or d.shape[1] < 4 or d.mean() < min_ink:
         return None
     ys, xs = np.nonzero(d)
     if ys.size < 6:
@@ -72,6 +77,23 @@ def crop_ink(arr: np.ndarray, box: tuple[int, int, int, int], inset: int, dark: 
     cx0, cx1 = max(0, xs.min() - pad), min(d.shape[1], xs.max() + pad + 1)
     crop = np.where(d[cy0:cy1, cx0:cx1], 0, 255).astype(np.uint8)
     return crop
+
+
+def _trim_lines(d: np.ndarray, max_px: int) -> np.ndarray:
+    """Срезает у краёв ячейки полосы, похожие на линию сетки: почти целиком тёмные строки (столбцы)
+    пикселей в пределах max_px от края — до самой внутренней из них."""
+    def edge(profile: np.ndarray, limit: float) -> tuple[int, int]:
+        n = profile.size
+        k = min(max_px, n // 3)
+        lo = max((i + 1 for i in range(k) if profile[i] > limit), default=0)
+        hi = min((n - 1 - i for i in range(k) if profile[n - 1 - i] > limit), default=n)
+        return lo, hi
+    t, b = edge(d.mean(axis=1), 0.7)
+    d = d[t:b]
+    if d.size == 0:
+        return d
+    left, right = edge(d.mean(axis=0), 0.8)
+    return d[:, left:right]
 
 
 def ocr_cells(arr: np.ndarray, boxes: list[tuple[int, int, int, int]], cfg: OcrConfig, mode: str = "text",
@@ -193,6 +215,8 @@ _NOISE = re.compile(r"^[|\\/\-—–_`'\".,:;°~^•]+$|^[a-zA-Z]$")
 
 def _kug_code(text: str) -> str:
     t = text.replace(" ", "").upper()
+    if t.startswith("ПД"):
+        return "Пд"
     for ch in t:
         if ch in "ТЭУПДКГН*":
             return ch

@@ -31,6 +31,9 @@ def test_web_flow(tmp_path):
         op = c.get("/op/09.04.01-iiis-2024-och")
         assert op.status_code == 200
         assert "Учебный план" in op.text and "Глубокое обучение" in op.text and "app-kug" in op.text
+        # карусель по курсам и полки категорий
+        assert op.text.count('class="app-carousel__slide"') == 2 and "1 курс" in op.text
+        assert 'class="app-shelf app-cat--ai"' in op.text and "Из чего состоит программа" in op.text
         docs = c.get("/api/programs/09.04.01-iiis-2024-och/documents").json()
         assert all(c.get(f"/op/09.04.01-iiis-2024-och/doc/{d['id']}").status_code == 200 for d in docs)
         assert c.get(f"/api/documents/{docs[0]['id']}/json?kind=primary").json()["schema"] == "robot-op/primary/1"

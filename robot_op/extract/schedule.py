@@ -5,7 +5,7 @@ import re
 from collections import Counter
 
 from . import pdf as pdfmod
-from .grid import Grid, assign_words, binarize, detect_grid
+from .grid import FineRaster, Grid, assign_words, binarize, detect_grid, rotate, skew_angle
 from .ocr import OcrConfig, ocr_cells, ocr_single
 from .util import norm, to_int
 
@@ -17,6 +17,7 @@ LEGEND = {
     "Э": "экзаменационная сессия",
     "У": "учебная практика",
     "П": "производственная практика",
+    "Пд": "производственная (преддипломная) практика",
     "Н": "научно-исследовательская работа",
     "Г": "подготовка к сдаче и сдача государственного экзамена",
     "Д": "выполнение и защита ВКР",
@@ -47,35 +48,57 @@ def _label_col(grid: Grid) -> int | None:
     return votes.most_common(1)[0][0] if votes else None
 
 
-def ocr_grid(arr, grid: Grid, cfg: OcrConfig) -> None:
+def ocr_grid(arr, grid: Grid, cfg: OcrConfig, fine: FineRaster | None = None) -> None:
     dark = binarize(arr)
     inset = grid.line_px + 1
+
+    def read(cells, mode):
+        if fine is not None:
+            return ocr_cells(fine.arr, [fine.box(c.box) for c in cells], cfg, mode, inset * fine.k, fine.dark)
+        return ocr_cells(arr, [c.box for c in cells], cfg, mode, inset, dark)
+
+    def read_one(c, mode, scale):
+        if fine is not None:
+            return ocr_single(fine.arr, fine.box(c.box), cfg, mode, inset * fine.k, fine.dark, scale)
+        return ocr_single(arr, c.box, cfg, mode, inset, dark, scale)
+
+    # колонка дней недели — среди первых колонок; месяцы — в первой строке правее неё
     left = [c for r in grid.rows for c in r.cells if c.col0 <= 4]
-    first = [c for c in grid.rows[0].cells if c.col0 > 4]
-    cells = left + first
-    for c, t in zip(cells, ocr_cells(arr, [c.box for c in cells], cfg, "rus", inset, dark)):
+    for c, t in zip(left, read(left, "rus")):
         c.text = t
     label = _label_col(grid)
     if label is None:
         return
+    first = [c for c in grid.rows[0].cells if c.col0 > label]
+    for c, t in zip(first, read(first, "rus")):
+        c.text = t
     weeks_row, course_rows = _structure(grid, label)
     if weeks_row is not None:
         wc = [c for c in grid.rows[weeks_row].cells if c.col0 > label]
-        for n, (c, t) in enumerate(zip(wc, ocr_cells(arr, [c.box for c in wc], cfg, "digits", inset, dark)), 1):
+        for n, (c, t) in enumerate(zip(wc, read(wc, "digits")), 1):
             c.text = t
             # номер недели известен заранее — сомнительные ячейки перечитываются по одной, в т. ч. с увеличением
             for scale in (1.0, 2.0, 3.0):
                 if to_int(c.text) == n:
                     break
-                c.text = ocr_single(arr, c.box, cfg, "digits", inset, dark, scale) or c.text
+                c.text = read_one(c, "digits", scale) or c.text
     body = [c for ri in course_rows for c in grid.rows[ri].cells if c.col0 > label]
-    for c, t in zip(body, ocr_cells(arr, [c.box for c in body], cfg, "kug", inset, dark)):
+    for c, t in zip(body, read(body, "kug")):
         c.text = t
 
 
 def _structure(grid: Grid, label: int) -> tuple[int | None, list[int]]:
-    """Строка номеров недель и строки курсов (после шапки с датами, где есть «вс»)."""
+    """Строка номеров недель и строки курсов.
+
+    Шапку (месяцы, даты по дням недели, номера недель) накрывает объединённая ячейка «Курс» в первой
+    колонке; строки ниже неё — курсы. Если такой ячейки нет, шапка заканчивается строкой «вс»
+    (в реальных графиках она напечатана бледно и может не распознаться)."""
     labels = [norm(r.text_at(label)) for r in grid.rows]
+    head = next((c for c in grid.rows[0].cells if c.col0 == 0), None) if grid.rows else None
+    if head is not None and head.y1 > grid.rows[0].y1 + 5:
+        last = max(i for i, r in enumerate(grid.rows) if (r.y0 + r.y1) / 2 <= head.y1 + 2)
+        weeks_row = last if last > 0 and labels[last] not in DAYS else None
+        return weeks_row, [i for i in range(last + 1, len(grid.rows)) if labels[i] in DAYS]
     last_sunday = max((i for i, t in enumerate(labels) if t == "вс"), default=-1)
     weeks_row = last_sunday + 1 if 0 <= last_sunday + 1 < len(grid.rows) and labels[last_sunday + 1] not in DAYS else None
     start = (weeks_row + 1) if weeks_row is not None else last_sunday + 1
@@ -93,6 +116,10 @@ def parse_grid(grid: Grid) -> dict:
     # номера недель
     if weeks_row is not None:
         nums = [to_int(grid.rows[weeks_row].text_at(c)) for c in week_cols]
+        # за 52-й неделей бывает заштрихованная колонка без номера — остаток августа, «обучение не ведётся»
+        while len(week_cols) > 52 and nums and nums[-1] is None:
+            week_cols.pop()
+            nums.pop()
         bad = [i + 1 for i, n in enumerate(nums) if n != i + 1]
         if bad:
             messages.append(f"Номера недель распознаны не полностью: позиции {', '.join(map(str, bad[:10]))}")
@@ -109,6 +136,11 @@ def parse_grid(grid: Grid) -> dict:
     courses = [_course(grid, block, label, week_cols, messages) for block in _course_blocks(grid, course_rows)]
     if not courses:
         raise NoSchedule("Не найдены строки курсов")
+    # номер курса — одна цифра в высокой узкой ячейке, OCR её иногда не видит; курсы идут по порядку
+    known = [(i, int(c["course"])) for i, c in enumerate(courses) if c["course"].isdigit()]
+    if known and all(n - i == known[0][1] - known[0][0] for i, n in known):
+        for i, c in enumerate(courses):
+            c["course"] = c["course"] or str(known[0][1] - known[0][0] + i)
     if len(week_cols) not in (52, 53):
         messages.append(f"Число недель учебного года {len(week_cols)} (ожидается 52)")
     return {"months": months, "weeks": len(week_cols), "courses": courses, "messages": messages}
@@ -145,7 +177,7 @@ def _course(grid: Grid, rows: list[int], label: int, week_cols: list[int], messa
     for col in week_cols:
         codes = []
         for ri in rows:
-            t = grid.rows[ri].text_at(col).strip().upper()[:1]
+            t = _code(grid.rows[ri].text_at(col))
             if t not in ALLOWED:
                 unknown.add(t)
             codes.append(t)
@@ -154,7 +186,12 @@ def _course(grid: Grid, rows: list[int], label: int, week_cols: list[int], messa
         weeks.append(code)
     if unknown:
         messages.append(f"Курс {course}: недопустимые обозначения {', '.join(sorted(unknown))}")
-    return {"course": course, "group": group, "weeks": "".join(weeks)}
+    return {"course": course, "group": group, "weeks": weeks}
+
+
+def _code(text: str) -> str:
+    t = text.replace(" ", "").upper()
+    return "Пд" if t.startswith("ПД") else t[:1]
 
 
 def extract(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> dict:
@@ -162,11 +199,13 @@ def extract(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> dict:
     result = None
     for i in range(pdfmod.page_count(data)):
         arr = pdfmod.render_page(data, i, dpi)
+        angle = skew_angle(arr) if scanned else 0.0
+        arr = rotate(arr, angle)
         grid = detect_grid(arr)
         if grid is None:
             continue
         if scanned:
-            ocr_grid(arr, grid, cfg)
+            ocr_grid(arr, grid, cfg, FineRaster.for_scan(data, i, dpi, angle))
             from .ocr import ocr_page_text
             top = arr[: max(1, grid.rows[0].y0 - 4)]
             title_text = ocr_page_text(top, cfg) if top.shape[0] > 20 else ""

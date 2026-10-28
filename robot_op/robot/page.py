@@ -10,6 +10,7 @@ from ..catalog import DOC_ORDER, DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE, REVIEW_
 from ..extract import curriculum
 from ..extract.schedule import LEGEND
 from ..models import Document, JsonVersion, Program
+from . import plan_view
 
 QUALIFICATION = {"bachelor": "Бакалавр", "specialist": "Специалист", "master": "Магистр",
                  "spo": "Специалист среднего звена", "postgraduate": "Исследователь. Преподаватель-исследователь"}
@@ -153,15 +154,22 @@ def build(ses, prog: Program) -> dict:
             parts += [f"{n} — {labels.get(s, s)}" for s, n in statuses.items() if s != "processed"]
             title = ("Рабочие программы дисциплин" if t == "rpd" else "Рабочие программы практик") + f" — {len(group)} док."
             documents.append({"type": DOC_TYPES[t], "title": title, "status": status, "note": ", ".join(parts),
-                              "url": "#discipliny" if t == "rpd" else "#praktiki",
-                              "json_url": f"/api/programs/{prog.id}/documents?type={t}", "group": True})
+                              "url": "#discipliny" if t == "rpd" else "#praktiki", "group": True})
         for d in group if not (t in ("rpd", "practice") and len(group) > 1) else []:
             documents.append({"type": DOC_TYPES[t], "title": DOC_TYPE_TITLES[t] if t not in ("rpd", "practice") else d.title,
-                              "status": d.status, "note": d.note, "url": d.url,
-                              "json_url": f"/api/documents/{d.id}/json", "doc_id": d.id})
+                              "status": d.status, "note": d.note, "url": d.url, "doc_id": d.id})
+    # карусель по курсам и полки категорий; дисциплины ведут на страницы своих РПД и программ практик
+    links = {}
+    for d in by_type.get("rpd", []) + by_type.get("practice", []):
+        links.setdefault(_key(d.title), f"/op/{prog.id}/doc/{d.id}")
+        discipline = ((finals.get(d.id) or {}).get("data") or {}).get("discipline")
+        if discipline:
+            links.setdefault(_key(discipline), f"/op/{prog.id}/doc/{d.id}")
+    plan = plan_view.build(up_data, links, key=_key)
+
     review = [{"type": DOC_TYPES[d.doc_type], "title": d.title, "note": d.note, "status": d.status,
                "url": f"/op/{prog.id}/doc/{d.id}"} for d in docs if d.status in REVIEW_STATUSES]
     errors = [{"type": DOC_TYPES[d.doc_type], "title": d.title, "note": d.note} for d in docs if d.status == "error"]
-    return {"op": op, "curriculum": matrix, "schedule": schedule, "disciplines": disciplines, "practices": practices,
+    return {"op": op, "curriculum": matrix, "plan": plan, "schedule": schedule, "disciplines": disciplines, "practices": practices,
             "gia": gia_ctx, "documents": documents, "review": review, "errors": errors,
             "up_checks": up_data.get("checks", {}).get("messages", [])}

@@ -5,6 +5,7 @@
   python -m robot_op programs bachelor 2023
   python -m robot_op run bachelor 2023 [09.03.01-isoiu-2023-och ...] [--force]
   python -m robot_op resume <номер запуска>
+  python -m robot_op pages
 """
 from __future__ import annotations
 
@@ -32,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--force", action="store_true")
     rs = sub.add_parser("resume", help="продолжить прерванный запуск")
     rs.add_argument("run_id", type=int)
+    sub.add_parser("pages", help="пересобрать веб-страницы ОП по итоговым JSON-файлам, без скачивания")
     a = ap.parse_args(argv)
 
     if a.cmd == "serve":
@@ -57,6 +59,17 @@ def main(argv: list[str] | None = None) -> int:
     if a.cmd == "levels":
         for lv in robot.levels():
             print(f"{lv.level:13} {lv.title:13} {', '.join(map(str, sorted(lv.years)))}")
+    elif a.cmd == "pages":
+        from sqlalchemy import select
+        from .models import Program, now
+        from .robot import page as pagebuilder
+        with db.Session() as ses:
+            progs = ses.scalars(select(Program).where(Program.page.is_not(None))).all()
+            for prog in progs:
+                prog.page = pagebuilder.build(ses, prog)
+                prog.page_updated_at = now()
+            ses.commit()
+        print(f"Страниц ОП пересобрано: {len(progs)}")
     elif a.cmd == "programs":
         for b in robot.programs(a.level, a.year):
             print(f"{b.key:40} {b.code} {b.title} — документов: {len(b.docs)}")

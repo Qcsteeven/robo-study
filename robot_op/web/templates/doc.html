@@ -11,7 +11,7 @@
     <section class="app-section" aria-labelledby="h-sum">
       <h2 class="section-title" id="h-sum">Кратко</h2>
       <p class="app-prose" style="margin-top:0">{{ final.summary }}</p>
-      <p class="app-llm-note">Сформировано LLM ({{ final.summary_model }}) по первичному JSON-файлу и носит вспомогательный характер.</p>
+      <p class="app-llm-note">Сформировано LLM ({{ final.summary_model }}) по сведениям из документа и носит вспомогательный характер.</p>
     </section>
     {%- endif %}
 
@@ -47,26 +47,6 @@
     <section class="app-section"><p><a class="ir-link" href="/op/{{ program.id }}#kug">График учебного процесса на странице ОП</a> — курсов: {{ d.courses | length }}.</p></section>
     {%- endif %}
 
-    <section class="app-section" id="versions" aria-labelledby="h-ver">
-      <h2 class="section-title" id="h-ver">История версий JSON-файлов</h2>
-      {%- if versions %}
-      <div class="ir-table-wrap">
-        <table class="ir-table app-table-compact">
-          <thead><tr><th scope="col">Файл</th><th scope="col" class="ir-num">Версия</th><th scope="col">Дата</th><th scope="col" class="ir-num">Запуск</th><th scope="col">Скачать</th></tr></thead>
-          <tbody>
-            {%- for v in versions %}
-            <tr><td>{{ 'Итоговый' if v.kind == 'final' else 'Первичный' }}</td><td class="ir-num">{{ v.version }}</td>
-              <td class="app-nowrap">{{ v.created_at.strftime('%d.%m.%Y, %H:%M') }}</td>
-              <td class="ir-num">{% if v.run_id %}<a class="ir-link" href="/reports/{{ v.run_id }}">{{ v.run_id }}</a>{% endif %}</td>
-              <td><a class="ir-link" href="/api/documents/{{ doc.id }}/json?kind={{ v.kind }}&amp;version={{ v.version }}">JSON</a></td></tr>
-            {%- endfor %}
-          </tbody>
-        </table>
-      </div>
-      {%- else %}
-      {{ ui.empty('JSON-файлы ещё не сформированы.') }}
-      {%- endif %}
-    </section>
   </div>
   <aside class="app-aside">
     {{ ui.info_block([

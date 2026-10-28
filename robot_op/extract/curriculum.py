@@ -2,10 +2,11 @@
 from __future__ import annotations
 
 import re
+from collections import Counter
 from dataclasses import dataclass, field
 
 from . import pdf as pdfmod
-from .grid import Grid, Row, assign_words, binarize, detect_grid
+from .grid import FineRaster, Grid, Row, assign_words, binarize, detect_grid, rotate, skew_angle
 from .ocr import OcrConfig, ocr_cells, ocr_single
 from .util import clean_text, fix_index, norm, semesters_from_code, to_int
 
@@ -21,7 +22,7 @@ FIXED = {
     "ze": r"^факт|^з\.?\s*е",
     "plan": r"^по\s*план",
     "kont": r"^конт\w*\.?\s*раб",
-    "aud": r"^ауд",
+    "aud": r"^ау[да]",                   # «Ауд.» на скане читается и как «Aya.»
     "control": r"^конт\w*\s*роль|^контроль",
     "sr": r"^ср$|^срс$|^сам",
 }
@@ -50,9 +51,9 @@ def find_layout(grid: Grid) -> Layout:
             t = norm(c.text)
             if not t:
                 continue
-            m = SEM_RE.search(t)
-            if m:
-                sem_spans.append((int(m.group(1)), int(m.group(2)), c.col0, c.col1))
+            sem = _semester(t)
+            if sem and c.col1 > c.col0:
+                sem_spans.append((*sem, c.col0, c.col1))
                 last_header = max(last_header, ri)
                 continue
             if c.col0 != c.col1 and not t.startswith(("курс", "форма", "итого")):
@@ -67,6 +68,7 @@ def find_layout(grid: Grid) -> Layout:
                 break
     if "name" not in lay.cols:
         raise NoTable("Не найдена колонка «Наименование»")
+    sem_spans = _renumber(sem_spans)
     for num, weeks, a, b in sem_spans:
         cols: dict[str, int] = {}
         for ri, row in enumerate(grid.rows[:last_header + 2]):
@@ -91,12 +93,45 @@ def find_layout(grid: Grid) -> Layout:
     return lay
 
 
-def ocr_grid(arr, grid: Grid, cfg: OcrConfig) -> None:
-    """OCR в два прохода: шапка и объединённые ячейки — текстом; затем колонки по их смыслу."""
+def _semester(t: str) -> tuple[int, int] | None:
+    """«Семестр 3 [16 нед]» → (3, 16). Подпись мелкая, OCR путает в ней буквы («Cemectn», «Семесто»)
+    и читает скобку как единицу («Семестр 6116 нед»), поэтому слово узнаётся по форме, а числа — по смыслу."""
+    m = SEM_RE.search(t)
+    if m:
+        return int(m.group(1)), int(m.group(2))
+    m = re.match(r"^[сc5][^\s\d]{4,8}\s*(.*)$", t)
+    if not m:
+        return None
+    nums = re.findall(r"\d+", m.group(1))
+    if len(nums) >= 2:
+        num, weeks = int(nums[0]), int(nums[1][-2:])
+    elif nums and len(nums[0]) >= 3:
+        num, weeks = int(nums[0][0]), int(nums[0][-2:])
+    else:
+        return None
+    return (num, weeks) if 1 <= num <= 12 and 1 <= weeks <= 30 else None
+
+
+def _renumber(spans: list[tuple[int, int, int, int]]) -> list[tuple[int, int, int, int]]:
+    """Семестры идут слева направо подряд: номер, прочитанный с ошибкой, восстанавливается по порядку."""
+    spans = sorted(spans, key=lambda s: s[2])
+    if not spans:
+        return spans
+    start = Counter(num - i for i, (num, *_rest) in enumerate(spans)).most_common(1)[0][0]
+    return [(start + i, weeks, a, b) for i, (_, weeks, a, b) in enumerate(spans)]
+
+
+def ocr_grid(arr, grid: Grid, cfg: OcrConfig, fine: FineRaster | None = None) -> None:
+    """OCR в два прохода: шапка и объединённые ячейки — текстом; затем колонки по их смыслу.
+    Если есть подробный растр, ячейки читаются по нему, а сетка ищется по обычному."""
     dark = binarize(arr)
     inset = grid.line_px + 1
     head = [c for ri, r in enumerate(grid.rows) for c in r.cells if ri < 6 or c.col1 > c.col0]
-    for c, t in zip(head, ocr_cells(arr, [c.box for c in head], cfg, "text", inset, dark)):
+    if fine is not None:
+        texts = ocr_cells(fine.arr, [fine.box(c.box) for c in head], cfg, "text", inset * fine.k, fine.dark)
+    else:
+        texts = ocr_cells(arr, [c.box for c in head], cfg, "text", inset, dark)
+    for c, t in zip(head, texts):
         c.text = t
     try:
         lay = find_layout(grid)
@@ -114,39 +149,60 @@ def ocr_grid(arr, grid: Grid, cfg: OcrConfig) -> None:
             else:
                 groups["digits"].append(c)
     for mode, cells in groups.items():
-        for c, t in zip(cells, ocr_cells(arr, [c.box for c in cells], cfg, mode, inset, dark)):
+        if fine is not None:
+            # при 300 dpi Tesseract заметно чаще теряет цифры, чем по родному разрешению скана
+            texts = ocr_cells(fine.arr, [fine.box(c.box) for c in cells], cfg, mode, inset * fine.k, fine.dark)
+        else:
+            texts = ocr_cells(arr, [c.box for c in cells], cfg, mode, inset, dark)
+        for c, t in zip(cells, texts):
             c.text = t
 
 
-def read_pages(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> list[tuple[Grid, object]]:
+def read_pages(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> list[tuple[Grid, object, FineRaster | None]]:
     pages = []
     for i in range(pdfmod.page_count(data)):
         arr = pdfmod.render_page(data, i, dpi)
+        angle = skew_angle(arr) if scanned else 0.0
+        arr = rotate(arr, angle)
         grid = detect_grid(arr)
         if grid is None:
             continue
+        fine = FineRaster.for_scan(data, i, dpi, angle) if scanned else None
         if scanned:
-            ocr_grid(arr, grid, cfg)
+            ocr_grid(arr, grid, cfg, fine)
         else:
             assign_words(grid, pdfmod.page_words(data, i, dpi / 72))
-        pages.append((grid, arr))
+        pages.append((grid, arr, fine))
     return pages
 
 
-def recheck_rows(arr, grid: Grid, lay: Layout, items: list[dict], cfg: OcrConfig) -> int:
-    """Строки скана, не прошедшие проверку сумм, перечитываются с увеличением; новое чтение принимается,
-    только если с ним проверка проходит лучше. Возвращает число исправленных строк."""
+def recheck_rows(arr, grid: Grid, lay: Layout, items: list[dict], cfg: OcrConfig, fine: FineRaster | None = None) -> int:
+    """Строки скана, не прошедшие проверку сумм, перечитываются; новое чтение принимается, только если
+    с ним проверка проходит лучше. Возвращает число исправленных строк.
+
+    Tesseract на мелких ячейках иногда теряет цифру («54» → «4»), причём при разных увеличениях — в разных
+    ячейках. Поэтому каждая ячейка читается несколько раз, и побеждает самое частое чтение, при равенстве —
+    самое длинное (лишнюю цифру OCR добавляет реже, чем теряет)."""
     validate(items)
     fixed = 0
     dark = binarize(arr)
+    inset = grid.line_px + 1
     for item in items:
+        if not INDEX_RE.match(item["index"]):
+            _reread_index(arr, dark, grid, lay, item, cfg, fine)
         if not item["checks"]:
             continue
         row = grid.rows[item["_ri"]]
         before = {id(c): c.text for c in row.cells}
         for c in row.cells:
-            if c.col0 == c.col1 and c.col0 not in (lay.cols.get("index"), lay.cols["name"]) and c.text.strip():
-                c.text = ocr_single(arr, c.box, cfg, "digits", grid.line_px + 1, dark, scale=2.0) or c.text
+            if c.col0 == c.col1 and c.col0 not in (lay.cols.get("index"), lay.cols["name"]) and before[id(c)].strip():
+                if fine is not None:
+                    reads = [before[id(c)]] + [ocr_single(fine.arr, fine.box(c.box), cfg, "digits", inset * fine.k,
+                                                          fine.dark, scale=k) for k in (1.0, 1.5, 0.75)]
+                else:
+                    reads = [before[id(c)]] + [ocr_single(arr, c.box, cfg, "digits", inset, dark, scale=k)
+                                               for k in (1.0, 2.0, 3.0)]
+                c.text = _vote(reads) or before[id(c)]
         new = _parse_row(row, lay, item["block"], item["part"])
         new["_ri"] = item["_ri"]
         validate([new])
@@ -157,6 +213,34 @@ def recheck_rows(arr, grid: Grid, lay: Layout, items: list[dict], cfg: OcrConfig
             for c in row.cells:
                 c.text = before[id(c)]
     return fixed
+
+
+INDEX_RE = re.compile(r"^(Б\d(\.([А-Я]{1,2}|\d\d))+(\([А-Яа-я]{1,2}\))?|ФТД\.\d\d)$")
+
+
+def _reread_index(arr, dark, grid: Grid, lay: Layout, item: dict, cfg: OcrConfig, fine: FineRaster | None) -> None:
+    """Индекс, не похожий ни на один допустимый («Б2.В.0П)» вместо «Б2.В.01(П)»), перечитывается по одной
+    ячейке; принимается первое чтение допустимого вида."""
+    c = grid.rows[item["_ri"]].cell_at(lay.cols["index"]) if "index" in lay.cols else None
+    if c is None:
+        return
+    inset = grid.line_px + 1
+    for k in (1.0, 2.0, 3.0):
+        if fine is not None:
+            text = ocr_single(fine.arr, fine.box(c.box), cfg, "index", inset * fine.k, fine.dark, scale=k)
+        else:
+            text = ocr_single(arr, c.box, cfg, "index", inset, dark, scale=k)
+        index = fix_index(text)
+        if INDEX_RE.match(index):
+            c.text, item["index"] = text, index
+            return
+
+
+def _vote(reads: list[str]) -> str:
+    counts = Counter(r.strip() for r in reads if r and r.strip())
+    if not counts:
+        return ""
+    return max(counts, key=lambda r: (counts[r], len(r)))
 
 
 # ---------------------------------------------------------------- разбор строк
@@ -180,6 +264,8 @@ def parse_grid(grid: Grid, lay: Layout) -> list[dict]:
         text = clean_text(name_cell.text)
         if not text:
             continue
+        if norm(text).startswith("итого"):
+            break               # под таблицей — итоги и недельная нагрузка, это не дисциплины
         if merged:
             # строка-заголовок: «Блок 1. Дисциплины (модули)», «Обязательная часть», «Часть, формируемая…»
             if norm(text).startswith("блок"):
@@ -246,25 +332,33 @@ def validate(rows: list[dict]) -> list[str]:
     """Совпадение итоговых часов с суммой часов по семестрам и видам занятий. Документы между собой не сверяются."""
     messages = []
     indexes = [r["index"] for r in rows]
+    # строки без з.е.: элективные курсы по физической культуре в з.е. не входят (часы не кратны 36)
+    no_ze = {r["index"] for r in rows if r["index"] and not r.get("ze")}
     for r in rows:
         r["is_module"] = bool(r["index"]) and any(i != r["index"] and i.startswith(r["index"] + ".") for i in indexes)
         problems = []
         h = r["hours"]
         sems = r["semesters"].values()
-        aud_sum = sum(s.get("lec", 0) + s.get("lab", 0) + s.get("pr", 0) + s.get("eios", 0) for s in sems)
+        # «Ауд.» — лекции, лабораторные и практические; работа в ЭИОС входит в «Конт. раб.», но не в «Ауд.»
+        aud_sum = sum(s.get("lec", 0) + s.get("lab", 0) + s.get("pr", 0) for s in sems)
+        eios_sum = sum(s.get("eios", 0) for s in sems)
         sr_sum = sum(s.get("sr", 0) for s in sems)
         if r["semesters"]:
-            if h.get("aud") and aud_sum != h["aud"]:
+            if h.get("aud") and h["aud"] not in (aud_sum, aud_sum + eios_sum):
                 problems.append(f"«Ауд.» {h['aud']} ≠ сумме по семестрам {aud_sum}")
+            if eios_sum and h.get("kont") and h.get("aud") and h["kont"] != h["aud"] + eios_sum:
+                problems.append(f"«Конт. раб.» {h['kont']} ≠ «Ауд.» {h['aud']} + ЭИОС {eios_sum}")
             if h.get("sr") and sr_sum and sr_sum != h["sr"]:
                 problems.append(f"«СР» {h['sr']} ≠ сумме по семестрам {sr_sum}")
         if h.get("plan"):
             parts = (h.get("kont") or h.get("aud") or 0) + (h.get("sr") or 0) + (h.get("control") or 0)
             if parts and parts != h["plan"]:
                 problems.append(f"«По плану» {h['plan']} ≠ конт. раб. + СР + контроль = {parts}")
+            has_free_child = r["is_module"] and any(i.startswith(r["index"] + ".") for i in no_ze)
             if not r.get("ze"):
-                problems.append("не распознано число з.е.")
-            elif r["ze"] * 36 != h["plan"]:
+                if h["plan"] % 36 == 0:
+                    problems.append("не распознано число з.е.")
+            elif r["ze"] * 36 != h["plan"] and not has_free_child:
                 problems.append(f"з.е. {r['ze']} × 36 ≠ «По плану» {h['plan']}")
         if not r["name"] or len(r["name"]) < 3:
             problems.append("не распознано наименование")
@@ -278,14 +372,21 @@ def extract(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> dict:
     pages = []
     title = ""
     rechecked = 0
-    for grid, arr in read_pages(data, scanned, cfg, dpi):
+    prev: tuple[int, Layout] | None = None
+    for grid, arr, fine in read_pages(data, scanned, cfg, dpi):
         try:
             lay = find_layout(grid)
         except NoTable:
             continue
+        # шапка на всех страницах плана одна: колонку, подпись которой на этой странице не прочиталась,
+        # берём с предыдущей страницы, если сетка та же
+        if prev is not None and prev[0] == len(grid.columns):
+            for key, col in prev[1].cols.items():
+                lay.cols.setdefault(key, col)
+        prev = (len(grid.columns), lay)
         items = parse_grid(grid, lay)
         if scanned:
-            rechecked += recheck_rows(arr, grid, lay, items, cfg)
+            rechecked += recheck_rows(arr, grid, lay, items, cfg, fine)
         pages.append((lay, items))
     if not pages:
         raise NoTable("Таблица учебного плана не найдена")

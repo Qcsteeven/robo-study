@@ -68,7 +68,16 @@
 
     <section class="app-section" id="up" aria-labelledby="h-up">
       <h2 class="section-title" id="h-up">Учебный план</h2>
+      {%- if plan %}
+      <h3 class="card-title app-subhead app-subhead--first">По курсам</h3>
+      <p class="app-lead">Что изучают в каждом семестре. Цвет — категория дисциплины, справа — форма контроля; название ведёт на страницу рабочей программы.</p>
+      {{ ui.plan_carousel(plan) }}
+      <h3 class="card-title app-subhead">Из чего состоит программа</h3>
+      <p class="app-lead">Доля категорий в объёме программы ({{ plan.total_ze }} з. е. без факультативов). Категории робот определяет по названиям дисциплин.</p>
+      {{ ui.plan_shelves(plan) }}
+      {%- endif %}
       {%- if curriculum %}
+      {%- if plan %}<h3 class="card-title app-subhead">Нагрузка в парах в неделю</h3>{% endif %}
       <p class="app-lead">Аудиторная нагрузка в парах в неделю: Лек — лекции, Лаб — лабораторные, Пр — практические занятия; «Контр.» — форма контроля. Пары в неделю = часы за семестр ÷ 2 ÷ число учебных недель; часы видны в подсказке ячейки. Таблица прокручивается по горизонтали, колонка дисциплин остаётся на месте.</p>
       {{ ui.curriculum_matrix(curriculum) }}
       {%- if up_checks %}
@@ -211,6 +220,56 @@
       entries.forEach(function (e) { if (e.isIntersecting) activate(e.target.id); });
     }, { rootMargin: '-20% 0px -70% 0px' });
     Object.keys(byId).forEach(function (id) { var el = document.getElementById(id); if (el) obs.observe(el); });
+  })();
+
+  // Карусель курсов: переключатель «N курс», стрелки, клавиши ← →; без скрипта остаётся прокрутка
+  (function () {
+    var root = document.querySelector('[data-carousel]');
+    if (!root) return;
+    var track = root.querySelector('[data-track]');
+    var slides = Array.prototype.slice.call(track.children);
+    var tabs = Array.prototype.slice.call(root.querySelectorAll('[data-go]'));
+    var bar = root.querySelector('[data-carousel-bar]');
+    var current = 0;
+    bar.hidden = false;
+    function show(i, smooth) {
+      current = Math.max(0, Math.min(slides.length - 1, i));
+      track.scrollTo({ left: slides[current].offsetLeft - track.offsetLeft, behavior: smooth === false ? 'auto' : 'smooth' });
+      mark();
+    }
+    function mark() {
+      tabs.forEach(function (t, k) { if (k === current) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
+      root.querySelector('[data-prev]').disabled = current === 0;
+      root.querySelector('[data-next]').disabled = current === slides.length - 1;
+    }
+    tabs.forEach(function (t) { t.addEventListener('click', function () { show(+t.dataset.go); }); });
+    root.querySelector('[data-prev]').addEventListener('click', function () { show(current - 1); });
+    root.querySelector('[data-next]').addEventListener('click', function () { show(current + 1); });
+    track.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(current - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(current + 1); }
+    });
+    var timer;
+    track.addEventListener('scroll', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        var i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+        if (i !== current) { current = i; mark(); }
+      }, 80);
+    });
+    mark();
+
+    // фильтр категорий: скрывает дисциплины выключенных категорий во всех семестрах
+    var filter = document.querySelector('[data-catfilter]');
+    if (!filter) return;
+    filter.hidden = false;
+    filter.querySelectorAll('[data-cat]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var on = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        root.querySelectorAll('.app-chip[data-cat="' + b.dataset.cat + '"]').forEach(function (c) { c.hidden = !on; });
+      });
+    });
   })();
 </script>
 {% endblock %}

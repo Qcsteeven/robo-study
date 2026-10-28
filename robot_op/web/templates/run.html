@@ -65,12 +65,6 @@
       <a class="ir-btn ir-btn--outline app-aside__btn" href="/reports/{{ active.run.id }}">Ход запуска</a>
     </section>
     {%- endif %}
-    {{ ui.info_block([
-        {'label': 'Сайт', 'value': site_host},
-        {'label': 'OCR', 'value': ocr_info},
-        {'label': 'LLM', 'value': llm_info},
-        {'label': 'Запросов к сайту', 'value': rps}],
-        title='Настройки робота', variant='navy') }}
     {%- if recent %}
     <section>
       <h2 class="card-title" style="margin:0 0 var(--space-12)">Последние запуски</h2>

@@ -75,5 +75,19 @@ def render_page(data: bytes, index: int, dpi: int = 300) -> np.ndarray:
     return np.asarray(img)
 
 
+def scan_dpi(data: bytes, index: int) -> float:
+    """Разрешение самого подробного встроенного изображения страницы (0 — изображений нет)."""
+    pdf = pdfium.PdfDocument(data)
+    try:
+        page = pdf[index]
+        side_in = max(page.get_size()) / 72
+        best = 0.0
+        for obj in page.get_objects(filter=[pdfium.raw.FPDF_PAGEOBJ_IMAGE]):
+            best = max(best, max(obj.get_px_size()) / side_in)
+        return best
+    finally:
+        pdf.close()
+
+
 def to_image(arr: np.ndarray) -> Image.Image:
     return Image.fromarray(arr)

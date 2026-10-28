@@ -90,6 +90,84 @@
 </div>
 {%- endmacro %}
 
+{#- Дисциплины по курсам: слайд на курс, в нём два семестра. Без скриптов — горизонтальная прокрутка
+    с прилипанием к слайду; скрипт страницы добавляет переключатель курсов, стрелки и фильтр категорий -#}
+{% macro plan_carousel(plan) -%}
+<div class="app-catfilter" data-catfilter hidden>
+  <span class="app-catfilter__label">Показать:</span>
+  {%- for c in plan.categories %}
+  <button type="button" class="app-catbtn app-cat--{{ c.key }}" data-cat="{{ c.key }}" aria-pressed="true"><span class="app-cat__mark" aria-hidden="true"></span>{{ c.title }}</button>
+  {%- endfor %}
+</div>
+<div class="app-carousel" data-carousel role="region" aria-roledescription="карусель" aria-label="Дисциплины по курсам">
+  <div class="app-carousel__bar" data-carousel-bar hidden>
+    <button type="button" class="app-carousel__arrow" data-prev aria-label="Предыдущий курс">&#8592;</button>
+    <div class="app-carousel__tabs">
+      {%- for c in plan.courses %}
+      <button type="button" class="app-carousel__tab" data-go="{{ loop.index0 }}"{% if loop.first %} aria-current="true"{% endif %}>{{ c.number }} курс</button>
+      {%- endfor %}
+    </div>
+    <button type="button" class="app-carousel__arrow" data-next aria-label="Следующий курс">&#8594;</button>
+  </div>
+  <div class="app-carousel__track app-scroll" data-track tabindex="0">
+    {%- for c in plan.courses %}
+    <section class="app-carousel__slide" role="group" aria-roledescription="слайд" aria-label="{{ c.number }} курс из {{ plan.courses | length }}">
+      <div class="app-course__head">
+        <h4 class="item-title app-course__title">{{ c.number }} курс</h4>
+        <span class="app-course__meta">{{ c.count }} дисциплин{{ c.count | plural('а', 'ы', '') }} · {{ c.exams }} экзамен{{ c.exams | plural('', 'а', 'ов') }}</span>
+      </div>
+      <div class="app-course__sems">
+        {%- for s in c.semesters %}
+        <div class="app-sem">
+          <p class="app-sem__title">{{ s.number }} семестр{% if s.weeks %} <span>· {{ s.weeks }} нед.</span>{% endif %}</p>
+          <ul class="app-chips">
+            {%- for d in s['items'] %}
+            <li class="app-chip app-cat--{{ d.category }}" data-cat="{{ d.category }}">
+              <span class="app-cat__mark" aria-hidden="true"></span>
+              {%- if d.url %}<a class="app-chip__name" href="{{ d.url }}">{{ d.name }}</a>{% else %}<span class="app-chip__name">{{ d.name }}</span>{% endif %}
+              {%- if d.optional %}<span class="app-chip__tag">факультатив</span>{% endif %}
+              {%- if d.control %}<span class="app-chip__ctl">{{ d.control }}</span>{% endif %}
+            </li>
+            {%- endfor %}
+          </ul>
+        </div>
+        {%- endfor %}
+      </div>
+    </section>
+    {%- endfor %}
+  </div>
+</div>
+{%- endmacro %}
+
+{#- Из чего состоит программа: доля категорий в з. е. и раскрывающиеся полки с дисциплинами -#}
+{% macro plan_shelves(plan) -%}
+<div class="app-shares" role="img" aria-label="Доля категорий в объёме программы: {% for sh in plan.shelves %}{{ sh.title }} — {{ sh.share }}%{% if not loop.last %}, {% endif %}{% endfor %}">
+  {%- for sh in plan.shelves if sh.share %}
+  <span class="app-shares__part app-cat--{{ sh.key }}" style="flex-grow: {{ sh.ze }}" title="{{ sh.title }}: {{ sh.ze }} з. е."></span>
+  {%- endfor %}
+</div>
+<div class="app-shelves">
+  {%- for sh in plan.shelves %}
+  <details class="app-shelf app-cat--{{ sh.key }}"{% if loop.first %} open{% endif %}>
+    <summary class="app-shelf__head">
+      <span class="app-shelf__mark" aria-hidden="true">{{ sh.short }}</span>
+      <span class="app-shelf__title">{{ sh.title }}</span>
+      <span class="app-shelf__meta">{{ sh.count }} дисциплин{{ sh.count | plural('а', 'ы', '') }} · {{ sh.ze }} з. е.</span>
+      <span class="app-shelf__share">{{ sh.share }}%</span>
+    </summary>
+    <ul class="app-shelf__list">
+      {%- for d in sh['items'] %}
+      <li>
+        {%- if d.url %}<a class="ir-link" href="{{ d.url }}">{{ d.name }}</a>{% else %}<span>{{ d.name }}</span>{% endif %}
+        <span class="app-shelf__item-meta">{{ d.semesters }} сем.{% if d.ze %} · {{ d.ze }} з. е.{% endif %}{% if d.control %} · {{ d.control }}{% endif %}{% if d.optional %} · факультатив{% endif %}</span>
+      </li>
+      {%- endfor %}
+    </ul>
+  </details>
+  {%- endfor %}
+</div>
+{%- endmacro %}
+
 {#- Учебный план «дисциплины × семестры» -#}
 {% macro curriculum_matrix(cur, caption=none) -%}
 {%- set sems = cur.semesters -%}
@@ -125,7 +203,7 @@
 {%- endmacro %}
 
 {#- График учебного процесса: курсы × недели учебного года -#}
-{%- set KUG_CLASS = {'Т': 't', 'Э': 'e', 'У': 'u', 'П': 'p', 'Н': 'p', 'Г': 'd', 'Д': 'd', 'К': 'k'} -%}
+{%- set KUG_CLASS = {'Т': 't', 'Э': 'e', 'У': 'u', 'П': 'p', 'Пд': 'p', 'Н': 'p', 'Г': 'd', 'Д': 'd', 'К': 'k'} -%}
 {% macro schedule_grid(kug) -%}
 <div class="ir-table-wrap app-scroll" tabindex="0" role="region" aria-label="График учебного процесса {{ kug.academic_year }}">
   <table class="app-kug">
@@ -159,7 +237,6 @@
     {%- if d.note %}<span class="app-doc__note">{{ d.note }}</span>{% endif %}
   </span>
   <span class="app-doc__status">{{ status(d.status) }}</span>
-  <a class="app-doc__json ir-link" href="{{ d.json_url }}">JSON</a>
 </li>
 {%- endmacro %}
 

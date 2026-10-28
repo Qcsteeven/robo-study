@@ -26,7 +26,7 @@ class SiteSettings:
     op_list_url_template: str = ""
     https_only: bool = True
     allow_http_hosts: list[str] = field(default_factory=lambda: ["127.0.0.1", "localhost"])
-    allowed_hosts: list[str] = field(default_factory=lambda: ["www.istu.edu", "istu.edu"])
+    allowed_hosts: list[str] = field(default_factory=lambda: ["www.istu.edu", "istu.edu", "int.istu.edu", "app.istu.edu"])
     requests_per_second: float = 2.0
     retries: int = 4
     backoff_base: float = 2.0

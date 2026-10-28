@@ -33,6 +33,16 @@ def duration(seconds: float | None) -> str:
     return f"{s // 3600} ч {s % 3600 // 60:02d} мин"
 
 
+def plural(n: int, one: str, few: str, many: str) -> str:
+    """Окончание по числу: 1 дисциплинА, 2 дисциплинЫ, 5 дисциплин."""
+    n = abs(int(n or 0))
+    if n % 10 == 1 and n % 100 != 11:
+        return one
+    if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
+        return few
+    return many
+
+
 def create_app(settings: Settings | None = None, transport: httpx.BaseTransport | None = None,
                llm_transport: httpx.BaseTransport | None = None, start_worker: bool = True) -> FastAPI:
     settings = settings or get_settings()
@@ -56,6 +66,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
     app.state.settings, app.state.db, app.state.robot, app.state.worker = settings, db, robot, worker
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
     templates = Jinja2Templates(directory=HERE / "templates")
+    templates.env.filters["plural"] = plural
     if settings.app.demo:
         from demo_site.site import router as demo_router
         app.include_router(demo_router())
@@ -116,9 +127,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
         return render(request, "run.html", page_title="Запуск робота", crumbs=crumbs(("Запуск робота", None)),
                       active_nav="run", levels=levels, level=level if lv else "", years=years,
                       year=year, programs=programs, selected=[], site_error=site_error, message=message,
-                      active=active, recent=recent, site_host=urlparse(settings.site.base_url).hostname,
-                      ocr_info=f"Tesseract, {settings.ocr.lang}, {settings.ocr.dpi} dpi", llm_info=robot.llm.describe(),
-                      rps=f"не более {settings.site.requests_per_second:g} в секунду")
+                      active=active, recent=recent)
 
     @app.post("/run", include_in_schema=False)
     def start_run(level: str = Form(...), year: int = Form(...), programs: list[str] = Form(default=[]),
@@ -251,13 +260,11 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                 return not_found(request, "Документ не найден.")
             prog = ses.get(Program, program_id)
             final = latest_final(ses, doc_id)
-            versions = ses.scalars(select(JsonVersion).where(JsonVersion.document_id == doc_id)
-                                   .order_by(JsonVersion.kind, JsonVersion.version.desc())).all()
         facts, lists = _doc_facts(doc.doc_type, (final or {}).get("data") or {})
         return render(request, "doc.html", page_title=doc.title,
                       crumbs=crumbs(("Программы", "/programs"), (prog.code, f"/op/{prog.id}"), (DOC_TYPES[doc.doc_type], None)),
                       meta=[DOC_TYPE_TITLES[doc.doc_type], f"{prog.code} {prog.profile}", STATUSES.get(doc.status, ("", doc.status))[1]],
-                      active_nav="programs", doc=doc, program=prog, final=final, versions=versions, facts=facts, lists=lists,
+                      active_nav="programs", doc=doc, program=prog, final=final, facts=facts, lists=lists,
                       type_title=DOC_TYPE_TITLES[doc.doc_type], STATUS_TITLES={k: v[1] for k, v in STATUSES.items()})
 
     @app.get("/documents/{doc_id}/pdf", include_in_schema=False)

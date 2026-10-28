@@ -20,7 +20,7 @@ op_list_url_template = ""
 # Только HTTPS (ТЗ, раздел 7). Исключение — хосты из allow_http_hosts (демо-сайт).
 https_only = true
 allow_http_hosts = ["127.0.0.1", "localhost"]
-allowed_hosts = ["www.istu.edu", "istu.edu"]
+allowed_hosts = ["www.istu.edu", "istu.edu", "int.istu.edu", "app.istu.edu"]
 # Нагрузка на сайт: не более 2 запросов в секунду (ТЗ, раздел 9)
 requests_per_second = 2.0
 # Повторные попытки с возрастающей паузой: 2, 4, 8, 16 с

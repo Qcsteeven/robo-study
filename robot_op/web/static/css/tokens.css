@@ -1,0 +1,111 @@
+/* Робот ОП ИРНИТУ — generated from tokens.json */
+:root, [data-theme="light"] {
+  --brand-blue: #155693;
+  --brand-cyan: #08c0c6;
+  --brand-sky: #619bd1;
+  --navy: #2d3a53;
+  --navy-deep: #16233b;
+  --band-overlay: #00265833;
+  --surface: #ffffff;
+  --surface-alt: #f0f0f0;
+  --line: #cccccc;
+  --line-soft: #e0e0e0;
+  --line-strong: #787878;
+  --ink: #000000;
+  --ink-secondary: #4f4f4f;
+  --ink-muted: #787878;
+  --ink-faint: #999999;
+  --link: #1079a2;
+  --link-hover: #1598cb;
+  --focus-ring: var(--link);
+  --action: var(--brand-blue);
+  --on-action: #ffffff;
+  --activity: #009adb;
+  --card-hover: #8cd5ff;
+  --success: #1f6600;
+  --success-soft: #dff5d6;
+  --warning: #665500;
+  --warning-soft: #f5f0d6;
+  --danger: #660000;
+  --danger-soft: #f5d6d6;
+  --info: #003366;
+  --info-soft: #d6e5f5;
+  --neutral: #252525;
+  --neutral-soft: #e3e3e3;
+  --tag-cyan: #00ddff;
+  --tag-green: #00c26f;
+  --tag-lilac: #99aaff;
+  --tag-blue: #0065c4;
+  --tag-red: #ff0000;
+  --on-tag-dark: #000000;
+  --on-tag-light: #ffffff;
+}
+[data-theme="dark"] {
+  --brand-blue: #155693;
+  --brand-cyan: #08c0c6;
+  --brand-sky: #619bd1;
+  --navy: #2d3a53;
+  --navy-deep: #16233b;
+  --band-overlay: #00265833;
+  --surface: #16233b;
+  --surface-alt: #2d3a53;
+  --line: #ffffff4d;
+  --line-soft: #2d3a53;
+  --line-strong: #8aabcb;
+  --ink: #ffffff;
+  --ink-secondary: #8aabcb;
+  --ink-muted: #8aabcb;
+  --ink-faint: #8aabcb;
+  --link: #51c3f0;
+  --link-hover: #ffffff;
+  --focus-ring: var(--link);
+  --action: var(--brand-cyan);
+  --on-action: #16233b;
+  --activity: #009adb;
+  --card-hover: #51c3f0;
+  --success: #dff5d6;
+  --success-soft: #1f6600;
+  --warning: #f5f0d6;
+  --warning-soft: #665500;
+  --danger: #f5d6d6;
+  --danger-soft: #660000;
+  --info: #d6e5f5;
+  --info-soft: #003366;
+  --neutral: #e3e3e3;
+  --neutral-soft: #252525;
+}
+:root {
+  --space-6: 6px;
+  --space-9: 9px;
+  --space-12: 12px;
+  --space-18: 18px;
+  --space-20: 20px;
+  --space-36: 36px;
+  --space-72: 72px;
+  --radius-btn: 4px;
+  --radius-field: 0.45em;
+  --radius-tag: 9px;
+  --radius-card: 10px;
+  --radius-pill: 2em;
+  --stroke-hairline: 1px;
+  --stroke-rail: 3px;
+  --size-rail: 50px;
+  --size-card-min: 350px;
+  --size-form-max: 350px;
+  --size-title-max: 1000px;
+  --font-sans: GolosText, "Golos Text", "Segoe UI", sans-serif;
+}
+@font-face { font-family: 'GolosText'; src: url('../fonts/GolosText-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'GolosText'; src: url('../fonts/GolosText-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+.page-title { font-family: var(--font-sans); font-size: 40px; line-height: 1.2; font-weight: 700; }
+.section-title { font-family: var(--font-sans); font-size: 36px; line-height: 1.2; font-weight: 700; }
+.card-title { font-family: var(--font-sans); font-size: 23.4px; line-height: 1.25; font-weight: 700; }
+.item-title { font-family: var(--font-sans); font-size: 21.6px; line-height: 1.25; font-weight: 700; }
+.body { font-family: var(--font-sans); font-size: 18px; line-height: 27px; font-weight: 400; }
+.body-strong { font-family: var(--font-sans); font-size: 18px; line-height: 27px; font-weight: 700; }
+.label { font-family: var(--font-sans); font-size: 15.84px; line-height: 1.3; font-weight: 400; }
+.small { font-family: var(--font-sans); font-size: 14.4px; line-height: 21.6px; font-weight: 400; }
+.caption { font-family: var(--font-sans); font-size: 12.6px; line-height: 1.25; font-weight: 400; }
+.table-head { font-family: var(--font-sans); font-size: 16.2px; line-height: 1.42857; font-weight: 700; }
+.table-cell { font-family: var(--font-sans); font-size: 18px; line-height: 1.42857; font-weight: 400; }
+.table-dense { font-family: var(--font-sans); font-size: 14.4px; line-height: 1.42857; font-weight: 400; }

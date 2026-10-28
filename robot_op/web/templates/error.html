@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="app-page app-page--wide">
+  <div class="app-content">
+    {% call ui.alert('warning', page_title) %}<p>{{ message }}</p>{% endcall %}
+    <p><a class="ir-link" href="/">На главную</a></p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+{%- set d = final.data if final and final.data else {} -%}
+{% block content %}
+<div class="app-page">
+  <div class="app-content">
+    {%- if doc.status in ('needs_review', 'partial', 'unknown_template', 'error', 'skipped') %}
+    {% call ui.alert('danger' if doc.status == 'error' else 'warning', STATUS_TITLES.get(doc.status, doc.status)) %}<p>{{ doc.note }}</p>{% endcall %}
+    {%- endif %}
+
+    {%- if final and final.summary %}
+    <section class="app-section" aria-labelledby="h-sum">
+      <h2 class="section-title" id="h-sum">Кратко</h2>
+      <p class="app-prose" style="margin-top:0">{{ final.summary }}</p>
+      <p class="app-llm-note">Сформировано LLM ({{ final.summary_model }}) по первичному JSON-файлу и носит вспомогательный характер.</p>
+    </section>
+    {%- endif %}
+
+    {%- if facts %}
+    <section class="app-section" aria-labelledby="h-facts">
+      <h2 class="section-title" id="h-facts">Сведения</h2>
+      <dl class="app-kv">{% for k, v in facts %}<dt>{{ k }}</dt><dd>{{ v }}</dd>{% endfor %}</dl>
+    </section>
+    {%- endif %}
+
+    {%- for title, items in lists %}{% if items %}
+    <section class="app-section">
+      <h2 class="card-title" style="margin:0 0 var(--space-12)">{{ title }}</h2>
+      <ul class="app-list">{% for it in items %}<li>{{ it }}</li>{% endfor %}</ul>
+    </section>
+    {%- endif %}{% endfor %}
+
+    {%- if d.sections %}
+    <section class="app-section" aria-labelledby="h-sec">
+      <h2 class="section-title" id="h-sec">Разделы документа</h2>
+      {%- for key, s in d.sections.items() %}
+      <details class="app-details"><summary>{{ s.title }}</summary><p class="app-pre">{{ s.text or '—' }}</p></details>
+      {%- endfor %}
+      {%- if d.template and d.template.missing_required %}
+      <p class="app-llm-note">Не найдены разделы: {{ d.template.missing_required | join(', ') }}.</p>
+      {%- endif %}
+    </section>
+    {%- endif %}
+
+    {%- if doc.doc_type == 'up' and d.rows %}
+    <section class="app-section"><p><a class="ir-link" href="/op/{{ program.id }}#up">Учебный план на странице ОП</a> — {{ d.rows | length }} строк, проверку не прошли: {{ d.checks.failed }}.</p></section>
+    {%- elif doc.doc_type == 'kug' and d.courses %}
+    <section class="app-section"><p><a class="ir-link" href="/op/{{ program.id }}#kug">График учебного процесса на странице ОП</a> — курсов: {{ d.courses | length }}.</p></section>
+    {%- endif %}
+
+    <section class="app-section" id="versions" aria-labelledby="h-ver">
+      <h2 class="section-title" id="h-ver">История версий JSON-файлов</h2>
+      {%- if versions %}
+      <div class="ir-table-wrap">
+        <table class="ir-table app-table-compact">
+          <thead><tr><th scope="col">Файл</th><th scope="col" class="ir-num">Версия</th><th scope="col">Дата</th><th scope="col" class="ir-num">Запуск</th><th scope="col">Скачать</th></tr></thead>
+          <tbody>
+            {%- for v in versions %}
+            <tr><td>{{ 'Итоговый' if v.kind == 'final' else 'Первичный' }}</td><td class="ir-num">{{ v.version }}</td>
+              <td class="app-nowrap">{{ v.created_at.strftime('%d.%m.%Y, %H:%M') }}</td>
+              <td class="ir-num">{% if v.run_id %}<a class="ir-link" href="/reports/{{ v.run_id }}">{{ v.run_id }}</a>{% endif %}</td>
+              <td><a class="ir-link" href="/api/documents/{{ doc.id }}/json?kind={{ v.kind }}&amp;version={{ v.version }}">JSON</a></td></tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      {%- else %}
+      {{ ui.empty('JSON-файлы ещё не сформированы.') }}
+      {%- endif %}
+    </section>
+  </div>
+  <aside class="app-aside">
+    {{ ui.info_block([
+        {'label': 'Тип', 'value': type_title},
+        {'label': 'Статус', 'value': STATUS_TITLES.get(doc.status, doc.status)},
+        {'label': 'Способ извлечения', 'value': {'ocr': 'OCR (скан)', 'text': 'Текстовый слой'}.get(doc.method, '—')},
+        {'label': 'Страниц', 'value': final.document.pages if final else '—'},
+        {'label': 'Скачан', 'value': doc.downloaded_at.strftime('%d.%m.%Y, %H:%M') if doc.downloaded_at else '—'}],
+        title='Документ', variant='navy') }}
+    <a class="ir-btn ir-btn--outline app-aside__btn" href="{{ doc.url }}">PDF на сайте ИРНИТУ</a>
+    {%- if doc.file_path %}<a class="ir-btn ir-btn--outline app-aside__btn" href="/documents/{{ doc.id }}/pdf">Копия в хранилище</a>{% endif %}
+    <a class="ir-btn ir-btn--outline app-aside__btn" href="/op/{{ program.id }}">Страница ОП</a>
+  </aside>
+</div>
+{% endblock %}

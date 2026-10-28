@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="app-page">
+  <div class="app-content">
+    {%- if site_error %}
+    {% call ui.alert('danger', 'Сайт ИРНИТУ недоступен') %}
+      <p>{{ site_error }}</p>
+      <p>Проверьте доступ к сайту и адрес в настройках робота (config/robot.toml, раздел [site]).</p>
+    {% endcall %}
+    {%- endif %}
+    {%- if message %}{% call ui.alert('info') %}<p>{{ message }}</p>{% endcall %}{% endif %}
+
+    <section class="app-section" aria-labelledby="h-params">
+      <h2 class="section-title" id="h-params">Параметры запуска</h2>
+      <p class="app-lead">Списки уровней образования и годов набора соответствуют разделу «Образование» сайта ИРНИТУ, список ОП — странице перечня ОП выбранного уровня и года.</p>
+      <form class="app-form" method="post" action="/run" id="run-form">
+        <fieldset class="ir-choices ir-choices--row">
+          <legend class="ir-choices__label">Уровень образования</legend>
+          <div class="ir-choices__list">
+            {%- for lv in levels %}
+            <label class="ir-choice"><input type="radio" name="level" value="{{ lv.level }}" data-nav {% if lv.level == level %}checked{% endif %} required> {{ lv.title }}</label>
+            {%- endfor %}
+          </div>
+        </fieldset>
+        {%- if level %}
+        <fieldset class="ir-choices ir-choices--row">
+          <legend class="ir-choices__label">Год набора</legend>
+          <div class="ir-choices__list">
+            {%- for y in years %}
+            <label class="ir-choice"><input type="radio" name="year" value="{{ y }}" data-nav {% if y == year %}checked{% endif %} required> {{ y }}</label>
+            {%- endfor %}
+          </div>
+        </fieldset>
+        {%- endif %}
+        <noscript><button class="ir-btn" type="submit" formmethod="get" formaction="/run">Показать список ОП</button></noscript>
+        {%- if programs is not none %}
+        <fieldset class="ir-choices ir-choices--scroll app-form__programs">
+          <legend class="ir-choices__label">Образовательные программы ({{ programs | length }})</legend>
+          {%- if programs %}
+          <label class="ir-choice"><input type="checkbox" name="all" value="1" id="all-programs"> <b>Все ОП уровня и года набора</b><span class="ir-choice__meta">{{ programs | sum(attribute='documents') }} док.</span></label>
+          <div class="ir-choices__list">
+            {%- for p in programs %}
+            <label class="ir-choice"><input type="checkbox" name="programs" value="{{ p.key }}" data-program {% if p.key in selected %}checked{% endif %}> <span><span class="app-choice__code">{{ p.code }}</span>{{ p.title }}</span><span class="ir-choice__meta">{{ p.documents }} док.</span></label>
+            {%- endfor %}
+          </div>
+          {%- else %}
+          {{ ui.empty('На странице перечня не найдено ОП.') }}
+          {%- endif %}
+        </fieldset>
+        <label class="ir-choice"><input type="checkbox" name="force" value="1"> Обработать заново и документы, которые не изменились с прошлого запуска</label>
+        <div class="app-form__actions">
+          <button class="ir-btn ir-btn--primary ir-btn--pill" type="submit" {% if not programs %}disabled{% endif %}>Запустить робота</button>
+          <span class="app-form__hint">Средний запуск — одна ОП (60–90 документов, до 20 мин).</span>
+        </div>
+        {%- endif %}
+      </form>
+    </section>
+  </div>
+
+  <aside class="app-aside">
+    {%- if active %}
+    <section class="app-stack">
+      <h2 class="card-title" style="margin:0">Сейчас выполняется</h2>
+      {{ ui.run_progress(active.run, active.counts) }}
+      <a class="ir-btn ir-btn--outline app-aside__btn" href="/reports/{{ active.run.id }}">Ход запуска</a>
+    </section>
+    {%- endif %}
+    {{ ui.info_block([
+        {'label': 'Сайт', 'value': site_host},
+        {'label': 'OCR', 'value': ocr_info},
+        {'label': 'LLM', 'value': llm_info},
+        {'label': 'Запросов к сайту', 'value': rps}],
+        title='Настройки робота', variant='navy') }}
+    {%- if recent %}
+    <section>
+      <h2 class="card-title" style="margin:0 0 var(--space-12)">Последние запуски</h2>
+      <ul class="app-list">{% for r in recent %}<li><a class="ir-link" href="/reports/{{ r.id }}">№ {{ r.id }}</a> · {{ r.params.level_title }} {{ r.params.year }} · {{ ui.run_status(r.status) }}</li>{% endfor %}</ul>
+    </section>
+    {%- endif %}
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  (function () {
+    var form = document.getElementById('run-form');
+    form.querySelectorAll('[data-nav]').forEach(function (el) {
+      el.addEventListener('change', function () {
+        var p = new URLSearchParams();
+        var lv = form.querySelector('input[name=level]:checked');
+        var yr = form.querySelector('input[name=year]:checked');
+        if (lv) p.set('level', lv.value);
+        if (yr && el.name === 'year') p.set('year', yr.value);
+        location.href = '/run?' + p.toString();
+      });
+    });
+    var all = document.getElementById('all-programs');
+    if (all) all.addEventListener('change', function () {
+      form.querySelectorAll('[data-program]').forEach(function (c) { c.checked = all.checked; c.disabled = all.checked; });
+    });
+  })();
+</script>
+{% endblock %}

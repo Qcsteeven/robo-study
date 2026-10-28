@@ -1,0 +1,68 @@
+# Запуск всех компонентов одной командой:
+#   docker compose up -d --build                       — робот + PostgreSQL, http://localhost:8000
+#   docker compose --profile llm up -d --build         — плюс локальная LLM (Ollama)
+#   docker compose --profile https up -d --build       — плюс Nginx с HTTPS (сертификаты в deploy/certs)
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: robot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-robot}
+      POSTGRES_DB: robot
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U robot -d robot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://robot:${POSTGRES_PASSWORD:-robot}@db:5432/robot
+      ROBOT_APP_DATA_DIR: /data
+      ROBOT_APP_DEMO: ${ROBOT_APP_DEMO:-false}
+      ROBOT_LLM_PROVIDER: ${ROBOT_LLM_PROVIDER:-none}
+      ROBOT_LLM_BASE_URL: ${ROBOT_LLM_BASE_URL:-http://ollama:11434}
+      ROBOT_LLM_MODEL: ${ROBOT_LLM_MODEL:-qwen2.5:7b-instruct}
+      ROBOT_LLM_API_KEY: ${ROBOT_LLM_API_KEY:-}
+    volumes:
+      - robot-data:/data
+      - ./config:/app/config:ro
+    ports:
+      - "${ROBOT_PORT:-8000}:8000"
+
+  ollama:
+    image: ollama/ollama:0.5.7
+    profiles: ["llm"]
+    restart: unless-stopped
+    volumes:
+      - ollama:/root/.ollama
+    # GPU: раскомментируйте при наличии NVIDIA Container Toolkit
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{driver: nvidia, count: 1, capabilities: [gpu]}]
+
+  nginx:
+    image: nginx:1.27-alpine
+    profiles: ["https"]
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/certs:/etc/nginx/certs:ro
+
+volumes:
+  pgdata:
+  robot-data:
+  ollama:

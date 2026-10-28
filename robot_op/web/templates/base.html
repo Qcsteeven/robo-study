@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru" data-theme="{{ theme | default('light') }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Робот ОП{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/irnitu.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}">
+</head>
+<body>
+  {%- set nav = [
+    {'key': 'run', 'label': 'Запуск робота', 'href': '/run'},
+    {'key': 'programs', 'label': 'Образовательные программы', 'href': '/programs', 'children': [
+      {'label': 'Бакалавриат', 'href': '/programs?level=bachelor'},
+      {'label': 'Специалитет', 'href': '/programs?level=specialist'},
+      {'label': 'Магистратура', 'href': '/programs?level=master'},
+      {'label': 'СПО', 'href': '/programs?level=spo'},
+      {'label': 'Аспирантура', 'href': '/programs?level=postgraduate'}]},
+    {'key': 'reports', 'label': 'Отчёты о запусках', 'href': '/reports'},
+    {'key': 'log', 'label': 'Журнал', 'href': '/log'}
+  ] %}
+  <div class="app-rail">
+    <div class="ir-rail" id="rail">
+      <div class="ir-rail__buttons">
+        <button type="button" class="ir-rail__btn ir-burger" aria-expanded="false" aria-controls="rail-panel" aria-label="Развернуть меню" data-rail-toggle>
+          <span></span><span></span><span></span><span></span>
+        </button>
+        <a class="ir-rail__btn" href="/programs" aria-label="Образовательные программы" title="Образовательные программы">
+          <img src="{{ url_for('static', path='img/search-white.svg') }}" width="24" alt="">
+        </a>
+      </div>
+      <div class="ir-rail__panel" id="rail-panel" hidden>
+        <div class="ir-rail__header">Робот ОП</div>
+        <nav class="ir-rail__menu" aria-label="Разделы">
+          <ul>
+            {%- for item in nav %}
+            <li{% if item.key == active_nav %} class="is-active"{% endif %}>
+              <a href="{{ item.href }}"{% if item.key == active_nav %} aria-current="page"{% endif %}>{{ item.label }}</a>
+              {%- if item.children %}
+              <ul>
+                {%- for child in item.children %}
+                <li><a href="{{ child.href }}">{{ child.label }}</a></li>
+                {%- endfor %}
+              </ul>
+              {%- endif %}
+            </li>
+            {%- endfor %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    {% block header %}{% endblock %}
+    <main class="app-main" id="main">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="app-footer">
+      <div class="app-footer__inner">
+        <div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+        <div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+          {% block footer_note %}{% endblock %}
+        </div>
+        <div class="app-footer__note">
+          {%- set next = request.url.path ~ ('?' ~ request.url.query if request.url.query else '') %}
+          {% if theme == 'dark' %}<a class="app-theme" href="/theme?mode=light&amp;next={{ next | urlencode }}">Светлая тема</a>{% else %}<a class="app-theme" href="/theme?mode=dark&amp;next={{ next | urlencode }}">Тёмная тема</a>{% endif %}
+          · <a href="/api/docs">API</a>{% if demo %} · <a href="/demo-site/sveden/education/">Демо-сайт</a>{% endif %}
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="app-page app-page--wide">
+  <div class="app-content">
+    <form class="app-filter" method="get" action="/log">
+      <label class="ir-field ir-field--s"><span class="ir-field__label">Запуск</span>
+        <select class="ir-input" name="run"><option value="">Все</option>{% for r in runs %}<option value="{{ r.id }}" {% if r.id == run_id %}selected{% endif %}>№ {{ r.id }} — {{ r.params.level_title }} {{ r.params.year }}</option>{% endfor %}</select></label>
+      <label class="ir-field ir-field--s"><span class="ir-field__label">Уровень</span>
+        <select class="ir-input" name="level"><option value="">Все записи</option>{% for k, v in [('WARNING', 'Предупреждения и ошибки'), ('ERROR', 'Только ошибки')] %}<option value="{{ k }}" {% if k == level %}selected{% endif %}>{{ v }}</option>{% endfor %}</select></label>
+      <button class="ir-btn" type="submit">Показать</button>
+      <span class="app-form__hint">Журнал хранится за {{ keep_runs }} последних запусков. Файл журнала: data/logs/robot.log.</span>
+    </form>
+    {%- if entries %}
+    <div class="ir-table-wrap">
+      <table class="ir-table app-table-compact app-log">
+        <thead><tr><th scope="col">Время</th><th scope="col" class="ir-num">Запуск</th><th scope="col">Уровень</th><th scope="col">ОП / документ</th><th scope="col">Сообщение</th></tr></thead>
+        <tbody>
+          {%- for e in entries %}
+          <tr><td class="app-log__ts">{{ e.ts.strftime('%d.%m %H:%M:%S') }}</td>
+            <td class="ir-num">{% if e.run_id %}<a class="ir-link" href="/reports/{{ e.run_id }}">{{ e.run_id }}</a>{% endif %}</td>
+            <td class="app-log__lvl--{{ e.level }}">{{ {'INFO': 'инфо', 'WARNING': 'предупр.', 'ERROR': 'ошибка'}.get(e.level, e.level) }}</td>
+            <td class="app-small">{% if e.program_id %}<a class="ir-link" href="/op/{{ e.program_id }}">{{ e.program_id }}</a>{% endif %}{% if e.document %}<br>{{ e.document }}{% endif %}</td>
+            <td>{{ e.message }}</td></tr>
+          {%- endfor %}
+        </tbody>
+      </table>
+    </div>
+    {%- if entries | length >= limit %}<p class="app-form__hint">Показаны последние {{ limit }} записей.</p>{% endif %}
+    {%- else %}
+    {{ ui.empty('Записей нет.') }}
+    {%- endif %}
+  </div>
+</div>
+{% endblock %}

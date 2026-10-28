@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% import "ui.html" as ui with context %}
+
+{#-
+  Веб-страница ОП. Контекст формирует робот по итоговым JSON-файлам (robot_op/robot/page.py):
+  op, curriculum, schedule, disciplines, practices, gia, documents, review, errors, last_run.
+-#}
+
+{% block title %}{{ op.code }} {{ op.profile }} — Робот ОП{% endblock %}
+
+{% block header %}
+  {% call ui.page_header(
+      title=op.profile,
+      crumbs=[
+        {'label': 'Робот ОП', 'href': '/'},
+        {'label': 'Программы', 'href': '/programs'},
+        {'label': op.level ~ ', набор ' ~ op.year, 'href': '/programs?level=' ~ op.level_key ~ '&year=' ~ op.year},
+        {'label': op.code}],
+      meta=[op.code ~ ' ' ~ op.direction, op.level, op.form ~ ' форма', 'Набор ' ~ op.year],
+      logo_src=url_for('static', path='img/irnitu-logo-white.svg')) %}
+    <a class="ir-btn ir-btn--pill ir-btn--onband" href="{{ op.source_url }}">Исходные документы на istu.edu</a>
+  {% endcall %}
+{% endblock %}
+
+{% block content %}
+<div class="app-page">
+  <div class="app-content">
+
+    {%- if review %}
+    {% call ui.alert('warning', review | length ~ ' ' ~ ('документ требует' if review | length == 1 else 'документа требуют' if review | length < 5 else 'документов требуют') ~ ' проверки') %}
+      <ul class="app-alert-list">{% for d in review %}<li><a href="{{ d.url }}">{{ d.type }} «{{ d.title }}»</a> — {{ d.note }}</li>{% endfor %}</ul>
+      <p>Сведения из этих документов показаны как есть — сверьте их с <a href="#docs">исходными PDF</a>.</p>
+    {% endcall %}
+    {%- endif %}
+    {%- if errors %}
+    {% call ui.alert('danger', 'Не удалось обработать: ' ~ errors | length) %}
+      <ul class="app-alert-list">{% for d in errors %}<li>{{ d.type }} «{{ d.title }}» — {{ d.note }}</li>{% endfor %}</ul>
+    {% endcall %}
+    {%- endif %}
+
+    <section class="app-section" id="svedeniya" aria-labelledby="h-svedeniya">
+      <h2 class="section-title" id="h-svedeniya">Сведения о программе</h2>
+      {{ ui.info_block([
+          {'label': 'Уровень образования', 'value': op.level},
+          {'label': 'Направление', 'value': op.code ~ ' ' ~ op.direction},
+          {'label': 'Профиль', 'value': op.profile},
+          {'label': 'Квалификация', 'value': op.qualification or '—'},
+          {'label': 'Форма обучения', 'value': op.form},
+          {'label': 'Год набора', 'value': op.year},
+          {'label': 'Срок обучения', 'value': op.duration or '—'}]) }}
+      <h3 class="card-title app-subhead">Краткая характеристика</h3>
+      {%- if op.summary %}
+      <p class="app-prose">{{ op.summary }}</p>
+      <p class="app-llm-note">Сформировано LLM по тексту ООП и носит вспомогательный характер.</p>
+      {%- elif op.characteristic %}
+      <p class="app-prose">{{ op.characteristic }}</p>
+      <p class="app-llm-note">Фрагмент раздела «Общая характеристика» ООП. Краткое описание LLM не сформировано.</p>
+      {%- else %}
+      {{ ui.empty('Характеристика не сформирована: ООП не обработана.') }}
+      {%- endif %}
+      {%- if op.areas or op.task_types %}
+      <div class="app-grid2" style="margin-top: var(--space-18)">
+        {%- if op.areas %}<div><h4 class="item-title" style="margin:0 0 var(--space-9)">Области деятельности</h4><ul class="app-list">{% for a in op.areas %}<li>{{ a }}</li>{% endfor %}</ul></div>{% endif %}
+        {%- if op.task_types %}<div><h4 class="item-title" style="margin:0 0 var(--space-9)">Типы задач</h4><ul class="app-list">{% for a in op.task_types %}<li>{{ a }}</li>{% endfor %}</ul></div>{% endif %}
+      </div>
+      {%- endif %}
+    </section>
+
+    <section class="app-section" id="up" aria-labelledby="h-up">
+      <h2 class="section-title" id="h-up">Учебный план</h2>
+      {%- if curriculum %}
+      <p class="app-lead">Аудиторная нагрузка в парах в неделю: Лек — лекции, Лаб — лабораторные, Пр — практические занятия; «Контр.» — форма контроля. Пары в неделю = часы за семестр ÷ 2 ÷ число учебных недель; часы видны в подсказке ячейки. Таблица прокручивается по горизонтали, колонка дисциплин остаётся на месте.</p>
+      {{ ui.curriculum_matrix(curriculum) }}
+      {%- if up_checks %}
+      <details class="app-details" style="margin-top: var(--space-18)">
+        <summary>Строки, не прошедшие проверку сумм часов ({{ up_checks | length }})</summary>
+        <ul class="app-list">{% for m in up_checks %}<li>{{ m }}</li>{% endfor %}</ul>
+      </details>
+      {%- endif %}
+      {%- else %}
+      {{ ui.empty('Учебный план не обработан.') }}
+      {%- endif %}
+    </section>
+
+    <section class="app-section" id="kug" aria-labelledby="h-kug">
+      <h2 class="section-title" id="h-kug">График учебного процесса</h2>
+      {%- if schedule %}
+      <p class="app-lead">{{ schedule.academic_year or 'Текущий' }} учебный год, недели с 1 сентября.</p>
+      {{ ui.schedule_grid(schedule) }}
+      {%- else %}
+      {{ ui.empty('Календарный учебный график не обработан или не опубликован на сайте.') }}
+      {%- endif %}
+    </section>
+
+    <section class="app-section" id="discipliny" aria-labelledby="h-discipliny">
+      <h2 class="section-title" id="h-discipliny">Дисциплины</h2>
+      {%- if disciplines %}
+      <div class="ir-table-wrap">
+        <table class="ir-table app-table-text">
+          <thead><tr><th scope="col">Дисциплина</th><th scope="col" class="ir-num">Семестр</th><th scope="col">Контроль</th><th scope="col">Кратко (LLM)</th></tr></thead>
+          <tbody>
+            {%- for d in disciplines %}
+            <tr>
+              <td><a class="ir-link" href="{{ d.url }}">{{ d.name }}</a>{% if d.status not in ('processed',) %}<br>{{ ui.status(d.status) }}{% endif %}</td>
+              <td class="ir-num">{{ d.semesters }}</td>
+              <td class="app-nowrap">{{ d.control }}</td>
+              <td class="ir-muted app-small">{{ d.summary or d.goal or '—' }}</td>
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      {%- else %}
+      {{ ui.empty('РПД не обработаны.') }}
+      {%- endif %}
+    </section>
+
+    <section class="app-section" id="praktiki" aria-labelledby="h-praktiki">
+      <h2 class="section-title" id="h-praktiki">Практики</h2>
+      {%- if practices %}
+      <div class="ir-table-wrap">
+        <table class="ir-table app-table-text">
+          <thead><tr><th scope="col">Практика</th><th scope="col" class="ir-num">Семестр</th><th scope="col" class="ir-num">Недель</th><th scope="col">Кратко (LLM)</th></tr></thead>
+          <tbody>
+            {%- for p in practices %}
+            <tr>
+              <td><a class="ir-link" href="{{ p.url }}">{{ p.name }}</a>{% if p.status not in ('processed',) %}<br>{{ ui.status(p.status) }}{% endif %}</td>
+              <td class="ir-num">{{ p.semester }}</td>
+              <td class="ir-num">{{ p.weeks }}</td>
+              <td class="ir-muted app-small">{{ p.summary or '—' }}</td>
+            </tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      {%- else %}
+      {{ ui.empty('Программы практик не обработаны.') }}
+      {%- endif %}
+    </section>
+
+    <section class="app-section" id="gia" aria-labelledby="h-gia">
+      <h2 class="section-title" id="h-gia">Государственная итоговая аттестация</h2>
+      {%- if gia['items'] or gia.summary %}
+      {{ ui.info_block(gia['items']) }}
+      {%- if gia.summary %}
+      <p class="app-prose">{{ gia.summary }}</p>
+      <p class="app-llm-note">Сформировано LLM по программе ГИА и ФОС ГИА.</p>
+      {%- endif %}
+      {%- if gia.vkr_topics %}
+      <h3 class="card-title app-subhead">Примерная тематика ВКР</h3>
+      <ul class="app-list">{% for t in gia.vkr_topics %}<li>{{ t }}</li>{% endfor %}</ul>
+      {%- endif %}
+      <p class="app-llm-note">{% if gia.gia_url %}<a class="ir-link" href="{{ gia.gia_url }}">Программа ГИА</a>{% endif %}{% if gia.gia_url and gia.fos_url %} · {% endif %}{% if gia.fos_url %}<a class="ir-link" href="{{ gia.fos_url }}">ФОС ГИА</a>{% endif %}</p>
+      {%- else %}
+      {{ ui.empty('Программа ГИА и ФОС ГИА не обработаны.') }}
+      {%- endif %}
+    </section>
+
+    <section class="app-section" id="docs" aria-labelledby="h-docs">
+      <h2 class="section-title" id="h-docs">Исходные документы</h2>
+      <ul class="app-docs">
+        {%- for d in documents %}
+        {{ ui.doc_row(d) }}
+        {%- endfor %}
+      </ul>
+    </section>
+
+  </div>
+
+  <aside class="app-aside">
+    {{ ui.section_nav('Программа', [
+        {'label': 'Сведения о программе', 'href': '#svedeniya'},
+        {'label': 'Учебный план', 'href': '#up'},
+        {'label': 'График учебного процесса', 'href': '#kug'},
+        {'label': 'Дисциплины', 'href': '#discipliny'},
+        {'label': 'Практики', 'href': '#praktiki'},
+        {'label': 'ГИА', 'href': '#gia'},
+        {'label': 'Исходные документы', 'href': '#docs'}]) }}
+    {%- if last_run %}
+    {{ ui.info_block([
+        {'label': 'Дата', 'value': last_run.date},
+        {'label': 'Документов', 'value': last_run.documents},
+        {'label': 'Требуют проверки', 'value': last_run.needs_review},
+        {'label': 'Ошибок', 'value': last_run.errors},
+        {'label': 'Длительность', 'value': last_run.duration}],
+        title='Запуск № ' ~ last_run.number, variant='navy') }}
+    <a class="ir-btn ir-btn--outline app-aside__btn" href="{{ last_run.report_url }}">Отчёт о запуске</a>
+    {%- endif %}
+  </aside>
+</div>
+{% endblock %}
+
+{% block footer_note %}Страница обновлена {{ op.updated_at }}.{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var nav = document.querySelector('[data-scrollspy]');
+    if (!nav || !('IntersectionObserver' in window)) return;
+    var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+    var byId = {};
+    links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+    function activate(id) {
+      links.forEach(function (a) {
+        var on = a === byId[id];
+        a.parentNode.classList.toggle('is-active', on);
+        if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      });
+    }
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) activate(e.target.id); });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    Object.keys(byId).forEach(function (id) { var el = document.getElementById(id); if (el) obs.observe(el); });
+  })();
+</script>
+{% endblock %}

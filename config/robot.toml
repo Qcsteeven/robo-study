@@ -1,0 +1,56 @@
+# Настройки робота ОП. Любой параметр можно переопределить переменной окружения
+# ROBOT_<РАЗДЕЛ>_<ПАРАМЕТР>, например ROBOT_SITE_BASE_URL, ROBOT_LLM_PROVIDER.
+# Изменение настроек не требует изменения программы (ТЗ, раздел 8).
+
+[app]
+# Каталог хранилища: скачанные документы, журнал в файле, кэш демо-сайта
+data_dir = "data"
+# SQLite для локальной разработки; в Docker — PostgreSQL (см. docker-compose.yml)
+database_url = "sqlite:///data/robot.db"
+# Демо-режим: встроенная копия структуры сайта ИРНИТУ по адресу /demo-site/
+demo = false
+
+[site]
+base_url = "https://www.istu.edu"
+education_path = "/sveden/education/"
+# Шаблон адреса страницы перечня ОП. Пусто — адрес берётся из ссылок таблицы
+# «Информация по образовательным программам» на странице раздела «Образование».
+# Пример: "/sveden/education/eduop/?level={level_title}&year={year}"
+op_list_url_template = ""
+# Только HTTPS (ТЗ, раздел 7). Исключение — хосты из allow_http_hosts (демо-сайт).
+https_only = true
+allow_http_hosts = ["127.0.0.1", "localhost"]
+allowed_hosts = ["www.istu.edu", "istu.edu"]
+# Нагрузка на сайт: не более 2 запросов в секунду (ТЗ, раздел 9)
+requests_per_second = 2.0
+# Повторные попытки с возрастающей паузой: 2, 4, 8, 16 с
+retries = 4
+backoff_base = 2.0
+timeout = 60.0
+user_agent = "RobotOP-IRNITU/1.0 (+coursework; contact: robot-op)"
+# Наибольший размер скачиваемого документа, МБ
+max_document_mb = 80
+
+[ocr]
+tesseract_cmd = "tesseract"
+lang = "rus+eng"
+dpi = 300
+# Доля символов на страницу, ниже которой страница считается сканом
+min_text_chars_per_page = 80
+
+[llm]
+# ollama — локальная LLM; openai — любой OpenAI-совместимый API; none — без кратких описаний
+provider = "none"
+base_url = "http://localhost:11434"
+model = "qwen2.5:7b-instruct"
+# Ключ API лучше задавать переменной окружения ROBOT_LLM_API_KEY
+api_key = ""
+timeout = 120.0
+temperature = 0.2
+max_input_chars = 12000
+
+[history]
+# Сколько последних версий каждого JSON-файла хранить (не менее 5 по ТЗ)
+keep_versions = 10
+# За сколько последних запусков хранить журнал (не менее 10 по ТЗ)
+keep_log_runs = 20

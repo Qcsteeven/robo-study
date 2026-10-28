@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="app-page app-page--wide">
+  <div class="app-content">
+    {%- if runs %}
+    <div class="ir-table-wrap">
+      <table class="ir-table app-table-compact">
+        <thead><tr><th scope="col" class="ir-num">№</th><th scope="col">Дата</th><th scope="col">Уровень, набор</th><th scope="col">ОП</th><th scope="col">Статус</th>
+          <th scope="col" class="ir-num">Документов</th><th scope="col" class="ir-num">Обработано</th><th scope="col" class="ir-num">Требуют проверки</th><th scope="col" class="ir-num">Ошибок</th><th scope="col" class="ir-num">Длительность</th></tr></thead>
+        <tbody>
+          {%- for r in runs %}
+          <tr><td class="ir-num"><a class="ir-link" href="/reports/{{ r.run.id }}">{{ r.run.id }}</a></td>
+            <td class="app-nowrap">{{ r.run.created_at.strftime('%d.%m.%Y, %H:%M') }}</td>
+            <td>{{ r.run.params.level_title }}, {{ r.run.params.year }}</td>
+            <td>{{ 'все' if r.run.params.programs == ['*'] else r.run.params.programs | length }}</td>
+            <td>{{ ui.run_status(r.run.status) }}</td>
+            <td class="ir-num">{{ r.counts.total }}</td><td class="ir-num">{{ r.counts.processed }}</td>
+            <td class="ir-num">{{ r.counts.review }}</td><td class="ir-num">{{ r.counts.error }}</td><td class="ir-num">{{ r.duration }}</td></tr>
+          {%- endfor %}
+        </tbody>
+      </table>
+    </div>
+    {%- else %}
+    {{ ui.empty('Запусков ещё не было.') }}
+    <p><a class="ir-btn ir-btn--primary ir-btn--pill" href="/run">Запустить робота</a></p>
+    {%- endif %}
+  </div>
+</div>
+{% endblock %}

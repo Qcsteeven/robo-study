@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% import "ui.html" as ui with context %}
+{#- Обычная страница приложения: шапка с градиентом, контент и правая колонка -#}
+{% block title %}{{ page_title }} — Робот ОП{% endblock %}
+{% block header %}
+  {{ ui.page_header(title=page_title, crumbs=crumbs, meta=meta or [], logo_src=url_for('static', path='img/irnitu-logo-white.svg')) }}
+{% endblock %}

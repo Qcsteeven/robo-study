@@ -1,0 +1,185 @@
+{#- Макросы компонентов дизайн-системы «Робот ОП ИРНИТУ». Разметка повторяет классы ir-* из static/css/irnitu.css. -#}
+
+{#- Статусы робота: ключ в JSON → (вид плашки, слово) -#}
+{%- set STATUS = {
+  'processed': ('success', 'Обработан'),
+  'needs_review': ('warning', 'Требует проверки'),
+  'partial': ('warning', 'Частично обработан'),
+  'error': ('danger', 'Ошибка'),
+  'in_progress': ('info', 'В обработке'),
+  'queued': ('info', 'В очереди'),
+  'unknown_template': ('neutral', 'Неизвестный шаблон'),
+  'skipped': ('neutral', 'Пропущен'),
+} -%}
+
+{% macro status(key) -%}
+  {%- set s = STATUS.get(key, ('neutral', key)) -%}
+  <span class="ir-status ir-status--{{ s[0] }}">{{ s[1] }}</span>
+{%- endmacro %}
+
+{%- set RUN_STATUS = {
+  'queued': ('info', 'В очереди'),
+  'running': ('info', 'Выполняется'),
+  'finished': ('success', 'Завершён'),
+  'failed': ('danger', 'Сбой'),
+  'interrupted': ('warning', 'Прерван'),
+} -%}
+
+{% macro run_status(key) -%}
+  {%- set s = RUN_STATUS.get(key, ('neutral', key)) -%}
+  <span class="ir-status ir-status--{{ s[0] }}">{{ s[1] }}</span>
+{%- endmacro %}
+
+{% macro tag(label, tone=none) -%}
+  <span class="ir-tag{% if tone %} ir-tag--{{ tone }}{% endif %}" title="{{ label }}">{{ label }}</span>
+{%- endmacro %}
+
+{#- Число пар в неделю: 1 → «1», 0.5 → «0,5», пусто → «·» -#}
+{% macro pairs(v) -%}
+  {%- if v -%}{{ '%g' | format(v) | replace('.', ',') }}{%- else -%}<span class="ir-matrix__empty" aria-hidden="true">·</span>{%- endif -%}
+{%- endmacro %}
+
+{% macro page_header(title, crumbs=[], meta=[], logo_src=none) -%}
+<header class="ir-pagehead">
+  <div class="ir-pagehead__inner">
+    <div class="ir-pagehead__top">
+      {% if logo_src %}<img class="ir-pagehead__logo" src="{{ logo_src }}" alt="Иркутский политех">{% else %}<span></span>{% endif %}
+      <nav aria-label="Хлебные крошки">
+        <ol class="ir-crumbs">
+          {%- for c in crumbs %}
+          <li>{% if c.href and not loop.last %}<a href="{{ c.href }}">{{ c.label }}</a>{% else %}<span{% if loop.last %} aria-current="page"{% endif %}>{{ c.label }}</span>{% endif %}</li>
+          {%- endfor %}
+        </ol>
+      </nav>
+    </div>
+    <h1 class="ir-pagehead__title">{{ title }}</h1>
+    {%- if meta %}
+    <div class="ir-pagehead__meta">{% for m in meta %}<span>{{ m }}</span>{% endfor %}</div>
+    {%- endif %}
+    {%- if caller is defined %}
+    <div class="ir-pagehead__actions">{{ caller() }}</div>
+    {%- endif %}
+  </div>
+</header>
+{%- endmacro %}
+
+{% macro info_block(items, title=none, variant='lite') -%}
+<section class="ir-info ir-info--{{ variant }}">
+  {%- if title %}<h3 class="ir-info__title">{{ title }}</h3>{% endif %}
+  {%- for it in items %}
+  <div class="ir-info__item"><span class="ir-info__label">{{ it.label }}</span><span class="ir-info__value">{{ it.value }}</span></div>
+  {%- endfor %}
+</section>
+{%- endmacro %}
+
+{% macro section_nav(title, items) -%}
+<nav class="ir-snav" aria-label="{{ title }}" data-scrollspy>
+  <div class="ir-snav__title">{{ title }}</div>
+  <ul>
+    {%- for it in items %}
+    <li class="ir-snav__item{% if loop.first %} is-active{% endif %}"><a href="{{ it.href }}"{% if loop.first %} aria-current="true"{% endif %}>{{ it.label }}</a></li>
+    {%- endfor %}
+  </ul>
+</nav>
+{%- endmacro %}
+
+{% macro alert(tone, title=none) -%}
+<div class="ir-alert ir-alert--{{ tone }}" role="{{ 'alert' if tone == 'danger' else 'status' }}">
+  {%- if title %}<h4 class="ir-alert__title">{{ title }}</h4>{% endif %}
+  {{ caller() }}
+</div>
+{%- endmacro %}
+
+{#- Учебный план «дисциплины × семестры» -#}
+{% macro curriculum_matrix(cur, caption=none) -%}
+{%- set sems = cur.semesters -%}
+<div class="ir-table-wrap app-scroll" tabindex="0" role="region" aria-label="{{ caption or 'Учебный план' }}">
+  <table class="ir-table ir-table--dense ir-matrix">
+    {%- if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead>
+      <tr>
+        <th rowspan="2" scope="col" class="ir-matrix__name">Дисциплина</th>
+        {%- for s in sems %}<th colspan="4" scope="colgroup" class="ir-matrix__sem">Семестр {{ s }}{% if cur.weeks and cur.weeks.get(s | string) %} <span class="ir-matrix__sub">· {{ cur.weeks.get(s | string) }} нед.</span>{% endif %}</th>{% endfor %}
+      </tr>
+      <tr>
+        {%- for s in sems %}
+        <th scope="col" class="ir-matrix__sub ir-matrix__sem" title="Лекции">Лек</th><th scope="col" class="ir-matrix__sub" title="Лабораторные занятия">Лаб</th><th scope="col" class="ir-matrix__sub" title="Практические занятия">Пр</th><th scope="col" class="ir-matrix__sub" title="Форма контроля">Контр.</th>
+        {%- endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {%- for g in cur.groups %}
+      {%- if g.title %}<tr class="ir-matrix__group"><td colspan="{{ 1 + sems | length * 4 }}">{{ g.title }}</td></tr>{% endif %}
+      {%- for r in g.rows %}
+      <tr{% if r.checks %} class="app-matrix__flag"{% endif %}>
+        <th scope="row" class="ir-matrix__name" style="font-weight:400"{% if r.checks %} title="Требует проверки: {{ r.checks | join('; ') }}"{% endif %}>{{ r.name }}{% if r.checks %} <span class="app-flag" aria-label="требует проверки">!</span>{% endif %}</th>
+        {%- for s in sems %}{% set c = r.cells.get(s | string, {}) %}{% set h = c.hours or {} %}
+        <td class="ir-matrix__cell ir-matrix__sem"{% if h.lec %} title="{{ h.lec }} ч за семестр"{% endif %}>{{ pairs(c.lec) }}</td><td class="ir-matrix__cell"{% if h.lab %} title="{{ h.lab }} ч за семестр"{% endif %}>{{ pairs(c.lab) }}</td><td class="ir-matrix__cell"{% if h.pr %} title="{{ h.pr }} ч за семестр"{% endif %}>{{ pairs(c.pr) }}</td><td class="ir-matrix__ctl">{% if c.control %}{{ c.control }}{% else %}<span class="ir-matrix__empty" aria-hidden="true">·</span>{% endif %}</td>
+        {%- endfor %}
+      </tr>
+      {%- endfor %}
+      {%- endfor %}
+    </tbody>
+  </table>
+</div>
+{%- endmacro %}
+
+{#- График учебного процесса: курсы × недели учебного года -#}
+{%- set KUG_CLASS = {'Т': 't', 'Э': 'e', 'У': 'u', 'П': 'p', 'Н': 'p', 'Г': 'd', 'Д': 'd', 'К': 'k'} -%}
+{% macro schedule_grid(kug) -%}
+<div class="ir-table-wrap app-scroll" tabindex="0" role="region" aria-label="График учебного процесса {{ kug.academic_year }}">
+  <table class="app-kug">
+    <caption class="sr-only">График учебного процесса, {{ kug.academic_year }} учебный год</caption>
+    <thead>
+      <tr><th scope="col" rowspan="2" class="app-kug__course">Курс</th>{% for m in kug.months %}<th scope="colgroup" colspan="{{ m[1] }}" class="app-kug__month">{{ m[0] }}</th>{% endfor %}</tr>
+      <tr>{% for w in range(1, (kug.weeks or 52) + 1) %}<th scope="col" class="app-kug__week">{{ w }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {%- for c in kug.courses %}
+      <tr>
+        <th scope="row" class="app-kug__course"{% if c.group %} title="{{ c.group }}"{% endif %}>{{ c.course }}</th>
+        {%- for code in c.weeks %}<td class="app-kug__cell app-kug--{{ KUG_CLASS.get(code, 't') }}">{% if code != 'Т' %}{{ code }}{% endif %}</td>{% endfor %}
+      </tr>
+      {%- endfor %}
+    </tbody>
+  </table>
+</div>
+<ul class="app-kug-legend">
+  {%- for l in kug.legend %}
+  <li><span class="app-kug__cell app-kug--{{ KUG_CLASS.get(l.code, 't') }}" aria-hidden="true">{% if l.code != 'Т' %}{{ l.code }}{% endif %}</span>{{ l.code }} — {{ l.label }}</li>
+  {%- endfor %}
+</ul>
+{%- endmacro %}
+
+{% macro doc_row(d) -%}
+<li class="app-doc">
+  <span class="app-doc__type">{{ tag(d.type, 'outline') }}</span>
+  <span class="app-doc__main">
+    <a class="ir-link{% if not d.group %} ir-doclink{% endif %}" href="{{ d.url }}">{{ d.title }}</a>
+    {%- if d.note %}<span class="app-doc__note">{{ d.note }}</span>{% endif %}
+  </span>
+  <span class="app-doc__status">{{ status(d.status) }}</span>
+  <a class="app-doc__json ir-link" href="{{ d.json_url }}">JSON</a>
+</li>
+{%- endmacro %}
+
+{#- Сообщение «нет данных» вместо раздела, если документ не обработан -#}
+{% macro empty(text) -%}
+<p class="app-empty">{{ text }}</p>
+{%- endmacro %}
+
+{#- Ход запуска (RunProgress) -#}
+{% macro run_progress(run, counts) -%}
+{%- set pct = ((counts.done / counts.total * 100) if counts.total else (100 if run.status in ('finished', 'failed') else 0)) | round(0) -%}
+<div class="ir-run" data-run="{{ run.id }}">
+  <div class="ir-run__head">
+    <span class="ir-run__label">Запуск № {{ run.id }} · {{ run.stage or '—' }}</span>
+    <span class="ir-run__count">{{ counts.done }} из {{ counts.total }}</span>
+  </div>
+  <div class="ir-run__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct | int }}" aria-label="Ход запуска"><div class="ir-run__fill" style="width: {{ pct | int }}%"></div></div>
+  <div class="ir-run__stats">
+    {{ run_status(run.status) }}
+    {%- for key, n in counts.by_status | dictsort %}{% if n %} <span class="ir-status ir-status--{{ STATUS.get(key, ('neutral', key))[0] }}">{{ STATUS.get(key, ('neutral', key))[1] }}: {{ n }}</span>{% endif %}{% endfor %}
+  </div>
+</div>
+{%- endmacro %}

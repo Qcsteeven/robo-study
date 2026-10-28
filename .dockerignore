@@ -1,0 +1,9 @@
+.git
+data
+tests
+docs
+__pycache__
+*.pyc
+.pytest_cache
+.env
+deploy/certs

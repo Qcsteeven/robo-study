@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="app-page">
+  <div class="app-content">
+    {%- if run.status == 'failed' %}
+    {% call ui.alert('danger', 'Запуск завершился сбоем') %}<p>{{ run.error }}</p>{% endcall %}
+    {%- elif run.status == 'interrupted' %}
+    {% call ui.alert('warning', 'Запуск прерван') %}<p>{{ run.error or run.stage }}</p><p>Продолжение запуска начнётся с места остановки: уже обработанные документы повторно не скачиваются.</p>{% endcall %}
+    {%- endif %}
+
+    <section class="app-section" aria-labelledby="h-progress">
+      <h2 class="section-title" id="h-progress">Ход запуска</h2>
+      {{ ui.run_progress(run, counts) }}
+      <div class="app-form__actions" style="margin-top: var(--space-18)">
+        {%- if run.status in ('interrupted', 'failed') %}
+        <form method="post" action="/reports/{{ run.id }}/resume"><button class="ir-btn ir-btn--primary ir-btn--pill" type="submit">Продолжить запуск</button></form>
+        {%- endif %}
+        {%- if run.status in ('running', 'queued') %}
+        <form method="post" action="/reports/{{ run.id }}/stop"><button class="ir-btn ir-btn--pill" type="submit">Остановить</button></form>
+        {%- endif %}
+        <a class="ir-link" href="/log?run={{ run.id }}">Журнал запуска</a>
+      </div>
+    </section>
+
+    <section class="app-section" id="review" aria-labelledby="h-review">
+      <h2 class="section-title" id="h-review">Требуют проверки</h2>
+      {%- if review %}
+      <div class="ir-table-wrap">
+        <table class="ir-table app-table-compact">
+          <thead><tr><th scope="col">ОП</th><th scope="col">Документ</th><th scope="col">Статус</th><th scope="col">Причина</th></tr></thead>
+          <tbody>
+            {%- for it in review %}
+            <tr><td class="app-nowrap"><a class="ir-link" href="/op/{{ it.program_id }}">{{ it.program_id.split('-')[0] }}</a></td>
+              <td>{{ ui.tag(types[it.doc_type], 'outline') }} {% if it.document_id %}<a class="ir-link" href="/op/{{ it.program_id }}/doc/{{ it.document_id }}">{{ it.title }}</a>{% else %}{{ it.title }}{% endif %}</td>
+              <td>{{ ui.status(it.status) }}</td><td class="app-small">{{ it.note }}</td></tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+      {%- else %}
+      {{ ui.empty('Документов, требующих проверки, нет.') }}
+      {%- endif %}
+    </section>
+
+    {%- if errors %}
+    <section class="app-section" id="errors" aria-labelledby="h-errors">
+      <h2 class="section-title" id="h-errors">Ошибки</h2>
+      <div class="ir-table-wrap">
+        <table class="ir-table app-table-compact">
+          <thead><tr><th scope="col">ОП</th><th scope="col">Документ</th><th scope="col">Причина</th></tr></thead>
+          <tbody>
+            {%- for it in errors %}
+            <tr><td class="app-nowrap">{{ it.program_id.split('-')[0] }}</td><td>{{ ui.tag(types[it.doc_type], 'outline') }} <a class="ir-link" href="{{ it.url }}">{{ it.title }}</a></td><td class="app-small">{{ it.note }}</td></tr>
+            {%- endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    {%- endif %}
+
+    <section class="app-section" id="items" aria-labelledby="h-items">
+      <h2 class="section-title" id="h-items">Документы по ОП</h2>
+      {%- for pid, group in by_program %}
+      <details class="app-details"{% if by_program | length == 1 %} open{% endif %}>
+        <summary>{{ programs[pid].code if programs.get(pid) else '' }} {{ programs[pid].profile if programs.get(pid) else pid }} — {{ group | length }} док.</summary>
+        <p><a class="ir-link" href="/op/{{ pid }}">Веб-страница ОП</a></p>
+        <div class="ir-table-wrap">
+          <table class="ir-table app-table-compact">
+            <thead><tr><th scope="col">Тип</th><th scope="col">Документ</th><th scope="col">Статус</th><th scope="col">Примечание робота</th><th scope="col" class="ir-num">Время</th></tr></thead>
+            <tbody>
+              {%- for it in group %}
+              <tr><td>{{ ui.tag(types[it.doc_type], 'outline') }}</td>
+                <td>{% if it.document_id and it.done %}<a class="ir-link" href="/op/{{ it.program_id }}/doc/{{ it.document_id }}">{{ it.title }}</a>{% else %}{{ it.title }}{% endif %}</td>
+                <td>{{ ui.status(it.status) }}</td><td class="app-small">{{ it.note }}</td>
+                <td class="ir-num app-small">{{ '%.1f' | format(it.seconds) }} с</td></tr>
+              {%- endfor %}
+            </tbody>
+          </table>
+        </div>
+      </details>
+      {%- else %}
+      {{ ui.empty('Документы ещё не найдены.') }}
+      {%- endfor %}
+    </section>
+  </div>
+
+  <aside class="app-aside">
+    {{ ui.info_block([
+        {'label': 'Начат', 'value': run.started_at.strftime('%d.%m.%Y, %H:%M') if run.started_at else '—'},
+        {'label': 'Завершён', 'value': run.finished_at.strftime('%d.%m.%Y, %H:%M') if run.finished_at else '—'},
+        {'label': 'Документов', 'value': counts.total},
+        {'label': 'Обработано', 'value': counts.processed},
+        {'label': 'Требуют проверки', 'value': counts.review},
+        {'label': 'Ошибок', 'value': counts.error},
+        {'label': 'Пропущено', 'value': counts.skipped},
+        {'label': 'Длительность', 'value': duration}],
+        title='Запуск № ' ~ run.id, variant='navy') }}
+    <a class="ir-btn ir-btn--outline app-aside__btn" href="/api/runs/{{ run.id }}/report">Отчёт в JSON</a>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}
+{%- if run.status in ('running', 'queued') %}
+<script>
+  (function () {
+    var last = {{ counts.done }} + ':{{ run.status }}';
+    setInterval(function () {
+      fetch('/api/runs/{{ run.id }}').then(function (r) { return r.json(); }).then(function (d) {
+        var now = d.counts.done + ':' + d.status;
+        if (now !== last) { sessionStorage.setItem('scroll', window.scrollY); location.reload(); }
+      }).catch(function () {});
+    }, 2500);
+    var y = sessionStorage.getItem('scroll');
+    if (y) { window.scrollTo(0, +y); sessionStorage.removeItem('scroll'); }
+  })();
+</script>
+{%- endif %}
+{% endblock %}

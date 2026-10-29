@@ -1,4 +1,4 @@
-"""Календарный учебный график: сетка видов деятельности по неделям для каждого курса (ТЗ, шаг 7, рисунок 5)."""
+"""Календарный учебный график: виды деятельности по дням и по неделям для каждого курса (ТЗ, шаг 7, рисунок 5)."""
 from __future__ import annotations
 
 import re
@@ -98,12 +98,26 @@ def _structure(grid: Grid, label: int) -> tuple[int | None, list[int]]:
     if head is not None and head.y1 > grid.rows[0].y1 + 5:
         last = max(i for i, r in enumerate(grid.rows) if (r.y0 + r.y1) / 2 <= head.y1 + 2)
         weeks_row = last if last > 0 and labels[last] not in DAYS else None
-        return weeks_row, [i for i in range(last + 1, len(grid.rows)) if labels[i] in DAYS]
+        return weeks_row, _day_rows(labels, last + 1)
     last_sunday = max((i for i, t in enumerate(labels) if t == "вс"), default=-1)
     weeks_row = last_sunday + 1 if 0 <= last_sunday + 1 < len(grid.rows) and labels[last_sunday + 1] not in DAYS else None
     start = (weeks_row + 1) if weeks_row is not None else last_sunday + 1
-    course_rows = [i for i in range(start, len(grid.rows)) if labels[i] in DAYS]
-    return weeks_row, course_rows
+    return weeks_row, _day_rows(labels, start)
+
+
+def _day_rows(labels: list[str], start: int) -> list[int]:
+    """Строки курсов — от первой до последней строки с подписью дня; строки между ними, чью подпись OCR не
+    распознал, тоже курсовые. Если таблица начинается не с «пн» или кончается не на «сб», недостающие
+    соседние строки добавляются."""
+    found = [i for i in range(start, len(labels)) if labels[i] in DAYS]
+    if not found:
+        return []
+    first, last = found[0], found[-1]
+    if labels[first] != "пн":
+        first = max(start, first - DAYS.index(labels[first]))
+    if labels[last] != "сб" and labels[last] in DAYS[:6]:
+        last = min(len(labels) - 1, last + 5 - DAYS.index(labels[last]))
+    return list(range(first, last + 1))
 
 
 def parse_grid(grid: Grid) -> dict:
@@ -112,6 +126,7 @@ def parse_grid(grid: Grid) -> dict:
         raise NoSchedule("Не найдена колонка дней недели")
     weeks_row, course_rows = _structure(grid, label)
     week_cols = [i for i in range(label + 1, len(grid.columns))]
+    day_cols = list(week_cols)   # по дням — все колонки, включая хвост августа без номера недели
     messages = []
     # номера недель
     if weeks_row is not None:
@@ -133,7 +148,7 @@ def parse_grid(grid: Grid) -> dict:
         if name and span > 0:
             months.append([name, span])
     # курсы: блоки подряд идущих строк пн…сб; номер курса и группа — в объединённых ячейках слева
-    courses = [_course(grid, block, label, week_cols, messages) for block in _course_blocks(grid, course_rows)]
+    courses = [_course(grid, block, label, week_cols, day_cols, messages) for block in _course_blocks(grid, course_rows)]
     if not courses:
         raise NoSchedule("Не найдены строки курсов")
     # номер курса — одна цифра в высокой узкой ячейке, OCR её иногда не видит; курсы идут по порядку
@@ -141,6 +156,7 @@ def parse_grid(grid: Grid) -> dict:
     if known and all(n - i == known[0][1] - known[0][0] for i, n in known):
         for i, c in enumerate(courses):
             c["course"] = c["course"] or str(known[0][1] - known[0][0] + i)
+    _fix_days(courses)
     if len(week_cols) not in (52, 53):
         messages.append(f"Число недель учебного года {len(week_cols)} (ожидается 52)")
     return {"months": months, "weeks": len(week_cols), "courses": courses, "messages": messages}
@@ -163,7 +179,8 @@ def _course_blocks(grid: Grid, course_rows: list[int]) -> list[list[int]]:
     return blocks
 
 
-def _course(grid: Grid, rows: list[int], label: int, week_cols: list[int], messages: list[str]) -> dict:
+def _course(grid: Grid, rows: list[int], label: int, week_cols: list[int], day_cols: list[int],
+            messages: list[str]) -> dict:
     course, group = "", ""
     for ri in rows:
         for c in grid.rows[ri].cells:
@@ -186,7 +203,49 @@ def _course(grid: Grid, rows: list[int], label: int, week_cols: list[int], messa
         weeks.append(code)
     if unknown:
         messages.append(f"Курс {course}: недопустимые обозначения {', '.join(sorted(unknown))}")
-    return {"course": course, "group": group, "weeks": weeks}
+    # как в документе: обозначение каждого дня; «*» — нерабочий праздничный день, пусто — теоретическое обучение.
+    # Нераспознанное (штриховка «обучение не ведётся» за пределами учебного года) — пусто
+    days = {}
+    for k, ri in enumerate(rows):
+        # строки курса идут по порядку пн…сб; подпись дня OCR иногда не видит
+        day = DAYS[k] if len(rows) == 6 else norm(grid.rows[ri].text_at(label))
+        if day in DAYS and day not in days:
+            codes = [_code(grid.rows[ri].text_at(col)) for col in day_cols]
+            days[day] = [c if c in ALLOWED else "" for c in codes]
+    return {"course": course, "group": group, "weeks": weeks, "days": days}
+
+
+def _fix_days(courses: list[dict]) -> None:
+    """Сверка обозначений по дням со структурой графика — исправляет одиночные ошибки OCR.
+
+    Нерабочие праздничные дни общие для всех курсов: «*» ставится там, где его видит большинство курсов, и
+    снимается, где его видит меньшинство. Внутри недели у курса один вид деятельности: день, который один
+    расходится с остальными (не менее четырёх одинаковых рабочих дней той же недели), получает их обозначение."""
+    grids = [c["days"] for c in courses if c.get("days")]
+    if not grids:
+        return
+    for day in DAYS:
+        rows = [g[day] for g in grids if day in g]
+        if len(rows) < 2:
+            continue
+        for i in range(max(len(r) for r in rows)):
+            stars = sum(1 for r in rows if i < len(r) and r[i] == "*")
+            holiday = stars * 2 > len(rows)
+            for r in rows:
+                if i >= len(r):
+                    continue
+                if holiday:
+                    r[i] = "*"
+                elif r[i] == "*" and stars * 2 < len(rows):
+                    r[i] = ""
+    for g in grids:
+        n = max(len(v) for v in g.values())
+        for i in range(n):
+            week = {d: g[d][i] for d in g if i < len(g[d]) and g[d][i] != "*"}
+            for d, code in week.items():
+                others = [v for k, v in week.items() if k != d]
+                if len(others) >= 4 and len(set(others)) == 1 and code != others[0]:
+                    g[d][i] = others[0]
 
 
 def _code(text: str) -> str:

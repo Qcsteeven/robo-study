@@ -3,15 +3,11 @@
 {% block content %}
 <div class="app-page">
   <div class="app-content">
-    {%- if doc.status in ('needs_review', 'partial', 'unknown_template', 'error', 'skipped') %}
-    {% call ui.alert('danger' if doc.status == 'error' else 'warning', STATUS_TITLES.get(doc.status, doc.status)) %}<p>{{ doc.note }}</p>{% endcall %}
-    {%- endif %}
-
     {%- if final and final.summary %}
     <section class="app-section" aria-labelledby="h-sum">
       <h2 class="section-title" id="h-sum">Кратко</h2>
       <p class="app-prose" style="margin-top:0">{{ final.summary }}</p>
-      <p class="app-llm-note">Сформировано LLM ({{ final.summary_model }}) по сведениям из документа и носит вспомогательный характер.</p>
+      <p class="app-llm-note">Краткое описание сформировано автоматически и носит вспомогательный характер.</p>
     </section>
     {%- endif %}
 
@@ -42,22 +38,18 @@
     {%- endif %}
 
     {%- if doc.doc_type == 'up' and d.rows %}
-    <section class="app-section"><p><a class="ir-link" href="/op/{{ program.id }}#up">Учебный план на странице ОП</a> — {{ d.rows | length }} строк, проверку не прошли: {{ d.checks.failed }}.</p></section>
+    <section class="app-section"><p><a class="ir-link" href="/op/{{ program.id }}#up">Учебный план на странице ОП</a></p></section>
     {%- elif doc.doc_type == 'kug' and d.courses %}
-    <section class="app-section"><p><a class="ir-link" href="/op/{{ program.id }}#kug">График учебного процесса на странице ОП</a> — курсов: {{ d.courses | length }}.</p></section>
+    <section class="app-section"><p><a class="ir-link" href="/op/{{ program.id }}#kug">График учебного процесса на странице ОП</a></p></section>
     {%- endif %}
 
   </div>
   <aside class="app-aside">
     {{ ui.info_block([
         {'label': 'Тип', 'value': type_title},
-        {'label': 'Статус', 'value': STATUS_TITLES.get(doc.status, doc.status)},
-        {'label': 'Способ извлечения', 'value': {'ocr': 'OCR (скан)', 'text': 'Текстовый слой'}.get(doc.method, '—')},
-        {'label': 'Страниц', 'value': final.document.pages if final else '—'},
-        {'label': 'Скачан', 'value': doc.downloaded_at.strftime('%d.%m.%Y, %H:%M') if doc.downloaded_at else '—'}],
+        {'label': 'Страниц', 'value': final.document.pages if final else '—'}],
         title='Документ', variant='navy') }}
     <a class="ir-btn ir-btn--outline app-aside__btn" href="{{ doc.url }}">PDF на сайте ИРНИТУ</a>
-    {%- if doc.file_path %}<a class="ir-btn ir-btn--outline app-aside__btn" href="/documents/{{ doc.id }}/pdf">Копия в хранилище</a>{% endif %}
     <a class="ir-btn ir-btn--outline app-aside__btn" href="/op/{{ program.id }}">Страница ОП</a>
   </aside>
 </div>

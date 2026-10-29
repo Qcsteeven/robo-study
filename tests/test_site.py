@@ -20,9 +20,9 @@ def test_education_levels_and_years():
 
 
 def test_op_list_blocks_and_documents():
-    url = "https://www.istu.edu/sveden/education/eduop/?level=бакалавриат&year=2023"
-    blocks = parse_op_list(render.op_list_page("бакалавриат", 2023), url, "Бакалавриат", 2023)
-    assert [b.key for b in blocks] == ["09.03.01-isoiu-2023-och", "09.03.03-pie-2023-och"]
+    url = "https://www.istu.edu/sveden/education/eduop/?level=бакалавриат&year=2026"
+    blocks = parse_op_list(render.op_list_page("бакалавриат", 2026), url, "Бакалавриат", 2026)
+    assert [b.key for b in blocks] == ["09.03.01-isoiu-2026-och", "09.03.03-pie-2026-och"]
     b = blocks[0]
     assert b.code == "09.03.01" and b.direction == "Информатика и вычислительная техника"
     assert b.profile == "Интеллектуальные системы обработки информации и управления" and b.form == "Очная"

@@ -4,21 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Робот ОП{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='css/tokens.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', path='css/irnitu.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/tokens.css') }}?v={{ asset_v }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/irnitu.css') }}?v={{ asset_v }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}?v={{ asset_v }}">
 </head>
 <body>
   {%- set nav = [
-    {'key': 'run', 'label': 'Запуск робота', 'href': '/run'},
     {'key': 'programs', 'label': 'Образовательные программы', 'href': '/programs', 'children': [
       {'label': 'Бакалавриат', 'href': '/programs?level=bachelor'},
       {'label': 'Специалитет', 'href': '/programs?level=specialist'},
       {'label': 'Магистратура', 'href': '/programs?level=master'},
       {'label': 'СПО', 'href': '/programs?level=spo'},
       {'label': 'Аспирантура', 'href': '/programs?level=postgraduate'}]},
-    {'key': 'reports', 'label': 'Отчёты о запусках', 'href': '/reports'},
-    {'key': 'log', 'label': 'Журнал', 'href': '/log'}
+    {'key': 'run', 'label': 'Обновить данные', 'href': '/run'}
   ] %}
   <div class="app-rail">
     <div class="ir-rail" id="rail">
@@ -67,7 +65,7 @@
         <div class="app-footer__note">
           {%- set next = request.url.path ~ ('?' ~ request.url.query if request.url.query else '') %}
           {% if theme == 'dark' %}<a class="app-theme" href="/theme?mode=light&amp;next={{ next | urlencode }}">Светлая тема</a>{% else %}<a class="app-theme" href="/theme?mode=dark&amp;next={{ next | urlencode }}">Тёмная тема</a>{% endif %}
-          · <a href="/api/docs">API</a>{% if demo %} · <a href="/demo-site/sveden/education/">Демо-сайт</a>{% endif %}
+{% if demo %} · <a href="/demo-site/sveden/education/">Демо-сайт</a>{% endif %}
         </div>
       </div>
     </footer>

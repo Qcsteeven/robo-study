@@ -19,6 +19,15 @@ class ForbiddenUrl(SiteError):
     """Адрес не разрешён политикой безопасности (не HTTPS или посторонний хост)."""
 
 
+class AuthRequired(SiteError):
+    """Сайт переадресовал на страницу входа: документ размещён в закрытом разделе."""
+
+    def __init__(self, url: str, login_url: str):
+        self.url, self.login_url = url, login_url
+        host = urlparse(url).hostname or url
+        super().__init__(f"доступ только после входа на сайт ({host} переадресует на {login_url.split('?')[0]})")
+
+
 @dataclass
 class Fetched:
     url: str
@@ -64,6 +73,10 @@ class SiteClient:
             return
         raise ForbiddenUrl(f"Разрешён только HTTPS: {url}")
 
+    def is_login_page(self, url: str) -> bool:
+        path = urlparse(url).path.lower()
+        return any(path == p or path.startswith(p.rstrip("/") + "/") for p in self.s.login_paths)
+
     def _throttle(self) -> None:
         if self.s.requests_per_second <= 0:
             return
@@ -94,6 +107,8 @@ class SiteClient:
                         last_error = f"HTTP {r.status_code}"
                         continue
                     self.check_url(str(r.url))   # редирект не должен уводить с разрешённого хоста
+                    if r.history and self.is_login_page(str(r.url)):
+                        raise AuthRequired(url, str(r.url))
                     chunks, size = [], 0
                     for chunk in r.iter_bytes():
                         size += len(chunk)

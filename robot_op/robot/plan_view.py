@@ -1,4 +1,4 @@
-"""Учебный план для людей: дисциплины по курсам (карусель) и по категориям (полки).
+"""Учебный план для людей: дисциплины и нагрузка по семестрам (карусель) и по категориям (полки).
 
 Строится по итоговому JSON-файлу УП. Категория дисциплины определяется по названию набором правил: правила
 проверяются по порядку, первое совпадение побеждает. Дисциплины, не попавшие ни в одну тематическую категорию,
@@ -99,7 +99,13 @@ def _item(r: dict, name: str, cat: str, options: list[str] | None = None) -> dic
     sems = sorted(set(int(s) for s in r.get("semesters", {})) | {s for v in r.get("control", {}).values() for s in v})
     return {"name": name, "category": cat, "ze": r.get("ze") or 0, "semesters": sems, "control": r.get("control", {}),
             "elective": options is not None, "optional": r.get("index", "").startswith("ФТД"), "options": options or [],
-            "match": r["name"]}
+            "practice": "(" in r.get("index", "") and r.get("index", "")[:2] in ("Б2", "Б3"),
+            "hours": r.get("semesters", {}), "match": r["name"]}
+
+
+def _pairs(hours: float) -> float:
+    """Пара — два академических часа."""
+    return round((hours or 0) / 2, 1)
 
 
 def _control(control: dict, sem: int) -> str:
@@ -126,21 +132,28 @@ def build(up_data: dict, links: dict[str, str] | None = None, key=lambda s: s) -
         it["url"] = links.get(key(it["match"])) or next((links[key(o)] for o in it["options"] if key(o) in links), None)
 
     n_sem = max(weeks) if weeks else max((s for it in items for s in it["semesters"]), default=0)
-    courses = []
-    for c in range(1, (n_sem + 1) // 2 + 1):
-        sems = []
-        for s in (2 * c - 1, 2 * c):
-            if s > n_sem:
-                continue
-            here = [it for it in items if s in it["semesters"]]
-            entries = [{"name": it["name"], "category": it["category"], "control": _control(it["control"], s),
-                        "url": it["url"], "elective": it["elective"], "optional": it["optional"]}
-                       for it in sorted(here, key=lambda i: list(CATEGORIES).index(i["category"]))]
-            sems.append({"number": s, "weeks": weeks.get(s), "items": entries,
-                         "exams": sum(1 for e in entries if "Экз" in e["control"])})
-        names = {e["name"] for s in sems for e in s["items"]}
-        courses.append({"number": c, "semesters": sems, "count": len(names),
-                        "exams": sum(s["exams"] for s in sems)})
+    semesters = []
+    for s in range(1, n_sem + 1):
+        here = sorted((it for it in items if s in it["semesters"]),
+                      key=lambda i: (i["practice"], i["optional"], list(CATEGORIES).index(i["category"]), i["name"]))
+        entries = []
+        sem_total = {"lec": 0.0, "pr": 0.0, "lab": 0.0}
+        for it in here:
+            h = it["hours"].get(str(s)) or {}
+            load = {k: _pairs(h.get(k)) for k in ("lec", "pr", "lab")}
+            entries.append({"name": it["name"], "category": it["category"], "control": _control(it["control"], s),
+                            "url": it["url"], "elective": it["elective"], "optional": it["optional"],
+                            "practice": it["practice"], "ze": it["ze"], **load, "pairs": round(sum(load.values()), 1)})
+            if not it["optional"]:
+                for k in sem_total:
+                    sem_total[k] += load[k]
+        pairs = round(sum(sem_total.values()), 1)
+        w = weeks.get(s)
+        semesters.append({"number": s, "course": (s + 1) // 2, "weeks": w, "items": entries,
+                          **{k: round(v, 1) for k, v in sem_total.items()}, "pairs": pairs,
+                          "per_week": round(pairs / w, 1) if w else None,
+                          "count": sum(1 for e in entries if not e["practice"] and not e["optional"]),
+                          "exams": sum(1 for e in entries if "Экз" in e["control"])})
 
     total = sum(it["ze"] for it in items if not it["optional"]) or 1
     shelves = []
@@ -158,6 +171,6 @@ def build(up_data: dict, links: dict[str, str] | None = None, key=lambda s: s) -
                        "elective": it["elective"], "optional": it["optional"]}
                       for it in sorted(group, key=lambda i: (i["semesters"][:1] or [99], i["name"]))],
         })
-    return {"courses": courses, "shelves": shelves, "total_ze": total,
+    return {"semesters": semesters, "shelves": shelves, "total_ze": total,
             "categories": [{"key": k, "title": t, "short": s} for k, (t, s) in CATEGORIES.items()
                            if any(sh["key"] == k for sh in shelves)]}

@@ -33,6 +33,7 @@ class SiteSettings:
     timeout: float = 60.0
     user_agent: str = "RobotOP-IRNITU/1.0"
     max_document_mb: int = 80
+    login_paths: list[str] = field(default_factory=lambda: ["/esia", "/login", "/auth"])
 
 
 @dataclass

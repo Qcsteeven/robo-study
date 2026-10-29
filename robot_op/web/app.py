@@ -1,21 +1,21 @@
-"""Веб-интерфейс робота ОП (FastAPI + Jinja2): запуск, перечень ОП, страницы ОП, отчёты, журнал."""
+"""Веб-интерфейс робота ОП (FastAPI + Jinja2): перечень ОП, страницы ОП и документов, запуск робота."""
 from __future__ import annotations
 
 import json
 from contextlib import asynccontextmanager
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 import httpx
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import func, select
+from sqlalchemy import select
 
-from ..catalog import DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE, LEVELS, REVIEW_STATUSES, STATUSES
+from ..catalog import DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE, LEVELS, REVIEW_STATUSES
 from ..config import Settings, get_settings
-from ..models import Database, Document, JsonVersion, LogEntry, Program, Run, RunItem
+from ..models import Database, Document, JsonVersion, Program, Run, RunItem
 from ..robot.http import SiteError
 from ..robot.page import latest_final
 from ..robot.pipeline import Robot
@@ -67,6 +67,8 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
     templates = Jinja2Templates(directory=HERE / "templates")
     templates.env.filters["plural"] = plural
+    # версия стилей в адресе — после обновления приложения браузер не берёт старый CSS из кэша
+    templates.env.globals["asset_v"] = int(max(p.stat().st_mtime for p in (HERE / "static" / "css").glob("*.css")))
     if settings.app.demo:
         from demo_site.site import router as demo_router
         app.include_router(demo_router())
@@ -95,7 +97,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
 
     @app.get("/", include_in_schema=False)
     def index():
-        return RedirectResponse("/run", status_code=302)
+        return RedirectResponse("/programs", status_code=302)
 
     @app.get("/theme", include_in_schema=False)
     def set_theme(mode: str = "light", next: str = "/"):
@@ -105,70 +107,45 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
         return r
 
     @app.get("/run", response_class=HTMLResponse, include_in_schema=False)
-    def run_page(request: Request, level: str = "", year: int | None = None, message: str = ""):
+    def run_page(request: Request, level: str = "", message: str = ""):
+        """Запуск робота: уровень образования и ОП; год набора — всегда последний на сайте."""
         site_error = ""
-        levels, years, programs = [], [], None
+        levels, year, programs = [], None, None
         try:
             levels = robot.levels()
         except SiteError as e:
             site_error = str(e)
         lv = next((x for x in levels if x.level == level), None)
-        if lv:
-            years = sorted(lv.years, reverse=True)
-            if year in lv.years:
-                try:
-                    programs = [b.as_dict() for b in robot.programs(level, year)]
-                except SiteError as e:
-                    site_error = str(e)
+        if lv and lv.years:
+            year = max(lv.years)
+            try:
+                programs = [b.as_dict() for b in robot.programs(level, year)]
+            except SiteError as e:
+                site_error = str(e)
         with db.Session() as ses:
-            recent = ses.scalars(select(Run).order_by(Run.id.desc()).limit(5)).all()
-            active_run = next((r for r in recent if r.status in ("running", "queued")), None)
-            active = run_summary(ses, active_run) if active_run else None
-        return render(request, "run.html", page_title="Запуск робота", crumbs=crumbs(("Запуск робота", None)),
-                      active_nav="run", levels=levels, level=level if lv else "", years=years,
-                      year=year, programs=programs, selected=[], site_error=site_error, message=message,
-                      active=active, recent=recent)
+            last_run = ses.scalar(select(Run).order_by(Run.id.desc()).limit(1))
+            last = run_summary(ses, last_run) if last_run else None
+        return render(request, "run.html", page_title="Обновление данных", crumbs=crumbs(("Обновление данных", None)),
+                      active_nav="run", levels=levels, level=level if lv else "", year=year,
+                      programs=programs, site_error=site_error, message=message, last=last)
 
     @app.post("/run", include_in_schema=False)
-    def start_run(level: str = Form(...), year: int = Form(...), programs: list[str] = Form(default=[]),
+    def start_run(level: str = Form(...), programs: list[str] = Form(default=[]),
                   all: str = Form(default=""), force: str = Form(default="")):
         if level not in LEVELS:
             raise HTTPException(400, "Неизвестный уровень образования")
         chosen = ["*"] if all else programs
         if not chosen:
-            return RedirectResponse(f"/run?level={level}&year={year}&message=Выберите+хотя+бы+одну+ОП", status_code=303)
+            return RedirectResponse(f"/run?level={level}&message=Выберите+хотя+бы+одну+ОП", status_code=303)
+        try:
+            year = robot.latest_year(level)
+        except SiteError as e:
+            return RedirectResponse(f"/run?level={level}&message={quote(str(e))}", status_code=303)
         run_id = robot.create_run(level, year, chosen, force=bool(force))
         worker.submit(run_id)
-        return RedirectResponse(f"/reports/{run_id}", status_code=303)
+        return RedirectResponse(f"/run?level={level}", status_code=303)
 
-    @app.get("/reports", response_class=HTMLResponse, include_in_schema=False)
-    def reports(request: Request):
-        with db.Session() as ses:
-            runs = [run_summary(ses, r) for r in ses.scalars(select(Run).order_by(Run.id.desc()).limit(100))]
-        return render(request, "reports.html", page_title="Отчёты о запусках", crumbs=crumbs(("Отчёты о запусках", None)),
-                      active_nav="reports", runs=runs)
-
-    @app.get("/reports/{run_id}", response_class=HTMLResponse, include_in_schema=False)
-    def report(request: Request, run_id: int):
-        with db.Session() as ses:
-            run = ses.get(Run, run_id)
-            if run is None:
-                return not_found(request, f"Запуск № {run_id} не найден.")
-            items = ses.scalars(select(RunItem).where(RunItem.run_id == run_id).order_by(RunItem.id)).all()
-            counts = Robot.counts(ses, run_id)
-            pids = list(dict.fromkeys(i.program_id for i in items))
-            programs = {p.id: p for p in ses.scalars(select(Program).where(Program.id.in_(pids)))}
-        by_program = [(pid, [i for i in items if i.program_id == pid]) for pid in pids]
-        p = run.params
-        return render(request, "report.html", page_title=f"Запуск № {run.id}",
-                      crumbs=crumbs(("Отчёты о запусках", "/reports"), (f"№ {run.id}", None)),
-                      meta=[p.get("level_title", ""), f"Набор {p.get('year')}",
-                            "Все ОП" if p.get("programs") == ["*"] else f"ОП: {len(p.get('programs', []))}"],
-                      active_nav="reports", run=run, counts=counts, duration=duration(run.seconds), types=DOC_TYPES,
-                      review=[i for i in items if i.status in REVIEW_STATUSES],
-                      errors=[i for i in items if i.status == "error"], by_program=by_program, programs=programs)
-
-    @app.post("/reports/{run_id}/resume", include_in_schema=False)
+    @app.post("/run/{run_id}/resume", include_in_schema=False)
     def resume(run_id: int):
         with db.Session() as ses:
             run = ses.get(Run, run_id)
@@ -179,51 +156,29 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                 run.stage = "В очереди на продолжение"
                 ses.commit()
                 worker.submit(run_id)
-        return RedirectResponse(f"/reports/{run_id}", status_code=303)
+        return RedirectResponse("/run", status_code=303)
 
-    @app.post("/reports/{run_id}/stop", include_in_schema=False)
+    @app.post("/run/{run_id}/stop", include_in_schema=False)
     def stop(run_id: int):
         if worker.current == run_id:
             worker.stop_current()
-        return RedirectResponse(f"/reports/{run_id}", status_code=303)
-
-    @app.get("/log", response_class=HTMLResponse, include_in_schema=False)
-    def log_page(request: Request, run: str = "", level: str = ""):
-        run_id = int(run) if run.isdigit() else None
-        limit = 1000
-        with db.Session() as ses:
-            q = select(LogEntry).order_by(LogEntry.id.desc()).limit(limit)
-            if run_id:
-                q = q.where(LogEntry.run_id == run_id)
-            if level == "WARNING":
-                q = q.where(LogEntry.level.in_(["WARNING", "ERROR"]))
-            elif level == "ERROR":
-                q = q.where(LogEntry.level == "ERROR")
-            entries = ses.scalars(q).all()
-            runs = ses.scalars(select(Run).order_by(Run.id.desc()).limit(settings.history.keep_log_runs)).all()
-        return render(request, "log.html", page_title="Журнал", crumbs=crumbs(("Журнал", None)), active_nav="log",
-                      entries=entries, runs=runs, run_id=run_id, level=level, limit=limit,
-                      keep_runs=settings.history.keep_log_runs)
+        return RedirectResponse("/run", status_code=303)
 
     @app.get("/programs", response_class=HTMLResponse, include_in_schema=False)
-    def programs_page(request: Request, level: str = "", year: int | None = None):
+    def programs_page(request: Request, level: str = ""):
+        """Программы последнего года набора каждого уровня, у которых есть веб-страница."""
         with db.Session() as ses:
-            q = select(Program).order_by(Program.level, Program.year.desc(), Program.code, Program.profile)
+            q = select(Program).where(Program.page.is_not(None))
             if level:
                 q = q.where(Program.level == level)
-            if year:
-                q = q.where(Program.year == year)
             progs = ses.scalars(q).all()
-            stats = {}
-            for pid, status, n in ses.execute(select(Document.program_id, Document.status, func.count())
-                                              .group_by(Document.program_id, Document.status)).all():
-                st = stats.setdefault(pid, {"total": 0, "review": 0, "error": 0})
-                st["total"] += n
-                st["review"] += n if status in REVIEW_STATUSES else 0
-                st["error"] += n if status == "error" else 0
+        latest = {}
+        for p in progs:
+            latest[p.level] = max(latest.get(p.level, 0), p.year)
         groups: list[dict] = []
         order = list(LEVELS)
-        for p in sorted(progs, key=lambda p: (order.index(p.level) if p.level in order else 9, -p.year, p.code)):
+        for p in sorted((p for p in progs if p.year == latest[p.level]),
+                        key=lambda p: (order.index(p.level) if p.level in order else 9, p.code, p.profile or "")):
             title = f"{p.level_title}, набор {p.year}"
             if not groups or groups[-1]["title"] != title:
                 groups.append({"title": title, "programs": []})
@@ -231,7 +186,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
         title = "Образовательные программы" + (f": {LEVELS[level]}" if level in LEVELS else "")
         return render(request, "programs.html", page_title=title,
                       crumbs=crumbs(("Программы", "/programs" if level else None)) + ([{"label": LEVELS[level], "href": None}] if level in LEVELS else []),
-                      active_nav="programs", groups=groups, stats=stats, tones=LEVEL_TONE, level=level)
+                      active_nav="programs", groups=groups, tones=LEVEL_TONE, level=level)
 
     @app.get("/op/{program_id}", response_class=HTMLResponse, include_in_schema=False)
     def op_page(request: Request, program_id: str):
@@ -240,16 +195,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             if prog is None or not prog.page:
                 return not_found(request, "Образовательная программа не найдена или её страница ещё не сформирована роботом.")
             ctx = dict(prog.page)
-            ctx["op"] = dict(ctx["op"], updated_at=prog.page_updated_at.strftime("%d.%m.%Y, %H:%M") if prog.page_updated_at else "")
-            last = ses.scalar(select(Run).join(RunItem, RunItem.run_id == Run.id).where(RunItem.program_id == program_id)
-                              .order_by(Run.id.desc()).limit(1))
-            if last:
-                items = ses.scalars(select(RunItem).where(RunItem.run_id == last.id, RunItem.program_id == program_id)).all()
-                ctx["last_run"] = {
-                    "number": last.id, "date": (last.started_at or last.created_at).strftime("%d.%m.%Y, %H:%M"),
-                    "documents": len(items), "needs_review": sum(1 for i in items if i.status in REVIEW_STATUSES),
-                    "errors": sum(1 for i in items if i.status == "error"), "duration": duration(last.seconds),
-                    "report_url": f"/reports/{last.id}"}
+            ctx["op"] = dict(ctx["op"], updated_at=prog.page_updated_at.strftime("%d.%m.%Y") if prog.page_updated_at else "")
         return render(request, "op_page.html", active_nav="programs", **ctx)
 
     @app.get("/op/{program_id}/doc/{doc_id}", response_class=HTMLResponse, include_in_schema=False)
@@ -263,9 +209,9 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
         facts, lists = _doc_facts(doc.doc_type, (final or {}).get("data") or {})
         return render(request, "doc.html", page_title=doc.title,
                       crumbs=crumbs(("Программы", "/programs"), (prog.code, f"/op/{prog.id}"), (DOC_TYPES[doc.doc_type], None)),
-                      meta=[DOC_TYPE_TITLES[doc.doc_type], f"{prog.code} {prog.profile}", STATUSES.get(doc.status, ("", doc.status))[1]],
+                      meta=[DOC_TYPE_TITLES[doc.doc_type], f"{prog.code} {prog.profile}"],
                       active_nav="programs", doc=doc, program=prog, final=final, facts=facts, lists=lists,
-                      type_title=DOC_TYPE_TITLES[doc.doc_type], STATUS_TITLES={k: v[1] for k, v in STATUSES.items()})
+                      type_title=DOC_TYPE_TITLES[doc.doc_type])
 
     @app.get("/documents/{doc_id}/pdf", include_in_schema=False)
     def doc_pdf(doc_id: int):
@@ -291,14 +237,18 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
         except SiteError as e:
             raise HTTPException(502, str(e))
 
-    @app.post("/api/runs", tags=["Запуски"], summary="Запустить робота")
+    @app.post("/api/runs", tags=["Запуски"], summary="Запустить робота (последний год набора уровня)")
     def api_start(payload: dict):
-        level, year = payload.get("level"), payload.get("year")
-        if level not in LEVELS or not isinstance(year, int):
-            raise HTTPException(400, "Нужны level (bachelor, specialist, master, spo, postgraduate) и year")
+        level = payload.get("level")
+        if level not in LEVELS:
+            raise HTTPException(400, "Нужен level: bachelor, specialist, master, spo или postgraduate")
+        try:
+            year = robot.latest_year(level)
+        except SiteError as e:
+            raise HTTPException(502, str(e))
         run_id = robot.create_run(level, year, payload.get("programs") or ["*"], bool(payload.get("force")))
         worker.submit(run_id)
-        return {"id": run_id, "url": f"/reports/{run_id}"}
+        return {"id": run_id, "year": year}
 
     @app.get("/api/runs/{run_id}", tags=["Запуски"], summary="Состояние запуска")
     def api_run(run_id: int):
@@ -392,12 +342,9 @@ def _doc_facts(doc_type: str, d: dict) -> tuple[list, list]:
         facts = [("Проверяемые компетенции", ", ".join(d.get("competencies", [])) or None)]
         lists = [("Типовые задания и тематика ВКР", d.get("tasks"))]
     elif doc_type == "up" and d.get("semesters"):
-        facts = [("Семестров", len(d["semesters"])), ("Строк плана", len(d.get("rows", []))),
-                 ("Не прошли проверку", d.get("checks", {}).get("failed", 0))]
-        lists = [("Замечания проверки", d.get("checks", {}).get("messages"))]
+        facts = [("Семестров", len(d["semesters"]))]
     elif doc_type == "kug" and d.get("courses"):
-        facts = [("Учебный год", d.get("academic_year")), ("Недель", d.get("weeks")), ("Курсов", len(d["courses"]))]
-        lists = [("Замечания проверки", d.get("messages"))]
+        facts = [("Учебный год", d.get("academic_year")), ("Курсов", len(d["courses"]))]
     return [(k, v) for k, v in facts if v not in (None, "")], lists
 
 

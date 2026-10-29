@@ -30,6 +30,9 @@ timeout = 60.0
 user_agent = "RobotOP-IRNITU/1.0 (+coursework; contact: robot-op)"
 # Наибольший размер скачиваемого документа, МБ
 max_document_mb = 80
+# Переадресация на эти адреса означает, что документ закрыт авторизацией (ЕСИА, «Кампус»):
+# робот не входит на сайт и такие документы не скачивает
+login_paths = ["/esia", "/login", "/auth"]
 
 [ocr]
 tesseract_cmd = "tesseract"

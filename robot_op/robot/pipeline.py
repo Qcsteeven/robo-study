@@ -14,7 +14,7 @@ from datetime import datetime
 from email.utils import formatdate
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import httpx
 from sqlalchemy import delete, func, select
@@ -26,11 +26,11 @@ from ..extract import pdf as pdfmod
 from ..extract.ocr import OcrConfig, OcrUnavailable, ocr_page_text
 from ..models import Database, Document, JsonVersion, LogEntry, Program, Run, RunItem, now
 from . import page as pagebuilder
-from .http import SiteClient, SiteError
+from .http import AuthRequired, SiteClient, SiteError
 from .llm import LlmClient, LlmError
 from .site import LevelYears, ProgramBlock, parse_education, parse_op_list
 
-PARSER_VERSION = "1.0"
+PARSER_VERSION = "1.1"   # 1.1 — КУГ по дням
 log = logging.getLogger("robot_op")
 
 
@@ -51,6 +51,7 @@ class Robot:
         self.docs_dir.mkdir(parents=True, exist_ok=True)
         self._cache: dict[str, tuple[float, object]] = {}
         self._stop = threading.Event()
+        self._closed_hosts: dict[str, str] = {}
         self._setup_file_log()
 
     # ------------------------------------------------------------------ журнал
@@ -104,6 +105,13 @@ class Robot:
             finally:
                 client.close()
         return self._cached("levels", 600, load)
+
+    def latest_year(self, level: str) -> int:
+        """Робот обрабатывает только последний год набора уровня — документы прошлых лет на сайте закрыты авторизацией."""
+        lv = next((x for x in self.levels() if x.level == level), None)
+        if lv is None or not lv.years:
+            raise SiteError(f"На странице «Образование» нет годов набора для уровня «{LEVELS.get(level, level)}»")
+        return max(lv.years)
 
     def op_list_url(self, level: str, year: int) -> str:
         tpl = self.s.site.op_list_url_template
@@ -275,6 +283,7 @@ class Robot:
             programs = list(dict.fromkeys(i.program_id for i in items))
             total = len(items)
         done_before = total - len(todo)
+        self._closed_hosts: dict[str, str] = {}   # хост → примечание, если его документы закрыты авторизацией
         for n, (item_id, program_id) in enumerate(todo, 1):
             if self._stop.is_set():
                 raise RunStopped()
@@ -343,8 +352,20 @@ class Robot:
             item.status = "in_progress"
             ses.commit()
             # шаг 4 — скачивание
+            host = urlparse(doc.url).hostname or ""
+            if host in self._closed_hosts:   # сайт уже переадресовал на вход — не запрашиваем каждый документ
+                doc.status, doc.note = "error", self._closed_hosts[host]
+                ses.commit()
+                return doc.status, doc.note
             try:
                 data, changed = self._download(run_id, doc, client)
+            except AuthRequired as e:
+                doc.status, doc.note = "error", f"Документ недоступен: {e}"
+                self._closed_hosts[host] = doc.note
+                self.journal(run_id, "ERROR", f"{doc.note}. Остальные документы с {host} в этом запуске не запрашиваются "
+                             "и помечаются так же", prog.id, label, ses=ses)
+                ses.commit()
+                return doc.status, doc.note
             except SiteError as e:
                 doc.status, doc.note = "error", f"Документ недоступен: {e}"
                 self.journal(run_id, "ERROR", f"Документ не удалось скачать, помечен как недоступный: {e}", prog.id, label, ses=ses)

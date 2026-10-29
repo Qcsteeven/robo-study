@@ -9,7 +9,7 @@ from robot_op.models import Database, Document, JsonVersion, LogEntry, Program, 
 from robot_op.robot.pipeline import Robot
 
 pytestmark = needs_tesseract
-KEY = "09.03.01-isoiu-2023-och"
+KEY = "09.03.01-isoiu-2026-och"
 
 
 def statuses(robot, run_id):
@@ -18,7 +18,7 @@ def statuses(robot, run_id):
 
 
 def test_full_run_and_rerun(robot):
-    run_id = robot.create_run("bachelor", 2023, [KEY])
+    run_id = robot.create_run("bachelor", 2026, [KEY])
     robot.execute(run_id)
     st = statuses(robot, run_id)
     with robot.db.Session() as ses:
@@ -38,14 +38,17 @@ def test_full_run_and_rerun(robot):
         # первичный и итоговый JSON по каждому обработанному документу; сведения об ОП — со страницы сайта
         doc = ses.scalar(select(Document).where(Document.program_id == KEY, Document.doc_type == "up"))
         final = ses.scalar(select(JsonVersion).where(JsonVersion.document_id == doc.id, JsonVersion.kind == "final"))
-        assert final.data["program"]["code"] == "09.03.01" and final.data["program"]["year"] == 2023
+        assert final.data["program"]["code"] == "09.03.01" and final.data["program"]["year"] == 2026
         assert final.data["document"]["method"] == "ocr"
         page = ses.get(Program, KEY).page
-        assert page["curriculum"]["groups"] and page["schedule"]["courses"]
+        assert page["plan"]["semesters"] and page["schedule"]["courses"]
+        # график по дням: у курса шесть строк пн…сб, колонок — недель учебного года с хвостом августа
+        assert [r["day"] for r in page["schedule"]["courses"][0]["rows"]] == ["пн", "вт", "ср", "чт", "пт", "сб"]
+        assert len(page["schedule"]["courses"][0]["rows"][0]["cells"]) == len(page["schedule"]["week_numbers"])
         assert len(page["disciplines"]) == 13 and len(page["practices"]) == 4
         versions_before = ses.scalar(select(func.count()).select_from(JsonVersion))
     # повторный запуск: документы не изменились — не скачиваются заново (304) и не переобрабатываются
-    run2 = robot.create_run("bachelor", 2023, [KEY])
+    run2 = robot.create_run("bachelor", 2026, [KEY])
     robot.execute(run2)
     with robot.db.Session() as ses:
         assert ses.scalar(select(func.count()).select_from(JsonVersion)) == versions_before
@@ -70,9 +73,9 @@ def test_new_json_version_when_document_changes(tmp_path):
             return httpx.Response(200, content=render.oop_pdf(p), headers={"content-type": "application/pdf"})
         return base.handle_request(request)
     robot = Robot(settings, db, transport=httpx.MockTransport(handler), sleep=lambda s: None)
-    robot.execute(robot.create_run("bachelor", 2023, [KEY]))
+    robot.execute(robot.create_run("bachelor", 2026, [KEY]))
     changed["on"] = True
-    robot.execute(robot.create_run("bachelor", 2023, [KEY]))
+    robot.execute(robot.create_run("bachelor", 2026, [KEY]))
     with db.Session() as ses:
         oop = ses.scalar(select(Document).where(Document.program_id == KEY, Document.doc_type == "oop"))
         vs = ses.scalars(select(JsonVersion).where(JsonVersion.document_id == oop.id, JsonVersion.kind == "primary")
@@ -82,7 +85,7 @@ def test_new_json_version_when_document_changes(tmp_path):
 
 
 def test_interrupted_run_resumes_without_redownload(robot):
-    run_id = robot.create_run("bachelor", 2023, ["09.03.03-pie-2023-och"])
+    run_id = robot.create_run("bachelor", 2026, ["09.03.03-pie-2026-och"])
     calls = {"n": 0}
     original = robot._document
 
@@ -115,7 +118,7 @@ def test_llm_summaries_and_llm_failure(tmp_path):
     db = Database(settings.app.database_url)
     db.create_all()
     robot = Robot(settings, db, transport=mock_transport(), llm_transport=httpx.MockTransport(ollama), sleep=lambda s: None)
-    robot.execute(robot.create_run("master", 2024, ["*"]))
+    robot.execute(robot.create_run("master", 2026, ["*"]))
     with db.Session() as ses:
         page = ses.scalars(select(Program)).first().page
         assert page["op"]["summary"] == "Краткое описание документа."
@@ -130,10 +133,35 @@ def test_llm_summaries_and_llm_failure(tmp_path):
     db2 = Database(f"sqlite:///{tmp_path}/b/robot.db")
     db2.create_all()
     robot2 = Robot(settings2, db2, transport=mock_transport(), llm_transport=httpx.MockTransport(broken), sleep=lambda s: None)
-    rid = robot2.create_run("master", 2024, ["*"])
+    rid = robot2.create_run("master", 2026, ["*"])
     robot2.execute(rid)
     with db2.Session() as ses:
         assert ses.get(Run, rid).status == "finished"
         assert ses.scalar(select(func.count()).select_from(LogEntry).where(LogEntry.message.like("%LLM недоступен%"))) > 0
         final = ses.scalars(select(JsonVersion).where(JsonVersion.kind == "final")).first()
         assert final.data["summary"] is None
+
+
+def test_documents_behind_login_are_reported_once(tmp_path):
+    """Сайт переадресует документы на вход (ЕСИА): робот не входит, не запрашивает каждый документ и объясняет причину."""
+    settings = demo_settings(tmp_path)
+    db = Database(settings.app.database_url)
+    db.create_all()
+    base = mock_transport()
+    pdf_requests = []
+
+    def handler(request):
+        if request.url.path.endswith(".pdf"):
+            pdf_requests.append(request.url.path)
+            return httpx.Response(302, headers={"location": "http://demo.local/esia/campus?id=1"})
+        if request.url.path.startswith("/esia"):
+            return httpx.Response(200, content=b"<!DOCTYPE html><html>login</html>", headers={"content-type": "text/html"})
+        return base.handle_request(request)
+    robot = Robot(settings, db, transport=httpx.MockTransport(handler), sleep=lambda s: None)
+    run_id = robot.create_run("bachelor", 2026, [KEY])
+    robot.execute(run_id)
+    assert len(pdf_requests) == 1
+    with db.Session() as ses:
+        notes = {i.note for i in ses.scalars(select(RunItem).where(RunItem.run_id == run_id))}
+        assert {i.status for i in ses.scalars(select(RunItem).where(RunItem.run_id == run_id))} == {"error"}
+        assert len(notes) == 1 and "доступ только после входа" in notes.pop()

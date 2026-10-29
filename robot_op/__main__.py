@@ -2,8 +2,8 @@
 
   python -m robot_op serve [--port 8000] [--demo]
   python -m robot_op levels
-  python -m robot_op programs bachelor 2023
-  python -m robot_op run bachelor 2023 [09.03.01-isoiu-2023-och ...] [--force]
+  python -m robot_op programs bachelor
+  python -m robot_op run bachelor [09.03.01-isoiu-2026-och ...] [--force]
   python -m robot_op resume <номер запуска>
   python -m robot_op pages
 """
@@ -23,13 +23,11 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--port", type=int, default=8000)
     s.add_argument("--demo", action="store_true", help="демо-режим со встроенной копией сайта")
     sub.add_parser("levels", help="уровни образования и годы набора с сайта")
-    p = sub.add_parser("programs", help="перечень ОП уровня и года")
+    p = sub.add_parser("programs", help="перечень ОП уровня, последний год набора")
     p.add_argument("level")
-    p.add_argument("year", type=int)
-    r = sub.add_parser("run", help="запустить робота и дождаться завершения")
+    r = sub.add_parser("run", help="запустить робота (последний год набора) и дождаться завершения")
     r.add_argument("level")
-    r.add_argument("year", type=int)
-    r.add_argument("programs", nargs="*", help="ключи ОП; без ключей — все ОП уровня и года")
+    r.add_argument("programs", nargs="*", help="ключи ОП; без ключей — все ОП уровня")
     r.add_argument("--force", action="store_true")
     rs = sub.add_parser("resume", help="продолжить прерванный запуск")
     rs.add_argument("run_id", type=int)
@@ -71,10 +69,10 @@ def main(argv: list[str] | None = None) -> int:
             ses.commit()
         print(f"Страниц ОП пересобрано: {len(progs)}")
     elif a.cmd == "programs":
-        for b in robot.programs(a.level, a.year):
+        for b in robot.programs(a.level, robot.latest_year(a.level)):
             print(f"{b.key:40} {b.code} {b.title} — документов: {len(b.docs)}")
     else:
-        run_id = a.run_id if a.cmd == "resume" else robot.create_run(a.level, a.year, a.programs or ["*"], a.force)
+        run_id = a.run_id if a.cmd == "resume" else robot.create_run(a.level, robot.latest_year(a.level), a.programs or ["*"], a.force)
         robot.execute(run_id)
         with db.Session() as ses:
             print(json.dumps(Robot.counts(ses, run_id), ensure_ascii=False, indent=2))

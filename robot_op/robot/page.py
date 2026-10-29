@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import re
-from collections import Counter
+from datetime import date, timedelta
 
 from sqlalchemy import select
 
-from ..catalog import DOC_ORDER, DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE, REVIEW_STATUSES
+from ..catalog import DOC_ORDER, DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE
 from ..extract import curriculum
 from ..extract.schedule import LEGEND
 from ..models import Document, JsonVersion, Program
@@ -41,6 +41,64 @@ def _sem_text(sems) -> str:
     return ", ".join(str(s) for s in sorted(set(int(x) for x in sems))) if sems else "—"
 
 
+MONTH_NAMES = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август",
+               "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"]
+WEEKDAYS = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
+
+
+def calendar_grid(kd: dict, fallback_year: int) -> dict:
+    """График учебного процесса как в документе: по курсу шесть строк пн…сб, колонка — неделя с понедельника,
+    в каждой ячейке — обозначение дня. Даты считаются от 1 сентября учебного года; дни до 1 сентября и после
+    31 августа заштрихованы («обучение не ведётся»). Колонка относится к месяцу, на который приходится больше
+    её дней пн…сб внутри учебного года, при равенстве — к более раннему (28.09–03.10 — сентябрь)."""
+    m = re.match(r"(20\d\d)", kd.get("academic_year") or "")
+    y0 = int(m.group(1)) if m else fallback_year
+    first, last = date(y0, 9, 1), date(y0 + 1, 8, 31)
+    start = first - timedelta(days=first.weekday())
+    n_cols = (last - start).days // 7 + 1
+    mondays = [start + timedelta(weeks=i) for i in range(n_cols)]
+    n_weeks = kd.get("weeks") or 52
+
+    months: list[list] = []
+    for mon in mondays:
+        inside = [d for d in (mon + timedelta(days=k) for k in range(6)) if first <= d <= last]
+        month = max(dict.fromkeys(d.month for d in inside), key=[d.month for d in inside].count)
+        name = MONTH_NAMES[month - 1]
+        if months and months[-1][0] == name:
+            months[-1][1] += 1
+        else:
+            months.append([name, 1])
+    header = [{"day": d, "cells": [{"n": (mon + timedelta(days=k)).day,
+                                    "out": not first <= mon + timedelta(days=k) <= last} for mon in mondays]}
+              for k, d in enumerate(WEEKDAYS)]
+
+    used = set()
+    courses = []
+    for c in kd["courses"]:
+        days = c.get("days") or {}
+        rows = []
+        for k, d in enumerate(WEEKDAYS[:6]):
+            cells = []
+            for i, mon in enumerate(mondays):
+                if not first <= mon + timedelta(days=k) <= last:
+                    cells.append("out")
+                    continue
+                codes = days.get(d)
+                # старые JSON-файлы — только по неделям: обозначение недели на каждый её день
+                code = codes[i] if codes and i < len(codes) else (c["weeks"][i] if i < len(c["weeks"]) else "")
+                code = "" if code == "Т" else code
+                used.add(code)
+                cells.append(code)
+            rows.append({"day": d, "cells": cells})
+        courses.append({"course": c["course"], "group": c.get("group", ""), "rows": rows})
+    legend = [{"code": "", "label": LEGEND["Т"]}] + [{"code": k, "label": v} for k, v in LEGEND.items() if k in used and k != "Т"]
+    if "*" in used:
+        legend.append({"code": "*", "label": "нерабочие праздничные дни"})
+    legend.append({"code": "out", "label": "обучение не ведётся"})
+    return {"academic_year": kd.get("academic_year") or f"{y0}/{y0 + 1}", "months": months, "header": header,
+            "week_numbers": [i + 1 if i < n_weeks else None for i in range(n_cols)], "courses": courses, "legend": legend}
+
+
 def build(ses, prog: Program) -> dict:
     docs = ses.scalars(select(Document).where(Document.program_id == prog.id)).all()
     finals = {d.id: latest_final(ses, d.id) for d in docs}
@@ -63,7 +121,6 @@ def build(ses, prog: Program) -> dict:
 
     up_data = (up or {}).get("data") or {}
     oop_data = (oop or {}).get("data") or {}
-    matrix = curriculum.matrix(up_data) if up_data.get("rows") else None
     up_rows = {_key(r["name"]): r for r in up_data.get("rows", [])}
 
     op = {
@@ -79,17 +136,8 @@ def build(ses, prog: Program) -> dict:
         "task_types": oop_data.get("task_types", []),
     }
 
-    schedule = None
     kd = (kug or {}).get("data") or {}
-    if kd.get("courses"):
-        used = {c for course in kd["courses"] for c in course["weeks"]}
-        schedule = {
-            "academic_year": kd.get("academic_year", ""),
-            "months": kd.get("months") or [],
-            "weeks": kd.get("weeks", 52),
-            "legend": [{"code": k, "label": v} for k, v in LEGEND.items() if k in used or k == "Т"],
-            "courses": [{"course": c["course"], "group": c.get("group", ""), "weeks": c["weeks"]} for c in kd["courses"]],
-        }
+    schedule = calendar_grid(kd, prog.year) if kd.get("courses") else None
 
     disciplines = []
     for d in sorted(by_type.get("rpd", []), key=lambda x: x.title.lower()):
@@ -104,7 +152,7 @@ def build(ses, prog: Program) -> dict:
             sems = data.get("semesters", [])
             control = ", ".join(c.capitalize() for c in data.get("control", []))
         disciplines.append({"id": d.id, "name": d.title, "semesters": _sem_text(sems), "control": control or "—",
-                            "summary": f.get("summary") or "", "goal": data.get("goal", ""), "status": d.status,
+                            "summary": f.get("summary") or "", "goal": data.get("goal", ""),
                             "url": f"/op/{prog.id}/doc/{d.id}", "pdf_url": d.url})
 
     practices = []
@@ -116,7 +164,7 @@ def build(ses, prog: Program) -> dict:
             row = up_rows.get(_key(d.title))
             sems = sorted({s for v in (row or {}).get("control", {}).values() for s in v})
         practices.append({"id": d.id, "name": d.title, "semester": _sem_text(sems),
-                          "weeks": data.get("weeks") or "—", "summary": f.get("summary") or "", "status": d.status,
+                          "weeks": data.get("weeks") or "—", "summary": f.get("summary") or "",
                           "url": f"/op/{prog.id}/doc/{d.id}", "pdf_url": d.url, "_order": sems[0] if sems else 99})
     practices.sort(key=lambda p: (p.pop("_order"), p["name"]))
 
@@ -145,20 +193,13 @@ def build(ses, prog: Program) -> dict:
         if not group:
             continue
         if t in ("rpd", "practice") and len(group) > 1:
-            statuses = Counter(d.status for d in group)
-            worst = next((s for s in ("error", "needs_review", "partial", "unknown_template") if statuses.get(s)), None)
-            status = "needs_review" if worst in ("partial", "unknown_template", "needs_review") else (worst or "processed")
-            parts = [f"{statuses.get('processed', 0)} обработано"]
-            labels = {"partial": "частично", "needs_review": "требуют проверки", "unknown_template": "неизвестный шаблон",
-                      "error": "ошибка", "skipped": "пропущено", "queued": "в очереди"}
-            parts += [f"{n} — {labels.get(s, s)}" for s, n in statuses.items() if s != "processed"]
-            title = ("Рабочие программы дисциплин" if t == "rpd" else "Рабочие программы практик") + f" — {len(group)} док."
-            documents.append({"type": DOC_TYPES[t], "title": title, "status": status, "note": ", ".join(parts),
-                              "url": "#discipliny" if t == "rpd" else "#praktiki", "group": True})
+            title = ("Рабочие программы дисциплин" if t == "rpd" else "Рабочие программы практик") + f" — {len(group)}"
+            documents.append({"type": DOC_TYPES[t], "title": title, "url": "#discipliny" if t == "rpd" else "#praktiki",
+                              "group": True})
         for d in group if not (t in ("rpd", "practice") and len(group) > 1) else []:
             documents.append({"type": DOC_TYPES[t], "title": DOC_TYPE_TITLES[t] if t not in ("rpd", "practice") else d.title,
-                              "status": d.status, "note": d.note, "url": d.url, "doc_id": d.id})
-    # карусель по курсам и полки категорий; дисциплины ведут на страницы своих РПД и программ практик
+                              "url": d.url, "doc_id": d.id})
+    # карусель по семестрам и полки категорий; дисциплины ведут на страницы своих РПД и программ практик
     links = {}
     for d in by_type.get("rpd", []) + by_type.get("practice", []):
         links.setdefault(_key(d.title), f"/op/{prog.id}/doc/{d.id}")
@@ -167,9 +208,5 @@ def build(ses, prog: Program) -> dict:
             links.setdefault(_key(discipline), f"/op/{prog.id}/doc/{d.id}")
     plan = plan_view.build(up_data, links, key=_key)
 
-    review = [{"type": DOC_TYPES[d.doc_type], "title": d.title, "note": d.note, "status": d.status,
-               "url": f"/op/{prog.id}/doc/{d.id}"} for d in docs if d.status in REVIEW_STATUSES]
-    errors = [{"type": DOC_TYPES[d.doc_type], "title": d.title, "note": d.note} for d in docs if d.status == "error"]
-    return {"op": op, "curriculum": matrix, "plan": plan, "schedule": schedule, "disciplines": disciplines, "practices": practices,
-            "gia": gia_ctx, "documents": documents, "review": review, "errors": errors,
-            "up_checks": up_data.get("checks", {}).get("messages", [])}
+    return {"op": op, "plan": plan, "schedule": schedule, "disciplines": disciplines, "practices": practices,
+            "gia": gia_ctx, "documents": documents}

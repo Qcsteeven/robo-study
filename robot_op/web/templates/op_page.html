@@ -3,7 +3,7 @@
 
 {#-
   Веб-страница ОП. Контекст формирует робот по итоговым JSON-файлам (robot_op/robot/page.py):
-  op, curriculum, schedule, disciplines, practices, gia, documents, review, errors, last_run.
+  op, plan, schedule, disciplines, practices, gia, documents.
 -#}
 
 {% block title %}{{ op.code }} {{ op.profile }} — Робот ОП{% endblock %}
@@ -26,18 +26,6 @@
 <div class="app-page">
   <div class="app-content">
 
-    {%- if review %}
-    {% call ui.alert('warning', review | length ~ ' ' ~ ('документ требует' if review | length == 1 else 'документа требуют' if review | length < 5 else 'документов требуют') ~ ' проверки') %}
-      <ul class="app-alert-list">{% for d in review %}<li><a href="{{ d.url }}">{{ d.type }} «{{ d.title }}»</a> — {{ d.note }}</li>{% endfor %}</ul>
-      <p>Сведения из этих документов показаны как есть — сверьте их с <a href="#docs">исходными PDF</a>.</p>
-    {% endcall %}
-    {%- endif %}
-    {%- if errors %}
-    {% call ui.alert('danger', 'Не удалось обработать: ' ~ errors | length) %}
-      <ul class="app-alert-list">{% for d in errors %}<li>{{ d.type }} «{{ d.title }}» — {{ d.note }}</li>{% endfor %}</ul>
-    {% endcall %}
-    {%- endif %}
-
     <section class="app-section" id="svedeniya" aria-labelledby="h-svedeniya">
       <h2 class="section-title" id="h-svedeniya">Сведения о программе</h2>
       {{ ui.info_block([
@@ -54,9 +42,9 @@
       <p class="app-llm-note">Сформировано LLM по тексту ООП и носит вспомогательный характер.</p>
       {%- elif op.characteristic %}
       <p class="app-prose">{{ op.characteristic }}</p>
-      <p class="app-llm-note">Фрагмент раздела «Общая характеристика» ООП. Краткое описание LLM не сформировано.</p>
+      <p class="app-llm-note">Из раздела «Общая характеристика» ООП.</p>
       {%- else %}
-      {{ ui.empty('Характеристика не сформирована: ООП не обработана.') }}
+      {{ ui.empty('Характеристика программы пока не опубликована.') }}
       {%- endif %}
       {%- if op.areas or op.task_types %}
       <div class="app-grid2" style="margin-top: var(--space-18)">
@@ -69,35 +57,24 @@
     <section class="app-section" id="up" aria-labelledby="h-up">
       <h2 class="section-title" id="h-up">Учебный план</h2>
       {%- if plan %}
-      <h3 class="card-title app-subhead app-subhead--first">По курсам</h3>
-      <p class="app-lead">Что изучают в каждом семестре. Цвет — категория дисциплины, справа — форма контроля; название ведёт на страницу рабочей программы.</p>
+      <h3 class="card-title app-subhead app-subhead--first">По семестрам</h3>
+      <p class="app-lead">Нагрузка каждого семестра: сколько пар лекций, практических и лабораторных занятий за семестр. Пара — два академических часа. Название дисциплины ведёт на её рабочую программу.</p>
       {{ ui.plan_carousel(plan) }}
       <h3 class="card-title app-subhead">Из чего состоит программа</h3>
-      <p class="app-lead">Доля категорий в объёме программы ({{ plan.total_ze }} з. е. без факультативов). Категории робот определяет по названиям дисциплин.</p>
+      <p class="app-lead">Доля категорий в объёме программы ({{ plan.total_ze }} з. е. без факультативов).</p>
       {{ ui.plan_shelves(plan) }}
-      {%- endif %}
-      {%- if curriculum %}
-      {%- if plan %}<h3 class="card-title app-subhead">Нагрузка в парах в неделю</h3>{% endif %}
-      <p class="app-lead">Аудиторная нагрузка в парах в неделю: Лек — лекции, Лаб — лабораторные, Пр — практические занятия; «Контр.» — форма контроля. Пары в неделю = часы за семестр ÷ 2 ÷ число учебных недель; часы видны в подсказке ячейки. Таблица прокручивается по горизонтали, колонка дисциплин остаётся на месте.</p>
-      {{ ui.curriculum_matrix(curriculum) }}
-      {%- if up_checks %}
-      <details class="app-details" style="margin-top: var(--space-18)">
-        <summary>Строки, не прошедшие проверку сумм часов ({{ up_checks | length }})</summary>
-        <ul class="app-list">{% for m in up_checks %}<li>{{ m }}</li>{% endfor %}</ul>
-      </details>
-      {%- endif %}
       {%- else %}
-      {{ ui.empty('Учебный план не обработан.') }}
+      {{ ui.empty('Учебный план пока не опубликован.') }}
       {%- endif %}
     </section>
 
     <section class="app-section" id="kug" aria-labelledby="h-kug">
-      <h2 class="section-title" id="h-kug">График учебного процесса</h2>
+      <h2 class="section-title" id="h-kug">Календарный учебный график</h2>
       {%- if schedule %}
-      <p class="app-lead">{{ schedule.academic_year or 'Текущий' }} учебный год, недели с 1 сентября.</p>
+      <p class="app-lead">На {{ schedule.academic_year }} учебный год — как в документе: у каждого курса строки по дням недели, колонки — недели, в ячейке — вид деятельности в этот день. Таблица прокручивается по горизонтали.</p>
       {{ ui.schedule_grid(schedule) }}
       {%- else %}
-      {{ ui.empty('Календарный учебный график не обработан или не опубликован на сайте.') }}
+      {{ ui.empty('Календарный учебный график пока не опубликован.') }}
       {%- endif %}
     </section>
 
@@ -106,11 +83,11 @@
       {%- if disciplines %}
       <div class="ir-table-wrap">
         <table class="ir-table app-table-text">
-          <thead><tr><th scope="col">Дисциплина</th><th scope="col" class="ir-num">Семестр</th><th scope="col">Контроль</th><th scope="col">Кратко (LLM)</th></tr></thead>
+          <thead><tr><th scope="col">Дисциплина</th><th scope="col" class="ir-num">Семестр</th><th scope="col">Контроль</th><th scope="col">Кратко</th></tr></thead>
           <tbody>
             {%- for d in disciplines %}
             <tr>
-              <td><a class="ir-link" href="{{ d.url }}">{{ d.name }}</a>{% if d.status not in ('processed',) %}<br>{{ ui.status(d.status) }}{% endif %}</td>
+              <td><a class="ir-link" href="{{ d.url }}">{{ d.name }}</a></td>
               <td class="ir-num">{{ d.semesters }}</td>
               <td class="app-nowrap">{{ d.control }}</td>
               <td class="ir-muted app-small">{{ d.summary or d.goal or '—' }}</td>
@@ -120,7 +97,7 @@
         </table>
       </div>
       {%- else %}
-      {{ ui.empty('РПД не обработаны.') }}
+      {{ ui.empty('Рабочие программы дисциплин пока не опубликованы.') }}
       {%- endif %}
     </section>
 
@@ -129,11 +106,11 @@
       {%- if practices %}
       <div class="ir-table-wrap">
         <table class="ir-table app-table-text">
-          <thead><tr><th scope="col">Практика</th><th scope="col" class="ir-num">Семестр</th><th scope="col" class="ir-num">Недель</th><th scope="col">Кратко (LLM)</th></tr></thead>
+          <thead><tr><th scope="col">Практика</th><th scope="col" class="ir-num">Семестр</th><th scope="col" class="ir-num">Недель</th><th scope="col">Кратко</th></tr></thead>
           <tbody>
             {%- for p in practices %}
             <tr>
-              <td><a class="ir-link" href="{{ p.url }}">{{ p.name }}</a>{% if p.status not in ('processed',) %}<br>{{ ui.status(p.status) }}{% endif %}</td>
+              <td><a class="ir-link" href="{{ p.url }}">{{ p.name }}</a></td>
               <td class="ir-num">{{ p.semester }}</td>
               <td class="ir-num">{{ p.weeks }}</td>
               <td class="ir-muted app-small">{{ p.summary or '—' }}</td>
@@ -143,7 +120,7 @@
         </table>
       </div>
       {%- else %}
-      {{ ui.empty('Программы практик не обработаны.') }}
+      {{ ui.empty('Программы практик пока не опубликованы.') }}
       {%- endif %}
     </section>
 
@@ -161,7 +138,7 @@
       {%- endif %}
       <p class="app-llm-note">{% if gia.gia_url %}<a class="ir-link" href="{{ gia.gia_url }}">Программа ГИА</a>{% endif %}{% if gia.gia_url and gia.fos_url %} · {% endif %}{% if gia.fos_url %}<a class="ir-link" href="{{ gia.fos_url }}">ФОС ГИА</a>{% endif %}</p>
       {%- else %}
-      {{ ui.empty('Программа ГИА и ФОС ГИА не обработаны.') }}
+      {{ ui.empty('Программа ГИА пока не опубликована.') }}
       {%- endif %}
     </section>
 
@@ -180,21 +157,11 @@
     {{ ui.section_nav('Программа', [
         {'label': 'Сведения о программе', 'href': '#svedeniya'},
         {'label': 'Учебный план', 'href': '#up'},
-        {'label': 'График учебного процесса', 'href': '#kug'},
+        {'label': 'Календарный учебный график', 'href': '#kug'},
         {'label': 'Дисциплины', 'href': '#discipliny'},
         {'label': 'Практики', 'href': '#praktiki'},
         {'label': 'ГИА', 'href': '#gia'},
         {'label': 'Исходные документы', 'href': '#docs'}]) }}
-    {%- if last_run %}
-    {{ ui.info_block([
-        {'label': 'Дата', 'value': last_run.date},
-        {'label': 'Документов', 'value': last_run.documents},
-        {'label': 'Требуют проверки', 'value': last_run.needs_review},
-        {'label': 'Ошибок', 'value': last_run.errors},
-        {'label': 'Длительность', 'value': last_run.duration}],
-        title='Запуск № ' ~ last_run.number, variant='navy') }}
-    <a class="ir-btn ir-btn--outline app-aside__btn" href="{{ last_run.report_url }}">Отчёт о запуске</a>
-    {%- endif %}
   </aside>
 </div>
 {% endblock %}
@@ -222,7 +189,7 @@
     Object.keys(byId).forEach(function (id) { var el = document.getElementById(id); if (el) obs.observe(el); });
   })();
 
-  // Карусель курсов: переключатель «N курс», стрелки, клавиши ← →; без скрипта остаётся прокрутка
+  // Карусель семестров: переключатель семестров, стрелки, клавиши ← →; без скрипта остаётся прокрутка
   (function () {
     var root = document.querySelector('[data-carousel]');
     if (!root) return;
@@ -237,7 +204,11 @@
       track.scrollTo({ left: slides[current].offsetLeft - track.offsetLeft, behavior: smooth === false ? 'auto' : 'smooth' });
       mark();
     }
+    // высота карусели — по текущему семестру, а не по самому длинному
+    function fit() { track.style.height = slides[current].offsetHeight + 'px'; }
+    window.addEventListener('resize', fit);
     function mark() {
+      fit();
       tabs.forEach(function (t, k) { if (k === current) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
       root.querySelector('[data-prev]').disabled = current === 0;
       root.querySelector('[data-next]').disabled = current === slides.length - 1;
@@ -267,7 +238,8 @@
       b.addEventListener('click', function () {
         var on = b.getAttribute('aria-pressed') !== 'true';
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
-        root.querySelectorAll('.app-chip[data-cat="' + b.dataset.cat + '"]').forEach(function (c) { c.hidden = !on; });
+        root.querySelectorAll('[data-cat="' + b.dataset.cat + '"]').forEach(function (c) { c.hidden = !on; });
+        fit();
       });
     });
   })();

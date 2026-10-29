@@ -34,11 +34,6 @@
   <span class="ir-tag{% if tone %} ir-tag--{{ tone }}{% endif %}" title="{{ label }}">{{ label }}</span>
 {%- endmacro %}
 
-{#- Число пар в неделю: 1 → «1», 0.5 → «0,5», пусто → «·» -#}
-{% macro pairs(v) -%}
-  {%- if v -%}{{ '%g' | format(v) | replace('.', ',') }}{%- else -%}<span class="ir-matrix__empty" aria-hidden="true">·</span>{%- endif -%}
-{%- endmacro %}
-
 {% macro page_header(title, crumbs=[], meta=[], logo_src=none) -%}
 <header class="ir-pagehead">
   <div class="ir-pagehead__inner">
@@ -90,8 +85,9 @@
 </div>
 {%- endmacro %}
 
-{#- Дисциплины по курсам: слайд на курс, в нём два семестра. Без скриптов — горизонтальная прокрутка
-    с прилипанием к слайду; скрипт страницы добавляет переключатель курсов, стрелки и фильтр категорий -#}
+{#- Учебный план по семестрам: слайд на семестр — сводка нагрузки и дисциплины с числом пар лекций, практик
+    и лабораторных за семестр. Без скриптов — горизонтальная прокрутка с прилипанием к слайду; скрипт
+    страницы добавляет переключатель семестров, стрелки и фильтр категорий -#}
 {% macro plan_carousel(plan) -%}
 <div class="app-catfilter" data-catfilter hidden>
   <span class="app-catfilter__label">Показать:</span>
@@ -99,44 +95,77 @@
   <button type="button" class="app-catbtn app-cat--{{ c.key }}" data-cat="{{ c.key }}" aria-pressed="true"><span class="app-cat__mark" aria-hidden="true"></span>{{ c.title }}</button>
   {%- endfor %}
 </div>
-<div class="app-carousel" data-carousel role="region" aria-roledescription="карусель" aria-label="Дисциплины по курсам">
+<div class="app-carousel" data-carousel role="region" aria-roledescription="карусель" aria-label="Учебный план по семестрам">
   <div class="app-carousel__bar" data-carousel-bar hidden>
-    <button type="button" class="app-carousel__arrow" data-prev aria-label="Предыдущий курс">&#8592;</button>
+    <button type="button" class="app-carousel__arrow" data-prev aria-label="Предыдущий семестр">&#8592;</button>
     <div class="app-carousel__tabs">
-      {%- for c in plan.courses %}
-      <button type="button" class="app-carousel__tab" data-go="{{ loop.index0 }}"{% if loop.first %} aria-current="true"{% endif %}>{{ c.number }} курс</button>
+      {%- for s in plan.semesters %}
+      <button type="button" class="app-carousel__tab" data-go="{{ loop.index0 }}" aria-label="{{ s.number }} семестр"{% if loop.first %} aria-current="true"{% endif %}>{{ s.number }}<span class="app-carousel__tab-sub"> сем.</span></button>
       {%- endfor %}
     </div>
-    <button type="button" class="app-carousel__arrow" data-next aria-label="Следующий курс">&#8594;</button>
+    <button type="button" class="app-carousel__arrow" data-next aria-label="Следующий семестр">&#8594;</button>
   </div>
   <div class="app-carousel__track app-scroll" data-track tabindex="0">
-    {%- for c in plan.courses %}
-    <section class="app-carousel__slide" role="group" aria-roledescription="слайд" aria-label="{{ c.number }} курс из {{ plan.courses | length }}">
+    {%- for s in plan.semesters %}
+    <section class="app-carousel__slide" role="group" aria-roledescription="слайд" aria-label="{{ s.number }} семестр из {{ plan.semesters | length }}">
       <div class="app-course__head">
-        <h4 class="item-title app-course__title">{{ c.number }} курс</h4>
-        <span class="app-course__meta">{{ c.count }} дисциплин{{ c.count | plural('а', 'ы', '') }} · {{ c.exams }} экзамен{{ c.exams | plural('', 'а', 'ов') }}</span>
+        <h4 class="item-title app-course__title">{{ s.number }} семестр</h4>
+        <span class="app-course__meta">{{ s.course }} курс{% if s.weeks %} · {{ s.weeks }} учебных недел{{ s.weeks | plural('я', 'и', 'ь') }}{% endif %} · {{ s.count }} дисциплин{{ s.count | plural('а', 'ы', '') }} · {{ s.exams }} экзамен{{ s.exams | plural('', 'а', 'ов') }}</span>
       </div>
-      <div class="app-course__sems">
-        {%- for s in c.semesters %}
-        <div class="app-sem">
-          <p class="app-sem__title">{{ s.number }} семестр{% if s.weeks %} <span>· {{ s.weeks }} нед.</span>{% endif %}</p>
-          <ul class="app-chips">
+      <dl class="app-load">
+        <div class="app-load__total"><dt>Пар за семестр</dt><dd>{{ num(s.pairs) }}</dd>{% if s.per_week %}<span class="app-load__note">≈ {{ num(s.per_week) }} в неделю</span>{% endif %}</div>
+        <div class="app-load--lec"><dt><span class="app-load__mark" aria-hidden="true"></span>Лекции</dt><dd>{{ num(s.lec) }}</dd></div>
+        <div class="app-load--pr"><dt><span class="app-load__mark" aria-hidden="true"></span>Практики</dt><dd>{{ num(s.pr) }}</dd></div>
+        <div class="app-load--lab"><dt><span class="app-load__mark" aria-hidden="true"></span>Лабораторные</dt><dd>{{ num(s.lab) }}</dd></div>
+      </dl>
+      {%- if s.pairs %}
+      <div class="app-load__bar" aria-hidden="true">
+        {%- for k in ('lec', 'pr', 'lab') if s[k] %}<span class="app-load--{{ k }}" style="flex-grow: {{ s[k] }}"></span>{% endfor %}
+      </div>
+      {%- endif %}
+      <div class="ir-table-wrap app-scroll">
+        <table class="ir-table app-semtable">
+          <caption class="sr-only">{{ s.number }} семестр: дисциплины и число пар</caption>
+          <thead><tr>
+            <th scope="col">Дисциплина</th>
+            <th scope="col" class="ir-num" title="Лекции, пар за семестр">Лек</th>
+            <th scope="col" class="ir-num" title="Практические занятия, пар за семестр">Пр</th>
+            <th scope="col" class="ir-num" title="Лабораторные работы, пар за семестр">Лаб</th>
+            <th scope="col" class="ir-num">Пар</th>
+            <th scope="col">Контроль</th>
+          </tr></thead>
+          <tbody>
             {%- for d in s['items'] %}
-            <li class="app-chip app-cat--{{ d.category }}" data-cat="{{ d.category }}">
-              <span class="app-cat__mark" aria-hidden="true"></span>
-              {%- if d.url %}<a class="app-chip__name" href="{{ d.url }}">{{ d.name }}</a>{% else %}<span class="app-chip__name">{{ d.name }}</span>{% endif %}
-              {%- if d.optional %}<span class="app-chip__tag">факультатив</span>{% endif %}
-              {%- if d.control %}<span class="app-chip__ctl">{{ d.control }}</span>{% endif %}
-            </li>
+            <tr class="app-semrow app-cat--{{ d.category }}{% if d.optional %} app-semtable__opt{% endif %}" data-cat="{{ d.category }}">
+              <td><span class="app-semtable__name"><span class="app-cat__mark" aria-hidden="true"></span>
+                <span>{%- if d.url %}<a class="ir-link" href="{{ d.url }}">{{ d.name }}</a>{% else %}{{ d.name }}{% endif %}
+                {%- if d.optional %} <span class="app-chip__tag">факультатив</span>{% endif %}</span></span></td>
+              {%- if d.practice and not d.pairs %}
+              <td colspan="4" class="app-semtable__practice">{{ 'практика' if d.category == 'prac' else 'без аудиторных занятий' }}{% if d.ze %} · {{ d.ze }} з. е.{% endif %}</td>
+              {%- else %}
+              <td class="ir-num">{{ num(d.lec, '—') }}</td><td class="ir-num">{{ num(d.pr, '—') }}</td><td class="ir-num">{{ num(d.lab, '—') }}</td>
+              <td class="ir-num app-semtable__sum">{{ num(d.pairs, '—') }}</td>
+              {%- endif %}
+              <td class="app-nowrap">{{ d.control or '—' }}</td>
+            </tr>
             {%- endfor %}
-          </ul>
-        </div>
-        {%- endfor %}
+          </tbody>
+          <tfoot><tr>
+            <th scope="row">Итого{% if s['items'] | selectattr('optional') | list %} <span class="app-chip__tag">без факультативов</span>{% endif %}</th>
+            <td class="ir-num">{{ num(s.lec, '—') }}</td><td class="ir-num">{{ num(s.pr, '—') }}</td><td class="ir-num">{{ num(s.lab, '—') }}</td>
+            <td class="ir-num app-semtable__sum">{{ num(s.pairs, '—') }}</td><td></td>
+          </tr></tfoot>
+        </table>
       </div>
     </section>
     {%- endfor %}
   </div>
 </div>
+{%- endmacro %}
+
+{#- Число: 32 → «32», 4.5 → «4,5»; ноль — заглушка -#}
+{% macro num(v, zero='0') -%}
+  {%- if v -%}{{ '%g' | format(v) | replace('.', ',') }}{%- else -%}{{ zero }}{%- endif -%}
 {%- endmacro %}
 
 {#- Из чего состоит программа: доля категорий в з. е. и раскрывающиеся полки с дисциплинами -#}
@@ -168,63 +197,53 @@
 </div>
 {%- endmacro %}
 
-{#- Учебный план «дисциплины × семестры» -#}
-{% macro curriculum_matrix(cur, caption=none) -%}
-{%- set sems = cur.semesters -%}
-<div class="ir-table-wrap app-scroll" tabindex="0" role="region" aria-label="{{ caption or 'Учебный план' }}">
-  <table class="ir-table ir-table--dense ir-matrix">
-    {%- if caption %}<caption>{{ caption }}</caption>{% endif %}
-    <thead>
-      <tr>
-        <th rowspan="2" scope="col" class="ir-matrix__name">Дисциплина</th>
-        {%- for s in sems %}<th colspan="4" scope="colgroup" class="ir-matrix__sem">Семестр {{ s }}{% if cur.weeks and cur.weeks.get(s | string) %} <span class="ir-matrix__sub">· {{ cur.weeks.get(s | string) }} нед.</span>{% endif %}</th>{% endfor %}
-      </tr>
-      <tr>
-        {%- for s in sems %}
-        <th scope="col" class="ir-matrix__sub ir-matrix__sem" title="Лекции">Лек</th><th scope="col" class="ir-matrix__sub" title="Лабораторные занятия">Лаб</th><th scope="col" class="ir-matrix__sub" title="Практические занятия">Пр</th><th scope="col" class="ir-matrix__sub" title="Форма контроля">Контр.</th>
-        {%- endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {%- for g in cur.groups %}
-      {%- if g.title %}<tr class="ir-matrix__group"><td colspan="{{ 1 + sems | length * 4 }}">{{ g.title }}</td></tr>{% endif %}
-      {%- for r in g.rows %}
-      <tr{% if r.checks %} class="app-matrix__flag"{% endif %}>
-        <th scope="row" class="ir-matrix__name" style="font-weight:400"{% if r.checks %} title="Требует проверки: {{ r.checks | join('; ') }}"{% endif %}>{{ r.name }}{% if r.checks %} <span class="app-flag" aria-label="требует проверки">!</span>{% endif %}</th>
-        {%- for s in sems %}{% set c = r.cells.get(s | string, {}) %}{% set h = c.hours or {} %}
-        <td class="ir-matrix__cell ir-matrix__sem"{% if h.lec %} title="{{ h.lec }} ч за семестр"{% endif %}>{{ pairs(c.lec) }}</td><td class="ir-matrix__cell"{% if h.lab %} title="{{ h.lab }} ч за семестр"{% endif %}>{{ pairs(c.lab) }}</td><td class="ir-matrix__cell"{% if h.pr %} title="{{ h.pr }} ч за семестр"{% endif %}>{{ pairs(c.pr) }}</td><td class="ir-matrix__ctl">{% if c.control %}{{ c.control }}{% else %}<span class="ir-matrix__empty" aria-hidden="true">·</span>{% endif %}</td>
-        {%- endfor %}
-      </tr>
-      {%- endfor %}
-      {%- endfor %}
-    </tbody>
-  </table>
-</div>
+{#- График учебного процесса как в документе: шапка — месяцы, даты по дням недели и номера недель;
+    у каждого курса шесть строк пн…сб, в ячейке — обозначение дня -#}
+{%- set KUG_CLASS = {'': 't', 'Т': 't', 'Э': 'e', 'У': 'u', 'П': 'p', 'Пд': 'p', 'Н': 'p', 'Г': 'd', 'Д': 'd', 'К': 'k', '*': 'h', 'out': 'out'} -%}
+{% macro kug_cell(code) -%}
+<td class="app-kug__cell app-kug--{{ KUG_CLASS.get(code, 't') }}">{% if code not in ('', 'out') %}{{ code }}{% endif %}</td>
 {%- endmacro %}
-
-{#- График учебного процесса: курсы × недели учебного года -#}
-{%- set KUG_CLASS = {'Т': 't', 'Э': 'e', 'У': 'u', 'П': 'p', 'Пд': 'p', 'Н': 'p', 'Г': 'd', 'Д': 'd', 'К': 'k'} -%}
 {% macro schedule_grid(kug) -%}
-<div class="ir-table-wrap app-scroll" tabindex="0" role="region" aria-label="График учебного процесса {{ kug.academic_year }}">
+<div class="ir-table-wrap app-scroll" tabindex="0" role="region" aria-label="Календарный учебный график {{ kug.academic_year }}">
   <table class="app-kug">
-    <caption class="sr-only">График учебного процесса, {{ kug.academic_year }} учебный год</caption>
+    <caption class="sr-only">Календарный учебный график на {{ kug.academic_year }} учебный год</caption>
     <thead>
-      <tr><th scope="col" rowspan="2" class="app-kug__course">Курс</th>{% for m in kug.months %}<th scope="colgroup" colspan="{{ m[1] }}" class="app-kug__month">{{ m[0] }}</th>{% endfor %}</tr>
-      <tr>{% for w in range(1, (kug.weeks or 52) + 1) %}<th scope="col" class="app-kug__week">{{ w }}</th>{% endfor %}</tr>
-    </thead>
-    <tbody>
-      {%- for c in kug.courses %}
       <tr>
-        <th scope="row" class="app-kug__course"{% if c.group %} title="{{ c.group }}"{% endif %}>{{ c.course }}</th>
-        {%- for code in c.weeks %}<td class="app-kug__cell app-kug--{{ KUG_CLASS.get(code, 't') }}">{% if code != 'Т' %}{{ code }}{% endif %}</td>{% endfor %}
+        <th scope="col" rowspan="{{ kug.header | length + 2 }}" class="app-kug__course"><span class="app-kug__vertical">Курс</span></th>
+        <th scope="col" rowspan="{{ kug.header | length + 2 }}" class="app-kug__group">Набор</th>
+        <td class="app-kug__day"></td>
+        {%- for m in kug.months %}<th scope="colgroup" colspan="{{ m[1] }}" class="app-kug__month">{{ m[0] }}</th>{% endfor %}
+      </tr>
+      {%- for row in kug.header %}
+      <tr class="app-kug__dates{% if row.day == 'вс' %} app-kug__dates--sun{% endif %}">
+        <th scope="row" class="app-kug__day">{{ row.day }}</th>
+        {%- for c in row.cells %}<td{% if c.out %} class="app-kug__out-date"{% endif %}>{{ c.n }}</td>{% endfor %}
+      </tr>
+      {%- endfor %}
+      <tr class="app-kug__weeks">
+        <td class="app-kug__day"></td>
+        {%- for w in kug.week_numbers %}<th scope="col" class="app-kug__week">{{ w or '' }}</th>{% endfor %}
+      </tr>
+    </thead>
+    {%- for c in kug.courses %}
+    <tbody class="app-kug__block">
+      {%- for row in c.rows %}
+      <tr>
+        {%- if loop.first %}
+        <th scope="rowgroup" rowspan="{{ c.rows | length }}" class="app-kug__course">{{ c.course }}</th>
+        <th scope="rowgroup" rowspan="{{ c.rows | length }}" class="app-kug__group">{{ c.group }}</th>
+        {%- endif %}
+        <th scope="row" class="app-kug__day">{{ row.day }}</th>
+        {%- for code in row.cells %}{{ kug_cell(code) }}{% endfor %}
       </tr>
       {%- endfor %}
     </tbody>
+    {%- endfor %}
   </table>
 </div>
 <ul class="app-kug-legend">
   {%- for l in kug.legend %}
-  <li><span class="app-kug__cell app-kug--{{ KUG_CLASS.get(l.code, 't') }}" aria-hidden="true">{% if l.code != 'Т' %}{{ l.code }}{% endif %}</span>{{ l.code }} — {{ l.label }}</li>
+  <li><span class="app-kug__cell app-kug--{{ KUG_CLASS.get(l.code, 't') }}" aria-hidden="true">{% if l.code not in ('', 'out') %}{{ l.code }}{% endif %}</span>{% if l.code and l.code != 'out' %}«{{ l.code }}» — {% endif %}{{ l.label }}</li>
   {%- endfor %}
 </ul>
 {%- endmacro %}
@@ -234,9 +253,7 @@
   <span class="app-doc__type">{{ tag(d.type, 'outline') }}</span>
   <span class="app-doc__main">
     <a class="ir-link{% if not d.group %} ir-doclink{% endif %}" href="{{ d.url }}">{{ d.title }}</a>
-    {%- if d.note %}<span class="app-doc__note">{{ d.note }}</span>{% endif %}
   </span>
-  <span class="app-doc__status">{{ status(d.status) }}</span>
 </li>
 {%- endmacro %}
 

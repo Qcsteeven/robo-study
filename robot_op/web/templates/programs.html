@@ -12,23 +12,16 @@
           <div class="ir-card__tags">{{ ui.tag(p.level_title, tones.get(p.level)) }}{{ ui.tag(p.form, 'outline') }}</div>
           <div class="ir-card__code">{{ p.code }} {{ p.direction }}</div>
           <a class="ir-card__title" href="/op/{{ p.id }}">{{ p.profile or p.block_title }}</a>
-          <div class="ir-card__foot">
-            <span>{{ 'Обновлено ' ~ p.page_updated_at.strftime('%d.%m.%Y') if p.page_updated_at else 'Страница не сформирована' }}</span>
-            <span class="app-card__status">
-              {%- set st = stats.get(p.id, {}) %}
-              {%- if st.review %}<span class="ir-status ir-status--warning">Проверка: {{ st.review }}</span>{% endif %}
-              {%- if st.error %}<span class="ir-status ir-status--danger">Ошибок: {{ st.error }}</span>{% endif %}
-              {%- if st.total and not st.review and not st.error %}<span class="ir-status ir-status--success">{{ st.total }} док.</span>{% endif %}
-            </span>
-          </div>
+          {%- if p.page_updated_at %}
+          <div class="ir-card__foot"><span>Обновлено {{ p.page_updated_at.strftime('%d.%m.%Y') }}</span></div>
+          {%- endif %}
         </article>
         {%- endfor %}
       </div>
     </section>
     {%- endfor %}
     {%- else %}
-    {{ ui.empty('Обработанных образовательных программ пока нет' ~ (' для выбранного уровня' if level else '') ~ '. Веб-страница ОП появляется после запуска робота.') }}
-    <p><a class="ir-btn ir-btn--primary ir-btn--pill" href="/run{% if level %}?level={{ level }}{% endif %}">Запустить робота</a></p>
+    {{ ui.empty('Образовательных программ' ~ (' этого уровня' if level else '') ~ ' пока нет: сведения появятся после обновления данных с сайта ИРНИТУ.') }}
     {%- endif %}
   </div>
 </div>

@@ -17,6 +17,7 @@ from ..catalog import DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE, LEVELS, REVIEW_STA
 from ..config import Settings, get_settings
 from ..models import Database, Document, JsonVersion, Program, Run, RunItem
 from ..robot.http import SiteError
+from ..robot import doc_view
 from ..robot.page import latest_final
 from ..robot.pipeline import Robot
 from ..robot.worker import Worker
@@ -125,9 +126,11 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
         with db.Session() as ses:
             last_run = ses.scalar(select(Run).order_by(Run.id.desc()).limit(1))
             last = run_summary(ses, last_run) if last_run else None
+            on_site = {p.id: p.page_updated_at.strftime("%d.%m.%Y") for p in
+                       ses.scalars(select(Program).where(Program.page.is_not(None), Program.year == year)) if p.page_updated_at}
         return render(request, "run.html", page_title="Обновление данных", crumbs=crumbs(("Обновление данных", None)),
                       active_nav="run", levels=levels, level=level if lv else "", year=year,
-                      programs=programs, site_error=site_error, message=message, last=last)
+                      programs=programs, site_error=site_error, message=message, last=last, on_site=on_site)
 
     @app.post("/run", include_in_schema=False)
     def start_run(level: str = Form(...), programs: list[str] = Form(default=[]),
@@ -206,11 +209,11 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                 return not_found(request, "Документ не найден.")
             prog = ses.get(Program, program_id)
             final = latest_final(ses, doc_id)
-        facts, lists = _doc_facts(doc.doc_type, (final or {}).get("data") or {})
+        view = doc_view.build(doc.doc_type, (final or {}).get("data") or {})
         return render(request, "doc.html", page_title=doc.title,
                       crumbs=crumbs(("Программы", "/programs"), (prog.code, f"/op/{prog.id}"), (DOC_TYPES[doc.doc_type], None)),
                       meta=[DOC_TYPE_TITLES[doc.doc_type], f"{prog.code} {prog.profile}"],
-                      active_nav="programs", doc=doc, program=prog, final=final, facts=facts, lists=lists,
+                      active_nav="programs", doc=doc, program=prog, final=final, view=view,
                       type_title=DOC_TYPE_TITLES[doc.doc_type])
 
     @app.get("/documents/{doc_id}/pdf", include_in_schema=False)
@@ -314,38 +317,6 @@ def _json_download(data, filename: str, inline: bool = False) -> Response:
     disp = "inline" if inline else "attachment"
     return Response(body, media_type="application/json; charset=utf-8",
                     headers={"Content-Disposition": f'{disp}; filename="{filename}"'})
-
-
-def _doc_facts(doc_type: str, d: dict) -> tuple[list, list]:
-    facts, lists = [], []
-    comp = lambda items: [f"{c['code']} — {c['description']}" if isinstance(c, dict) and c.get("description") else
-                          (c["code"] if isinstance(c, dict) else c) for c in items or []]
-    if doc_type == "rpd":
-        facts = [("Дисциплина", d.get("discipline")), ("Цель", d.get("goal")), ("Трудоёмкость", f"{d['ze']} з. е." if d.get("ze") else None),
-                 ("Часов", d.get("hours")), ("Семестры", ", ".join(map(str, d.get("semesters", []))) or None),
-                 ("Контроль", ", ".join(d.get("control", [])) or None)]
-        lists = [("Компетенции", comp(d.get("competencies"))), ("Темы", d.get("topics")), ("Литература", d.get("literature"))]
-    elif doc_type == "practice":
-        facts = [("Вид практики", d.get("practice_kind")), ("Тип практики", d.get("practice_type")), ("Способ проведения", d.get("method")),
-                 ("Семестр", ", ".join(map(str, d.get("semesters", []))) or None), ("Недель", d.get("weeks")),
-                 ("Трудоёмкость", f"{d['ze']} з. е." if d.get("ze") else None), ("Контроль", ", ".join(d.get("control", [])) or None)]
-        lists = [("Этапы практики", d.get("stages")), ("Компетенции", comp(d.get("competencies"))), ("Литература", d.get("literature"))]
-    elif doc_type == "oop":
-        facts = [("Квалификация", d.get("qualification")), ("Срок обучения", d.get("duration")),
-                 ("Объём программы", f"{d['ze_total']} з. е." if d.get("ze_total") else None)]
-        lists = [("Области профессиональной деятельности", d.get("areas")), ("Типы задач", d.get("task_types")),
-                 ("Компетенции", comp(d.get("competencies")))]
-    elif doc_type == "gia":
-        facts = [("Объём", f"{d['ze']} з. е." if d.get("ze") else None), ("Продолжительность", f"{d['weeks']} нед." if d.get("weeks") else None)]
-        lists = [("Формы ГИА", d.get("forms"))]
-    elif doc_type == "fos_gia":
-        facts = [("Проверяемые компетенции", ", ".join(d.get("competencies", [])) or None)]
-        lists = [("Типовые задания и тематика ВКР", d.get("tasks"))]
-    elif doc_type == "up" and d.get("semesters"):
-        facts = [("Семестров", len(d["semesters"]))]
-    elif doc_type == "kug" and d.get("courses"):
-        facts = [("Учебный год", d.get("academic_year")), ("Курсов", len(d["courses"]))]
-    return [(k, v) for k, v in facts if v not in (None, "")], lists
 
 
 def _setup_demo(settings: Settings) -> httpx.BaseTransport:

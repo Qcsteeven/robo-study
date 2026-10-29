@@ -9,6 +9,7 @@ from sqlalchemy import select
 from ..catalog import DOC_ORDER, DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE
 from ..extract import curriculum
 from ..extract.schedule import LEGEND
+from ..extract.tables import vkr_topics
 from ..models import Document, JsonVersion, Program
 from . import plan_view
 
@@ -180,8 +181,10 @@ def build(ses, prog: Program) -> dict:
         gia_items.append({"label": "Проверяемые компетенции", "value": ", ".join(fd["competencies"])})
     gia_ctx = {
         "items": gia_items,
-        "summary": " ".join(s for s in ((gia or {}).get("summary"), (fos or {}).get("summary")) if s),
-        "vkr_topics": fd.get("tasks", [])[:10],
+        # описание ГИА и ВКР — не больше двух абзацев: из программы ГИА, а если её описания нет — из ФОС ГИА
+        "summary": [p for p in ((gia or {}).get("summary") or (fos or {}).get("summary") or "").split("\n\n") if p][:2],
+        # темы ВКР — только из таблицы тем программы ГИА; в тексте ФОС ГИА это обрывки абзацев, а не темы
+        "vkr_topics": [t for t in vkr_topics([[t] for t in gd.get("vkr_topics") or []]) if len(t) < 200][:10],
         "criteria": gd.get("criteria") or fd.get("criteria") or "",
         "gia_url": f"/op/{prog.id}/doc/{gia_doc.id}" if gia_doc else None,
         "fos_url": f"/op/{prog.id}/doc/{fos_doc.id}" if fos_doc else None,
@@ -194,7 +197,7 @@ def build(ses, prog: Program) -> dict:
             continue
         if t in ("rpd", "practice") and len(group) > 1:
             title = ("Рабочие программы дисциплин" if t == "rpd" else "Рабочие программы практик") + f" — {len(group)}"
-            documents.append({"type": DOC_TYPES[t], "title": title, "url": "#discipliny" if t == "rpd" else "#praktiki",
+            documents.append({"type": DOC_TYPES[t], "title": title, "url": "#up" if t == "rpd" else "#praktiki",
                               "group": True})
         for d in group if not (t in ("rpd", "practice") and len(group) > 1) else []:
             documents.append({"type": DOC_TYPES[t], "title": DOC_TYPE_TITLES[t] if t not in ("rpd", "practice") else d.title,

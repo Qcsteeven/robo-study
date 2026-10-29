@@ -27,10 +27,10 @@ from ..extract.ocr import OcrConfig, OcrUnavailable, ocr_page_text
 from ..models import Database, Document, JsonVersion, LogEntry, Program, Run, RunItem, now
 from . import page as pagebuilder
 from .http import AuthRequired, SiteClient, SiteError
-from .llm import LlmClient, LlmError
+from .llm import LlmClient, LlmError, too_long
 from .site import LevelYears, ProgramBlock, parse_education, parse_op_list
 
-PARSER_VERSION = "1.1"   # 1.1 — КУГ по дням
+PARSER_VERSION = "1.2"   # 1.1 — КУГ по дням; 1.2 — таблицы РПД, практик и ГИА
 log = logging.getLogger("robot_op")
 
 
@@ -386,6 +386,7 @@ class Robot:
                 doc.note = (last.note if last and last.note else "Не изменился с прошлого запуска")
                 self.journal(run_id, "INFO", "Документ не изменился — повторная обработка не требуется", prog.id, label, ses=ses)
                 ses.commit()
+                self._add_missing_summary(run_id, doc.id, doc.doc_type, doc.status, prog.id, label)
                 return doc.status, doc.note
             ses.commit()
             program_info = {"id": prog.id, "level": prog.level_title, "code": prog.code, "direction": prog.direction,
@@ -433,6 +434,26 @@ class Robot:
         self.journal(run_id, level, f"Статус: {status}" + (f" — {note}" if note else ""), program_info["id"], label)
         return status, note
 
+    def _add_missing_summary(self, run_id: int, doc_id: int, doc_type: str, status: str, program_id: str, label: str) -> None:
+        """Документ не изменился, но краткого описания нет (LLM подключили позже) или оно длиннее положенного —
+        описание формируется заново по сохранённому JSON-файлу, без повторного скачивания и разбора."""
+        if not self.llm.enabled or doc_type not in SUMMARY_TYPES or status in ("unknown_template", "skipped", "error"):
+            return
+        with self.db.Session() as ses:
+            final = pagebuilder.latest_final(ses, doc_id)
+        if not final or not final.get("data") or (final.get("summary") and not too_long(doc_type, final["summary"])):
+            return
+        try:
+            summary = self.llm.summarize(doc_type, {"program": final.get("program"), "document": final.get("document"), **final["data"]})
+        except LlmError as e:
+            self.journal(run_id, "ERROR", f"{e}. Краткое описание не сформировано", program_id, label)
+            return
+        with self.db.Session() as ses:
+            self._save_version(ses, doc_id, "final", dict(final, summary=summary, summary_model=self.llm.describe(),
+                                                          final_at=datetime.now().isoformat(timespec="seconds")), run_id)
+            ses.commit()
+        self.journal(run_id, "INFO", "Сформировано краткое описание", program_id, label)
+
     def _extract(self, run_id: int, doc: Document, data: bytes, program: dict, label: str):
         pages = pdfmod.page_count(data)
         texts = pdfmod.page_texts(data, max_pages=min(pages, 3))
@@ -467,7 +488,7 @@ class Robot:
                 self.journal(run_id, "WARNING", f"Содержимое не соответствует типу ({why}) — документ помечен и не обрабатывается",
                              program["id"], label)
                 return "skipped", why[:1].upper() + why[1:], method, {}, pages
-            extracted = sections.extract(doc.doc_type, full)
+            extracted = sections.extract(doc.doc_type, full, None if scanned else pdfmod.page_tables(data))
             tpl = extracted["template"]
             if tpl["score"] < 0.5:
                 return "unknown_template", "Разделы документа не соответствуют известному шаблону", method, extracted, pages

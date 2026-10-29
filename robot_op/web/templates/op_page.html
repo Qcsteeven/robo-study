@@ -39,7 +39,7 @@
       <h3 class="card-title app-subhead">Краткая характеристика</h3>
       {%- if op.summary %}
       <p class="app-prose">{{ op.summary }}</p>
-      <p class="app-llm-note">Сформировано LLM по тексту ООП и носит вспомогательный характер.</p>
+      <p class="app-llm-note">Краткое описание сформировано автоматически по ООП и носит вспомогательный характер.</p>
       {%- elif op.characteristic %}
       <p class="app-prose">{{ op.characteristic }}</p>
       <p class="app-llm-note">Из раздела «Общая характеристика» ООП.</p>
@@ -78,29 +78,6 @@
       {%- endif %}
     </section>
 
-    <section class="app-section" id="discipliny" aria-labelledby="h-discipliny">
-      <h2 class="section-title" id="h-discipliny">Дисциплины</h2>
-      {%- if disciplines %}
-      <div class="ir-table-wrap">
-        <table class="ir-table app-table-text">
-          <thead><tr><th scope="col">Дисциплина</th><th scope="col" class="ir-num">Семестр</th><th scope="col">Контроль</th><th scope="col">Кратко</th></tr></thead>
-          <tbody>
-            {%- for d in disciplines %}
-            <tr>
-              <td><a class="ir-link" href="{{ d.url }}">{{ d.name }}</a></td>
-              <td class="ir-num">{{ d.semesters }}</td>
-              <td class="app-nowrap">{{ d.control }}</td>
-              <td class="ir-muted app-small">{{ d.summary or d.goal or '—' }}</td>
-            </tr>
-            {%- endfor %}
-          </tbody>
-        </table>
-      </div>
-      {%- else %}
-      {{ ui.empty('Рабочие программы дисциплин пока не опубликованы.') }}
-      {%- endif %}
-    </section>
-
     <section class="app-section" id="praktiki" aria-labelledby="h-praktiki">
       <h2 class="section-title" id="h-praktiki">Практики</h2>
       {%- if practices %}
@@ -129,8 +106,8 @@
       {%- if gia['items'] or gia.summary %}
       {{ ui.info_block(gia['items']) }}
       {%- if gia.summary %}
-      <p class="app-prose">{{ gia.summary }}</p>
-      <p class="app-llm-note">Сформировано LLM по программе ГИА и ФОС ГИА.</p>
+      {%- for p in (gia.summary if gia.summary is not string else [gia.summary]) %}<p class="app-prose">{{ p }}</p>{% endfor %}
+      <p class="app-llm-note">Краткое описание сформировано автоматически по программе ГИА.</p>
       {%- endif %}
       {%- if gia.vkr_topics %}
       <h3 class="card-title app-subhead">Примерная тематика ВКР</h3>
@@ -158,7 +135,6 @@
         {'label': 'Сведения о программе', 'href': '#svedeniya'},
         {'label': 'Учебный план', 'href': '#up'},
         {'label': 'Календарный учебный график', 'href': '#kug'},
-        {'label': 'Дисциплины', 'href': '#discipliny'},
         {'label': 'Практики', 'href': '#praktiki'},
         {'label': 'ГИА', 'href': '#gia'},
         {'label': 'Исходные документы', 'href': '#docs'}]) }}

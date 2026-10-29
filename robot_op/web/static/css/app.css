@@ -148,7 +148,7 @@ body.app-scroll-lock { overflow: hidden; }
 .app-catbtn { display: inline-flex; align-items: center; gap: var(--space-6); padding: 0.35em 0.9em; border-radius: var(--radius-pill); border: var(--stroke-hairline) solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 14.4px; cursor: pointer; }
 .app-catbtn[aria-pressed="false"] { color: var(--ink-faint); border-style: dashed; }
 .app-catbtn[aria-pressed="false"] .app-cat__mark { background: transparent; box-shadow: inset 0 0 0 2px var(--cat); }
-.app-catbtn:focus-visible, .app-carousel__tab:focus-visible, .app-carousel__arrow:focus-visible, .app-shelf__head:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.app-catbtn:focus-visible, .app-carousel__tab:focus-visible, .app-carousel__arrow:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
 .app-carousel { border: var(--stroke-hairline) solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
 .app-carousel__bar { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-12) var(--space-18); border-bottom: var(--stroke-hairline) solid var(--line); }
@@ -191,20 +191,10 @@ body.app-scroll-lock { overflow: hidden; }
 
 .app-shares { display: flex; gap: 2px; height: 14px; margin: 0 0 var(--space-18); border-radius: var(--radius-pill); overflow: hidden; }
 .app-shares__part { display: block; min-width: 4px; background: var(--cat); }
-.app-shelves { display: flex; flex-direction: column; gap: var(--space-9); }
-.app-shelf { border: var(--stroke-hairline) solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
-.app-shelf__head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "mark title share" "mark meta share"; align-items: center; gap: 2px var(--space-18); padding: var(--space-12) var(--space-18); cursor: pointer; list-style: none; }
-.app-shelf__head::-webkit-details-marker { display: none; }
-.app-shelf__mark { grid-area: mark; display: inline-flex; align-items: center; justify-content: center; min-width: 52px; height: 40px; padding: 0 var(--space-6); border-radius: var(--radius-btn); background: var(--cat); color: var(--on-tag-dark); font-weight: 700; font-size: 14.4px; }
-.app-cat--it .app-shelf__mark { color: var(--on-tag-light); }
-.app-shelf__title { grid-area: title; font-weight: 700; font-size: 18px; }
-.app-shelf__meta { grid-area: meta; font-size: 14.4px; color: var(--ink-secondary); }
-.app-shelf__share { grid-area: share; font-size: 23.4px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.app-shelf__share::after { content: "▾"; display: inline-block; margin-left: var(--space-12); font-size: 14.4px; color: var(--ink-secondary); transition: transform 0.2s; }
-.app-shelf[open] .app-shelf__share::after { transform: rotate(180deg); }
-.app-shelf__list { list-style: none; margin: 0; padding: 0 var(--space-18) var(--space-12); columns: 2 320px; column-gap: var(--space-36); }
-.app-shelf__list li { break-inside: avoid; display: flex; flex-direction: column; padding: var(--space-9) 0; border-top: var(--stroke-hairline) solid var(--line-soft); }
-.app-shelf__item-meta { font-size: 14.4px; color: var(--ink-secondary); }
+.app-shares-legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-9) var(--space-36); margin: 0; padding: 0; list-style: none; }
+.app-shares-legend li { display: flex; align-items: center; gap: var(--space-9); }
+.app-shares-legend__title { flex: 1; min-width: 0; }
+.app-shares-legend b { font-variant-numeric: tabular-nums; }
 
 @media (max-width: 599px) {
   .app-carousel__bar { padding: var(--space-9); gap: var(--space-6); }
@@ -212,5 +202,10 @@ body.app-scroll-lock { overflow: hidden; }
   .app-carousel__tab { padding: 0.4em 0.7em; }
   .app-carousel__tab-sub { display: none; }
   .app-load { gap: var(--space-9) var(--space-20); }
-  .app-shelf__head { grid-template-areas: "mark title share" "meta meta meta"; }
 }
+
+/* Темы дисциплины и этапы практики: название и краткое содержание */
+.app-topics { margin: 0; padding-left: 1.4em; display: flex; flex-direction: column; gap: var(--space-12); }
+.app-topics li { padding-left: var(--space-6); }
+.app-topics__title { display: block; font-weight: 700; }
+.app-topics__text { display: block; color: var(--ink-secondary); }

@@ -46,7 +46,11 @@ def test_web_flow(tmp_path):
         assert "ir-matrix" not in op.text and "ir-status" not in op.text and "Отчёт о запуске" not in op.text
         # график по дням: шесть строк на курс и строка дат «вс» в шапке
         assert op.text.count('<th scope="row" class="app-kug__day">пн</th>') >= 2 and "app-kug--out" in op.text
-        assert 'class="app-shelf app-cat--ai"' in op.text and "Из чего состоит программа" in op.text
+        # доли категорий — полоса и проценты, без раскрывающихся списков; отдельного перечня дисциплин нет
+        assert "app-shares-legend" in op.text and "app-shelf" not in op.text and "Из чего состоит программа" in op.text
+        assert 'id="discipliny"' not in op.text
+        run_page = c.get("/run?level=master").text
+        assert "Запуск №" not in run_page and "ir-status" not in run_page and "на сайте, обновлено" in run_page
         docs = c.get("/api/programs/09.04.01-iiis-2026-och/documents").json()
         assert all(c.get(f"/op/09.04.01-iiis-2026-och/doc/{d['id']}").status_code == 200 for d in docs)
         assert c.get(f"/api/documents/{docs[0]['id']}/json?kind=primary").json()["schema"] == "robot-op/primary/1"

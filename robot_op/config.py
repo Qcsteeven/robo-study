@@ -53,6 +53,10 @@ class LlmSettings:
     timeout: float = 120.0
     temperature: float = 0.2
     max_input_chars: int = 12000
+    # GigaChat: адрес получения токена, область доступа и корневой сертификат Минцифры для TLS
+    auth_url: str = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
+    scope: str = "GIGACHAT_API_PERS"
+    ca_bundle: str = "config/certs/russian_trusted_root_ca.pem"
 
 
 @dataclass
@@ -90,8 +94,21 @@ def _coerce(value: str, current):
     return value
 
 
+def dotenv(path: Path) -> dict:
+    """Файл .env (КЛЮЧ=значение) — те же переменные, что передаёт docker compose; при запуске без Docker."""
+    out = {}
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, value = line.split("=", 1)
+                out[key.strip()] = value.strip().strip('"').strip("'")
+    return out
+
+
 def load_settings(path: Path | None = None, env: dict | None = None) -> Settings:
-    env = os.environ if env is None else env
+    # переменные окружения важнее .env; явно переданный env (тесты) .env не читает
+    env = {**dotenv(ROOT / ".env"), **os.environ} if env is None else env
     path = Path(env.get("ROBOT_CONFIG", path or DEFAULT_CONFIG))
     raw = tomllib.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
     settings = Settings()

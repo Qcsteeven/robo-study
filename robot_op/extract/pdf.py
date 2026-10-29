@@ -55,6 +55,20 @@ def page_texts(data: bytes, max_pages: int | None = None) -> list[str]:
     return texts
 
 
+def page_tables(data: bytes, max_pages: int = 40) -> list[tuple[int, list[list[str]]]]:
+    """Таблицы с линиями из текстового слоя: (номер страницы, строки × ячейки). Перенос строки внутри
+    ячейки — пробел; после дефиса в конце строки пробел не ставится («научно-исследовательский»)."""
+    out = []
+    with pdfplumber.open(io.BytesIO(data)) as pdf:
+        for i, page in enumerate(pdf.pages[:max_pages]):
+            for table in page.extract_tables():
+                rows = [[" ".join((cell or "").replace("-\n", "-").split()) for cell in row] for row in table]
+                rows = [r for r in rows if any(r)]
+                if rows:
+                    out.append((i, rows))
+    return out
+
+
 def page_words(data: bytes, index: int, scale: float) -> list[Word]:
     """Слова текстового слоя страницы в координатах растра (scale = dpi / 72)."""
     with pdfplumber.open(io.BytesIO(data)) as pdf:

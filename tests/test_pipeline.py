@@ -126,6 +126,24 @@ def test_llm_summaries_and_llm_failure(tmp_path):
     # в LLM уходят только сведения первичного JSON
     assert prompts and all("Сведения документа" in p["messages"][1]["content"] for p in prompts)
 
+    # описание дописывается и к уже разобранным документам, когда LLM подключили позже, — без повторного разбора
+    (tmp_path / "late").mkdir()
+    late = demo_settings(tmp_path / "late")
+    db3 = Database(late.app.database_url)
+    db3.create_all()
+    Robot(late, db3, transport=mock_transport(), sleep=lambda s: None).execute(
+        Robot(late, db3, transport=mock_transport()).create_run("master", 2026, ["*"]))
+    late_llm = demo_settings(tmp_path / "late", ROBOT_LLM_PROVIDER="ollama", ROBOT_LLM_BASE_URL="http://llm.local:11434")
+    robot3 = Robot(late_llm, db3, transport=mock_transport(), llm_transport=httpx.MockTransport(ollama), sleep=lambda s: None)
+    rid3 = robot3.create_run("master", 2026, ["*"])
+    robot3.execute(rid3)
+    with db3.Session() as ses:
+        assert ses.scalar(select(func.count()).select_from(LogEntry).where(
+            LogEntry.run_id == rid3, LogEntry.message.like("%Статус:%"))) == 0           # ничего не разобрано заново
+        assert ses.scalar(select(func.count()).select_from(LogEntry).where(
+            LogEntry.run_id == rid3, LogEntry.message == "Сформировано краткое описание")) > 0
+        assert all(d["summary"] for d in ses.scalars(select(Program)).first().page["practices"])
+
     def broken(request):
         return httpx.Response(500)
     (tmp_path / "b").mkdir()

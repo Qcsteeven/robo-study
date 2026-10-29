@@ -42,7 +42,7 @@ dpi = 300
 min_text_chars_per_page = 80
 
 [llm]
-# ollama — локальная LLM; openai — любой OpenAI-совместимый API; none — без кратких описаний
+# ollama — локальная LLM; openai — любой OpenAI-совместимый API; gigachat — GigaChat (Сбер); none — без кратких описаний
 provider = "none"
 base_url = "http://localhost:11434"
 model = "qwen2.5:7b-instruct"
@@ -51,6 +51,10 @@ api_key = ""
 timeout = 120.0
 temperature = 0.2
 max_input_chars = 12000
+# GigaChat: получение токена по ключу авторизации, область доступа, корневой сертификат Минцифры для TLS
+auth_url = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
+scope = "GIGACHAT_API_PERS"
+ca_bundle = "config/certs/russian_trusted_root_ca.pem"
 
 [history]
 # Сколько последних версий каждого JSON-файла хранить (не менее 5 по ТЗ)

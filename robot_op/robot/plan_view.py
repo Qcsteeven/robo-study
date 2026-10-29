@@ -1,4 +1,4 @@
-"""Учебный план для людей: дисциплины и нагрузка по семестрам (карусель) и по категориям (полки).
+"""Учебный план для людей: дисциплины и нагрузка по семестрам (карусель) и доли категорий в объёме программы.
 
 Строится по итоговому JSON-файлу УП. Категория дисциплины определяется по названию набором правил: правила
 проверяются по порядку, первое совпадение побеждает. Дисциплины, не попавшие ни в одну тематическую категорию,
@@ -112,14 +112,6 @@ def _control(control: dict, sem: int) -> str:
     return curriculum.control_label(control, sem)
 
 
-def _sem_text(sems: list[int]) -> str:
-    if not sems:
-        return "—"
-    if len(sems) > 2 and sems == list(range(sems[0], sems[-1] + 1)):
-        return f"{sems[0]}–{sems[-1]}"
-    return ", ".join(map(str, sems))
-
-
 def build(up_data: dict, links: dict[str, str] | None = None, key=lambda s: s) -> dict | None:
     """Контекст карусели и полок. links: ключ названия (key(name)) → адрес страницы документа."""
     rows = up_data.get("rows") or []
@@ -165,11 +157,6 @@ def build(up_data: dict, links: dict[str, str] | None = None, key=lambda s: s) -
         shelves.append({
             "key": k, "title": title, "short": short, "count": len(group), "ze": ze,
             "share": round(ze / total * 100),
-            "items": [{"name": it["name"], "semesters": _sem_text(it["semesters"]), "ze": it["ze"], "url": it["url"],
-                       "control": ", ".join(sorted({curriculum.CONTROL_LABELS[c] for c, v in it["control"].items() if v},
-                                                  key=list(curriculum.CONTROL_LABELS.values()).index)),
-                       "elective": it["elective"], "optional": it["optional"]}
-                      for it in sorted(group, key=lambda i: (i["semesters"][:1] or [99], i["name"]))],
         })
     return {"semesters": semesters, "shelves": shelves, "total_ze": total,
             "categories": [{"key": k, "title": t, "short": s} for k, (t, s) in CATEGORIES.items()

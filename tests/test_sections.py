@@ -15,7 +15,7 @@ def test_rpd_extraction():
     assert d["discipline"] == "Иностранный язык"
     assert d["ze"] == 7 and d["semesters"] == [1, 2, 3, 4]
     assert d["competencies"][0]["code"] == "УК-4"
-    assert len(d["topics"]) == 4 and d["topics"][0] == "Грамматика профессионального текста"
+    assert len(d["topics"]) == 4 and d["topics"][0] == {"title": "Грамматика профессионального текста", "summary": ""}
     assert len(d["literature"]) == 2
 
 

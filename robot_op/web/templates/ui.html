@@ -168,33 +168,18 @@
   {%- if v -%}{{ '%g' | format(v) | replace('.', ',') }}{%- else -%}{{ zero }}{%- endif -%}
 {%- endmacro %}
 
-{#- Из чего состоит программа: доля категорий в з. е. и раскрывающиеся полки с дисциплинами -#}
+{#- Из чего состоит программа: доля категорий в з. е. — полоса и подписи с процентами -#}
 {% macro plan_shelves(plan) -%}
 <div class="app-shares" role="img" aria-label="Доля категорий в объёме программы: {% for sh in plan.shelves %}{{ sh.title }} — {{ sh.share }}%{% if not loop.last %}, {% endif %}{% endfor %}">
   {%- for sh in plan.shelves if sh.share %}
   <span class="app-shares__part app-cat--{{ sh.key }}" style="flex-grow: {{ sh.ze }}" title="{{ sh.title }}: {{ sh.ze }} з. е."></span>
   {%- endfor %}
 </div>
-<div class="app-shelves">
+<ul class="app-shares-legend" aria-hidden="true">
   {%- for sh in plan.shelves %}
-  <details class="app-shelf app-cat--{{ sh.key }}"{% if loop.first %} open{% endif %}>
-    <summary class="app-shelf__head">
-      <span class="app-shelf__mark" aria-hidden="true">{{ sh.short }}</span>
-      <span class="app-shelf__title">{{ sh.title }}</span>
-      <span class="app-shelf__meta">{{ sh.count }} дисциплин{{ sh.count | plural('а', 'ы', '') }} · {{ sh.ze }} з. е.</span>
-      <span class="app-shelf__share">{{ sh.share }}%</span>
-    </summary>
-    <ul class="app-shelf__list">
-      {%- for d in sh['items'] %}
-      <li>
-        {%- if d.url %}<a class="ir-link" href="{{ d.url }}">{{ d.name }}</a>{% else %}<span>{{ d.name }}</span>{% endif %}
-        <span class="app-shelf__item-meta">{{ d.semesters }} сем.{% if d.ze %} · {{ d.ze }} з. е.{% endif %}{% if d.control %} · {{ d.control }}{% endif %}{% if d.optional %} · факультатив{% endif %}</span>
-      </li>
-      {%- endfor %}
-    </ul>
-  </details>
+  <li class="app-cat--{{ sh.key }}"><span class="app-cat__mark"></span><span class="app-shares-legend__title">{{ sh.title }}</span><b>{{ sh.share }}%</b></li>
   {%- endfor %}
-</div>
+</ul>
 {%- endmacro %}
 
 {#- График учебного процесса как в документе: шапка — месяцы, даты по дням недели и номера недель;
@@ -262,18 +247,14 @@
 <p class="app-empty">{{ text }}</p>
 {%- endmacro %}
 
-{#- Ход запуска (RunProgress) -#}
+{#- Ход обновления: только полоса прогресса и число обработанных документов -#}
 {% macro run_progress(run, counts) -%}
 {%- set pct = ((counts.done / counts.total * 100) if counts.total else (100 if run.status in ('finished', 'failed') else 0)) | round(0) -%}
 <div class="ir-run" data-run="{{ run.id }}">
   <div class="ir-run__head">
-    <span class="ir-run__label">Запуск № {{ run.id }} · {{ run.stage or '—' }}</span>
-    <span class="ir-run__count">{{ counts.done }} из {{ counts.total }}</span>
+    <span class="ir-run__label">{{ 'Документов обработано' if counts.total else (run.stage or 'Подготовка') }}</span>
+    {%- if counts.total %}<span class="ir-run__count">{{ counts.done }} из {{ counts.total }}</span>{% endif %}
   </div>
-  <div class="ir-run__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct | int }}" aria-label="Ход запуска"><div class="ir-run__fill" style="width: {{ pct | int }}%"></div></div>
-  <div class="ir-run__stats">
-    {{ run_status(run.status) }}
-    {%- for key, n in counts.by_status | dictsort %}{% if n %} <span class="ir-status ir-status--{{ STATUS.get(key, ('neutral', key))[0] }}">{{ STATUS.get(key, ('neutral', key))[1] }}: {{ n }}</span>{% endif %}{% endfor %}
-  </div>
+  <div class="ir-run__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct | int }}" aria-label="Ход обновления"><div class="ir-run__fill" style="width: {{ pct | int }}%"></div></div>
 </div>
 {%- endmacro %}

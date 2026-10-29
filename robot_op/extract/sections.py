@@ -9,6 +9,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from . import tables as tbl
+
 NUM = r"^\s*(?:раздел\s+)?(?:\d{1,2}(?:\.\d{1,2})*\.?\s+)?"
 
 
@@ -94,13 +96,17 @@ def type_check(doc_type: str, first_pages: str) -> tuple[bool, str]:
     return bool(ok), "" if ok else "содержимое не соответствует типу документа"
 
 
+# строка оглавления: «2.2. Требования к выпускной квалификационной работе ........ 4»
+TOC_LINE = re.compile(r"(\.\s?){4,}\s*\d{1,3}\s*$|…{2,}\s*\d{1,3}\s*$")
+
+
 def split_sections(text: str, specs: list[Spec]) -> dict[str, dict]:
     lines = [ln.strip() for ln in text.splitlines()]
     found: list[tuple[int, Spec, str]] = []
     used = set()
     for i, line in enumerate(lines):
         low = line.lower().replace("ё", "е")
-        if not low or len(low) > 220:
+        if not low or len(low) > 220 or TOC_LINE.search(low):
             continue
         # заголовок: строка с номером раздела или короткая строка без точки в конце
         numbered = re.match(r"^\s*(раздел\s+)?\d{1,2}(\.\d{1,2})*\.?\s+\S", low)
@@ -130,7 +136,7 @@ def split_sections(text: str, specs: list[Spec]) -> dict[str, dict]:
 
 COMP_RE = re.compile(r"\b((?:УК|ОПК|ПК|ПКС|ОК|ПКО|ПКР)-\d{1,2})\b\s*[—–\-:.]?\s*([^;]{0,400})")
 CODE_RE = re.compile(r"\b((?:УК|ОПК|ПК|ПКС|ОК|ПКО|ПКР)-\d{1,2})\b")
-ZE_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:зачетн\w+|зач\.?)\s*(?:единиц\w*|ед\.?)|(\d+(?:[.,]\d+)?)\s*з\.\s*е\.?", re.I)
+ZE_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:зачетн\w+|зач\.?)\s*(?:единиц\w*|ед\.?)|(\d+(?:[.,]\d+)?)\s*(?:з\.\s*е\.?(?:\s*т\.?)?|ЗЕТ\b)", re.I)
 HOURS_RE = re.compile(r"(\d+)\s*(?:академическ\w+\s+)?час", re.I)
 WEEKS_RE = re.compile(r"(\d+)\s*недел", re.I)
 SEM_RE = re.compile(r"(\d{1,2}(?:\s*(?:,|и|-|–)\s*\d{1,2})*)\s*(?:-?м\s+)?семестр|семестр\w*\s*[:№]?\s*(\d{1,2}(?:\s*,\s*\d{1,2})*)", re.I)
@@ -212,41 +218,57 @@ def controls(text: str) -> list[str]:
 
 
 def quoted_title(text: str, word: str) -> str:
-    m = re.search(word + r"[^«\"]{0,40}[«\"]([^»\"]{3,200})[»\"]", text, re.I)
-    return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
+    """Название в кавычках после слова; на титуле оно часто набрано прописными — тогда берётся упоминание
+    в тексте («Дисциплина «Основы научных исследований» обеспечивает…») или прописные заменяются строчными."""
+    found = [re.sub(r"\s+", " ", m.group(1)).strip() for m in re.finditer(word + r"[^«\"]{0,40}[«\"]([^»\"]{3,200})[»\"]", text, re.I)]
+    if not found:
+        return ""
+    normal = next((t for t in found if not t.isupper()), None)
+    return normal or found[0][:1] + found[0][1:].lower()
 
 
-def extract(doc_type: str, text: str) -> dict:
+def extract(doc_type: str, text: str, tables: list | None = None) -> dict:
+    """tables — таблицы текстового слоя (pdf.page_tables); сведения из таблиц точнее, чем из текста."""
     specs = TEMPLATES[doc_type]
     sec = split_sections(text, specs)
+    t = tbl.group(tables or [])
     body = lambda key: sec.get(key, {}).get("text", "")
     data: dict = {"sections": {k: {"title": v["title"], "text": v["text"][:4000]} for k, v in sec.items()}}
     if doc_type == "rpd":
+        vol = tbl.volume(t["volume"]) if "volume" in t else {}
         data.update({
-            "discipline": quoted_title(text[:3000], r"дисциплин\w*"),
+            "discipline": quoted_title(text[:6000], r"дисциплин\w*"),
             "goal": _goal(text),
-            "competencies": competencies(body("results") or text),
+            "competencies": tbl.competencies(t["competencies"]) if "competencies" in t else competencies(body("results") or text),
+            "results": tbl.results(t["indicators"]) if "indicators" in t else [],
             "ze": first(ZE_RE, body("volume") or text),
-            "hours": first(HOURS_RE, body("volume")),
-            "semesters": semesters(body("place") + "\n" + body("volume")),
-            "control": controls(body("volume")),
-            "topics": topic_items(body("content")) or numbered_items(body("content"))[:30],
-            "assessment": body("assessment")[:1000],
+            "hours": vol.get("hours") or ({"total": h} if (h := first(HOURS_RE, body("volume"))) else {}),
+            "semesters": vol.get("semesters") or semesters(body("place") + "\n" + body("volume")),
+            "control": vol.get("control") or [c.capitalize() for c in controls(body("volume"))],
+            "topics": tbl.titled(t["topics"]) if "topics" in t else
+                      [{"title": x, "summary": ""} for x in (topic_items(body("content")) or numbered_items(body("content")))[:30]],
+            "labs": tbl.titled(t["labs"], hours=True) if "labs" in t else [],
+            "practicals": tbl.titled(t["practicals"], hours=True) if "practicals" in t else [],
+            "self_study": tbl.titled(t["self_study"], hours=True) if "self_study" in t else [],
             "literature": numbered_items(body("literature"))[:30],
         })
     elif doc_type == "practice":
         k = body("kind")
+        period = tbl.practice_period(t["practice_period"]) if "practice_period" in t else {}
         data.update({
             "practice_kind": _after(k, r"вид\w*\s+практики\s*[:—–-]\s*"),
             "practice_type": _after(k, r"тип\w*\s+практики\s*[:—–-]\s*"),
             "method": _after(k, r"способ\w*\s+проведения\s*[:—–-]\s*"),
-            "competencies": competencies(body("results") or text),
-            "semesters": semesters(body("place") + "\n" + body("volume")),
-            "ze": first(ZE_RE, body("volume") or text),
-            "weeks": first(WEEKS_RE, body("volume") or text),
-            "stages": topic_items(body("content"), r"этап|раздел") or numbered_items(body("content"))[:20],
-            "reporting": body("reporting")[:800],
-            "control": controls(body("reporting") + "\n" + body("assessment")),
+            "competencies": tbl.competencies(t["competencies"]) if "competencies" in t else competencies(body("results") or text),
+            "results": tbl.results(t["indicators"]) if "indicators" in t else [],
+            "semesters": period.get("semesters") or semesters(body("place") + "\n" + body("volume")),
+            "ze": period.get("ze") or first(ZE_RE, body("volume") or text),
+            "weeks": period.get("weeks") or first(WEEKS_RE, body("volume") or text),
+            "stages": (tbl.titled(t["stages"]) if "stages" in t else []) or
+                      [{"title": x, "summary": ""} for x in topic_items(body("content"), r"этап|раздел") if len(x) < 200][:20],
+            "content": _lead(body("content")),
+            "reporting": [x for x in numbered_items(body("reporting"), r"(?:\d{1,2}[.)]|[—–\-•\uf0b7])") if len(x) < 200][:10],
+            "control": period.get("control") or [c.capitalize() for c in controls(body("reporting") + "\n" + body("assessment"))][:1],
             "literature": numbered_items(body("literature"))[:20],
         })
     elif doc_type == "oop":
@@ -267,6 +289,7 @@ def extract(doc_type: str, text: str) -> dict:
             "ze": first(ZE_RE, body("volume")),
             "weeks": first(WEEKS_RE, body("volume")),
             "vkr_requirements": body("vkr")[:2000],
+            "vkr_topics": tbl.vkr_topics(t["vkr_topics"]) if "vkr_topics" in t else [],
             "procedure": body("procedure")[:1500],
             "criteria": body("criteria")[:1500],
         })
@@ -274,7 +297,7 @@ def extract(doc_type: str, text: str) -> dict:
         data.update({
             "competencies": sorted(set(CODE_RE.findall(body("competencies") or text)), key=_code_key),
             "indicators": body("indicators")[:1500],
-            "tasks": numbered_items(body("tasks"))[:40],
+            "tasks": [x for x in numbered_items(body("tasks")) if 10 < len(x) < 250 and "компетенц" not in x.lower()][:40],
             "criteria": body("criteria")[:1500],
         })
     found = [s.key for s in specs if s.key in sec]
@@ -289,10 +312,19 @@ def extract(doc_type: str, text: str) -> dict:
 
 
 def _goal(text: str) -> str:
-    m = re.search(r"цел\w*\s+(освоения|изучения|преподавания)?\s*(дисциплины)?\s*[—–:-]?\s*(является|—|–|-)?\s*([^\n]+(?:\n[^\n]+){0,2})", text, re.I)
+    """«Целью освоения дисциплины является …» / «Цель дисциплины — …»; без такой фразы цель не заполняется."""
+    m = re.search(r"цел(?:ь|ью)\s+(?:освоения\s+|изучения\s+|преподавания\s+)?дисциплины\s*(?:является|[—–:-])\s*([^\n]+(?:\n[^\n]+){0,3})",
+                  text, re.I)
     if not m:
         return ""
-    return re.sub(r"\s+", " ", m.group(4)).split(". ")[0].strip(" .")[:400]
+    return re.sub(r"\s+", " ", m.group(1)).split(". ")[0].strip(" .")[:400]
+
+
+def _lead(text: str, limit: int = 500) -> str:
+    """Первый абзац раздела до таблицы или перечня («Содержание этапов приведено в таблице…»)."""
+    lead = re.split(r"\n\s*(?:№\s*п/п|содержание\s+этапов|\d+\.\d|\d+\s+[А-ЯЁ][а-яё]+\s+[а-яё]+\s+по\s)", text, maxsplit=1, flags=re.I)[0]
+    lead = re.sub(r"\s+", " ", lead).strip()
+    return lead[:limit].rsplit(". ", 1)[0] + "." if len(lead) > limit else lead
 
 
 def _after(text: str, pattern: str) -> str:

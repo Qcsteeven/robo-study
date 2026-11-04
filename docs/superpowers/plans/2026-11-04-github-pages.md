@@ -26,11 +26,13 @@
 - [x] Write and run tests for query links, assets, downloads, backend-free update page and unexpected route rejection (RED).
 - [x] Implement exporter, backup-based CLI, theme and snapshot notice (GREEN).
 - [x] Run targeted tests, export current data, validate all local links, run full suite.
-- [ ] Review code; commit source changes excluding data.demo-backup and server.log.
-- [ ] Push source and gh-pages snapshot; enable Pages; verify deployed pages/assets/JSON.
+- [x] Review code; commit source changes excluding data.demo-backup and server.log.
+- [x] Push source and gh-pages snapshot; enable Pages; verify deployed pages/assets/JSON.
 
 Pre-flight: one task, no shared interfaces between tasks.
 
 Validation before publishing: 71 tests passed. Export: 203 HTML pages, 350 JSON files, 16.4MB. All internal links and CSS font references resolve. Browser confirmed program/discipline navigation, level filter, menu and persisted theme. Source database is accessed via SQLite read-only backup; no worker/lifespan is started.
 
 Final review: independent reviewer found no Critical, Important or Minor issues. Browser validation performed by primary agent.
+
+Published: https://qcsteeven.github.io/robo-study/ ; gh-pages commit 21084b5. GitHub deployment run 41794253105 succeeded. All 562 public HTML/JSON/asset files returned HTTP 200 on the final check (transient CDN 503 on the first pass, successful retry with connection pooling). Public AI summary and JSON content verified by GET. Only user files data.demo-backup/ and server.log remain untracked and were not published.

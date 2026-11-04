@@ -82,3 +82,22 @@ def test_unknown_curriculum_entry_is_not_found(discipline_app):
     with TestClient(discipline_app) as client:
         assert client.get("/op/test-op/discipline", params={"index": "missing"}).status_code == 404
         assert client.get("/op/other/discipline", params={"index": "Б1.О.02"}).status_code == 404
+
+
+def test_elective_card_handles_nested_module_without_link(discipline_app):
+    from copy import deepcopy
+    from sqlalchemy import select
+    with discipline_app.state.db.Session() as ses:
+        version = ses.scalar(select(JsonVersion).where(JsonVersion.document_id == 1))
+        payload = deepcopy(version.data)
+        module = row("Б1.В.ДВ.01.03", "Пакет дисциплин", [2])
+        module["is_module"] = True
+        payload["data"]["rows"].extend([module, row("Б1.В.ДВ.01.03.01", "Применение ИИ", [2])])
+        version.data = payload
+        ses.commit()
+    with TestClient(discipline_app) as client:
+        response = client.get("/op/test-op/discipline", params={"index":"Б1.В.ДВ.01"})
+        assert response.status_code == 200
+        options = BeautifulSoup(response.text, "html.parser").select(".app-discipline-options a")
+        assert "Применение ИИ" in [a.get_text(strip=True) for a in options]
+        assert all(client.get(a["href"]).status_code == 200 for a in options)

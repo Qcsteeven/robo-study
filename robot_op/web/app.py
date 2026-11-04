@@ -253,7 +253,8 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                 return not_found(request, "Дисциплина не найдена в учебном плане.")
             links = pagebuilder.discipline_links(program_id, rows, docs, finals)
             options = [{"name": discipline_name(r["name"]), "url": links[pagebuilder._key(r["name"])]}
-                       for r in rows if r.get("index", "").startswith(index + ".")]
+                       for r in rows if r.get("index", "").startswith(index + ".")
+                       and (not r.get("is_module") or plan_view.is_choice(r["index"]))]
             target = links.get(pagebuilder._key(row["name"]))
             if not options and target and target.startswith(f"/op/{program_id}/doc/"):
                 return RedirectResponse(target, status_code=302)

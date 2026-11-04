@@ -95,3 +95,34 @@ def test_static_site_does_not_publish_json_downloads(tmp_path):
     for file in output.rglob("*.html"):
         soup=BeautifulSoup(file.read_text(),"html.parser")
         assert not soup.select('a[href*="/downloads/"], a[href*="/api/documents/"], a[download]')
+
+
+def test_export_includes_saved_programs_missing_from_latest_catalog(tmp_path):
+    client = static_source()
+    @client.app.get("/op/old-program")
+    def archived_program():
+        return HTMLResponse('<html><head><title>Архив</title></head><body><main><h1>Программа набора 2023</h1><a href="/programs">Каталог</a></main></body></html>')
+    output = tmp_path / "site"
+    report = export_site(client, output, "/robo-study/", program_ids=["old-program"])
+    assert (output / "op/old-program/index.html").is_file()
+    for path in (output / "index.html", output / "programs/index.html"):
+        soup = BeautifulSoup(path.read_text(), "html.parser")
+        link = soup.find("a", string="Программа набора 2023")
+        assert link and link["href"] == "/robo-study/op/old-program/"
+    assert report["programs"] == 1
+
+
+def test_export_includes_saved_documents_absent_from_curriculum_links(tmp_path):
+    client = static_source()
+    @client.app.get("/op/extra")
+    def program():
+        return HTMLResponse('<html><head><title>ОП</title></head><body><main><h1>ОП</h1></main></body></html>')
+    @client.app.get("/op/extra/doc/42")
+    def document():
+        return HTMLResponse('<html><head><title>РПД</title></head><body><main><h1>Дополнительная дисциплина</h1></main></body></html>')
+    output = tmp_path / "site"
+    report = export_site(client, output, "/robo-study/", program_ids=["extra"], documents=[("extra",42)])
+    assert (output / "op/extra/doc/42/index.html").exists()
+    soup = BeautifulSoup((output / "op/extra/index.html").read_text(), "html.parser")
+    assert soup.find("a", string="Дополнительная дисциплина")["href"] == "/robo-study/op/extra/doc/42/"
+    assert report["documents"] == 1

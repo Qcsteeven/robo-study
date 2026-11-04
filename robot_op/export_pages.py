@@ -31,7 +31,7 @@ e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light'
 try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();"""
 
 
-def export_site(client, output: Path, base_path: str) -> dict:
+def export_site(client, output: Path, base_path: str, program_ids=(), documents=()) -> dict:
     """Crawl only public read routes; require an empty destination and fail on broken links."""
     output = Path(output)
     if output.exists() and any(output.iterdir()):
@@ -43,7 +43,10 @@ def export_site(client, output: Path, base_path: str) -> dict:
     (output / ".nojekyll").touch()
     origin = str(client.base_url)
     host = urlsplit(origin).netloc
-    pending, seen = deque(["/"]), set()
+    program_ids = sorted(set(program_ids))
+    documents = sorted(set(documents))
+    pending, seen = deque(["/", *(f"/op/{key}" for key in program_ids)]), set()
+    pending.extend(f"/op/{key}/doc/{doc_id}" for key, doc_id in documents)
     html_count = 0
 
     def canonical(href: str, current: str) -> tuple[str | None, str]:
@@ -139,6 +142,42 @@ def export_site(client, output: Path, base_path: str) -> dict:
         target.write_text(str(soup), encoding="utf-8")
         html_count += 1
 
+    def append_missing(catalog: Path, keys: list[str], heading_text: str):
+        if not catalog.is_file():
+            return
+        soup = BeautifulSoup(catalog.read_text(encoding="utf-8"), "html.parser")
+        linked = {a.get("href", "").split("#")[0] for a in soup.select("a[href]")}
+        missing = []
+        for key in keys:
+            rel, url = destination(key)
+            if url not in linked:
+                page = BeautifulSoup((output / rel).read_text(encoding="utf-8"), "html.parser")
+                missing.append((url, page.h1.get_text(" ", strip=True) if page.h1 else key))
+        if missing:
+            section = soup.new_tag("section", attrs={"class": "app-section"})
+            heading = soup.new_tag("h2", attrs={"class": "card-title"})
+            heading.string = heading_text
+            section.append(heading)
+            listing = soup.new_tag("ul", attrs={"class": "app-list"})
+            for url, title in missing:
+                item = soup.new_tag("li")
+                anchor = soup.new_tag("a", href=url)
+                anchor.string = title
+                item.append(anchor)
+                listing.append(item)
+            section.append(listing)
+            (soup.select_one(".app-content") or soup.find("main") or soup.body).append(section)
+            catalog.write_text(str(soup), encoding="utf-8")
+
+    # Latest-cohort catalogs and curriculum links do not necessarily expose
+    # every saved program/document. Include and link the rest explicitly.
+    for catalog in (output / "index.html", output / "programs/index.html"):
+        append_missing(catalog, [f"/op/{key}" for key in program_ids], "Другие сохранённые программы")
+    for key in program_ids:
+        append_missing(output / destination(f"/op/{key}")[0],
+                       [f"/op/{key}/doc/{doc_id}" for program_id,doc_id in documents if program_id == key],
+                       "Другие сохранённые документы")
+
     # Validate rewritten local destinations without relying on server routing.
     for file in output.rglob("*.html"):
         soup = BeautifulSoup(file.read_text(encoding="utf-8"), "html.parser")
@@ -152,7 +191,7 @@ def export_site(client, output: Path, base_path: str) -> dict:
                         local /= "index.html"
                     if not local.is_file():
                         raise ValueError(f"Broken exported link: {href}")
-    report = {"pages": html_count, "json_files": 0, "base_path": base_path,
+    report = {"pages": html_count, "programs": len(program_ids), "documents": len(documents), "json_files": 0, "base_path": base_path,
               "exported_at": datetime.now(timezone.utc).isoformat()}
     (output / "snapshot.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report
@@ -163,7 +202,7 @@ def main():
     from sqlalchemy import select
     from sqlalchemy.engine import make_url
     from .config import load_settings
-    from .models import Program
+    from .models import Program, Document
     from .web.app import create_app
 
     parser = argparse.ArgumentParser(description=__doc__)
@@ -188,12 +227,13 @@ def main():
         app = create_app(settings, start_worker=False)
         with app.state.db.Session() as ses:
             programs = set(ses.scalars(select(Program.id).where(Program.page.is_not(None))))
+            documents = list(ses.execute(select(Document.program_id, Document.id).where(Document.program_id.in_(programs))).all())
             if not programs:
                 parser.error("No saved program pages to publish")
         # Do not enter lifespan: no worker or interrupted-run updates are needed.
         client = TestClient(app, follow_redirects=True)
         try:
-            report = export_site(client, args.output, args.base_path)
+            report = export_site(client, args.output, args.base_path, program_ids=programs, documents=documents)
         finally:
             client.close()
             app.state.db.engine.dispose()

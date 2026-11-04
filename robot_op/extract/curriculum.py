@@ -8,14 +8,14 @@ from dataclasses import dataclass, field
 from . import pdf as pdfmod
 from .grid import FineRaster, Grid, Row, assign_words, binarize, detect_grid, rotate, skew_angle
 from .ocr import OcrConfig, ocr_cells, ocr_single
-from .util import clean_text, fix_index, norm, semesters_from_code, to_int
+from .util import discipline_name, clean_text, fix_index, norm, semesters_from_code, to_int
 
 SEM_RE = re.compile(r"семестр\.?\s*(\d{1,2})\s*\.?\s*[\[(]?\s*(\d{1,2})\s*не", re.I)
 FIXED = {
     "index": r"^индекс",
     "name": r"^наименован",
     "exam": r"^экза",
-    "zach_oc": r"^зач\w*\s*с\s*о|оц\.?$",
+    "zach_oc": r"^зач\w*\s*с\s*о|оц\.?$|^диф",
     "zach": r"^зач",
     "kp": r"^к[пn]$",
     "kr": r"^к[рp]$",
@@ -27,6 +27,7 @@ FIXED = {
     "sr": r"^ср$|^срс$|^сам",
 }
 SUB = {"lec": r"^л[еe]к", "lab": r"^л[аa]", "pr": r"^п[рp]|^нр", "eios": r"^эи|^кср|^иф", "sr": r"^с[рp]"}
+SUB.update({"control": r"^конт\w*\s*роль", "total": r"^итого$", "krp": r"^крп$", "ip": r"^ип$", "krp": r"^крп$", "consult": r"^паконс$", "pa_sr": r"^паср$", "exam": r"^экза"})
 SUB_ORDER = ["lec", "lab", "pr", "eios", "sr"]
 CONTROL_LABELS = {"exam": "Экз", "zach": "Зач", "zach_oc": "ЗаО", "kp": "КП", "kr": "КР"}
 
@@ -36,6 +37,7 @@ class Layout:
     cols: dict[str, int] = field(default_factory=dict)          # FIXED-ключ → листовая колонка
     semesters: dict[int, dict] = field(default_factory=dict)    # номер → {weeks, cols: {lec: col, ...}}
     header_rows: int = 0
+    credit_based: bool = True
 
 
 class NoTable(Exception):
@@ -69,12 +71,25 @@ def find_layout(grid: Grid) -> Layout:
     if "name" not in lay.cols:
         raise NoTable("Не найдена колонка «Наименование»")
     sem_spans = _renumber(sem_spans)
+    first_sem = min((a for _, _, a, _ in sem_spans), default=len(grid.columns))
+    lay.cols = {k: v for k, v in lay.cols.items() if v < first_sem}
+    lay.credit_based = "ze" in lay.cols
+    if not lay.credit_based:
+        for row in grid.rows[:last_header + 2]:
+            for cell in row.cells:
+                if cell.col0 != cell.col1 or not lay.cols.get("plan", 0) < cell.col0 < first_sem:
+                    continue
+                label = norm(cell.text).replace(" ", "")
+                for key, pattern in {"lec": r"^лек$", "lab": r"^лабораторные$", "pr": r"^практические$",
+                                     "krp": r"^крп$", "consult": r"^паконс$", "pa_sr": r"^паср$", "exam": r"^экзамены$"}.items():
+                    if re.search(pattern, label):
+                        lay.cols["hours_" + key] = cell.col0
     for num, weeks, a, b in sem_spans:
         cols: dict[str, int] = {}
         for ri, row in enumerate(grid.rows[:last_header + 2]):
             for c in row.cells:
                 if a <= c.col0 <= b and c.col0 == c.col1:
-                    t = norm(c.text)
+                    t = norm(c.text).replace(" ", "")
                     for key, pattern in SUB.items():
                         if key not in cols and re.search(pattern, t):
                             cols[key] = c.col0
@@ -84,7 +99,7 @@ def find_layout(grid: Grid) -> Layout:
         free = [i for i in range(a, b + 1) if i not in cols.values()]
         order = [k for k in SUB_ORDER if k != "eios"] if b - a + 1 == 4 else SUB_ORDER
         missing = [k for k in order if k not in cols]
-        if free and len(free) == len(missing):
+        if free and len(free) == len(missing) and not any(k not in SUB_ORDER for k in cols):
             cols.update(dict(zip(missing, free)))
         lay.semesters[num] = {"weeks": weeks, "cols": cols}
     lay.header_rows = last_header + 1
@@ -93,9 +108,17 @@ def find_layout(grid: Grid) -> Layout:
     return lay
 
 
-def _semester(t: str) -> tuple[int, int] | None:
+def _semester(t: str) -> tuple[int, float | None] | None:
     """«Семестр 3 [16 нед]» → (3, 16). Подпись мелкая, OCR путает в ней буквы («Cemectn», «Семесто»)
     и читает скобку как единицу («Семестр 6116 нед»), поэтому слово узнаётся по форме, а числа — по смыслу."""
+    explicit = re.match(r"^семестр\.?\s*(\d{1,2})(?:\s*[.\[(]|$)", t, re.I)
+    if explicit:
+        num = int(explicit.group(1))
+        weeks = re.search(r"[\[(]\s*(\d+)(?:\s+(\d+)\s*/\s*(\d+))?\s*не", t, re.I)
+        value = int(weeks.group(1)) if weeks else None
+        if weeks and weeks.group(2) and int(weeks.group(3)):
+            value += int(weeks.group(2)) / int(weeks.group(3))
+        return (num, value) if 1 <= num <= 12 else None
     m = SEM_RE.search(t)
     if m:
         return int(m.group(1)), int(m.group(2))
@@ -164,16 +187,40 @@ def read_pages(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> li
         arr = pdfmod.render_page(data, i, dpi)
         angle = skew_angle(arr) if scanned else 0.0
         arr = rotate(arr, angle)
-        grid = detect_grid(arr)
+        grid = detect_grid(arr, min_row_px=12 if scanned else 2)
         if grid is None:
             continue
         fine = FineRaster.for_scan(data, i, dpi, angle) if scanned else None
         if scanned:
             ocr_grid(arr, grid, cfg, fine)
         else:
-            assign_words(grid, pdfmod.page_words(data, i, dpi / 72))
+            words = pdfmod.page_words(data, i, dpi / 72)
+            assign_words(grid, words)
+            _split_header_cells(grid, words)
         pages.append((grid, arr, fine))
     return pages
+
+
+def _split_header_cells(grid: Grid, words: list) -> None:
+    """A short header may lose its inner dividers during raster line filtering.
+
+    Split only headers naming several distinct fixed columns, using the leaf
+    dividers already witnessed in the body. Semester and course spans remain merged.
+    """
+    from .grid import Cell
+    for row in grid.rows[:8]:
+        cells = []
+        for c in row.cells:
+            labels = sum(bool(re.search(pattern, norm(c.text))) for pattern in
+                         (r"индекс", r"наименован", r"зачет|зачёт", r"кп", r"кр"))
+            if c.col1 > c.col0 and labels >= 2:
+                for col in range(c.col0, c.col1 + 1):
+                    x0, x1 = grid.columns[col]
+                    cells.append(Cell(x0, x1, c.y0, c.y1, col, col))
+            else:
+                cells.append(c)
+        row.cells = cells
+    assign_words(grid, words)
 
 
 def recheck_rows(arr, grid: Grid, lay: Layout, items: list[dict], cfg: OcrConfig, fine: FineRaster | None = None) -> int:
@@ -279,11 +326,19 @@ def parse_grid(grid: Grid, lay: Layout) -> list[dict]:
     return rows_out
 
 
+def _index(text: str) -> str:
+    raw = re.sub(r"\s+", "", text)
+    if re.fullmatch(r"(?:\d+(?:\.\d+)+|[А-ЯЁ]{2,}\.\d+(?:\.\d+)*)(?:[а-я])?(?:\([А-Яа-я]\))?", raw):
+        return raw
+    return fix_index(text)
+
+
 def _parse_row(row: Row, lay: Layout, block: str, part: str) -> dict:
     idx_col = lay.cols.get("index")
     item = {
-        "index": fix_index(row.text_at(idx_col)) if idx_col is not None else "",
-        "name": clean_text(row.text_at(lay.cols["name"])),
+        "index": _index(row.text_at(idx_col)) if idx_col is not None else "",
+        "credit_based": lay.credit_based,
+        "name": discipline_name(row.text_at(lay.cols["name"])),
         "block": block,
         "part": part,
         "control": {k: semesters_from_code(row.text_at(lay.cols[k])) for k in CONTROL_LABELS if k in lay.cols},
@@ -291,6 +346,14 @@ def _parse_row(row: Row, lay: Layout, block: str, part: str) -> dict:
         "hours": {k: _num(row, lay.cols.get(k)) for k in ("plan", "kont", "aud", "sr", "control")},
         "semesters": {},
     }
+    if not lay.credit_based:
+        for key in ("lec", "lab", "pr", "krp", "consult", "pa_sr", "exam"):
+            if "hours_" + key in lay.cols:
+                item["hours"][key] = _num(row, lay.cols["hours_" + key])
+        if all("hours_" + key in lay.cols for key in ("lec", "lab", "pr")):
+            item["hours"]["aud"] = sum(item["hours"].get(k, 0) for k in ("lec", "lab", "pr"))
+            item["hours"]["kont"] = item["hours"]["aud"] + item["hours"].get("krp", 0)
+            item["hours"]["control"] = sum(item["hours"].get(k, 0) for k in ("consult", "pa_sr", "exam"))
     for num, sem in sorted(lay.semesters.items()):
         vals = {k: _num(row, col) for k, col in sem["cols"].items()}
         if any(vals.values()):
@@ -355,7 +418,9 @@ def validate(rows: list[dict]) -> list[str]:
             if parts and parts != h["plan"]:
                 problems.append(f"«По плану» {h['plan']} ≠ конт. раб. + СР + контроль = {parts}")
             has_free_child = r["is_module"] and any(i.startswith(r["index"] + ".") for i in no_ze)
-            if not r.get("ze"):
+            if not r.get("credit_based", True):
+                pass
+            elif not r.get("ze"):
                 if h["plan"] % 36 == 0:
                     problems.append("не распознано число з.е.")
             elif r["ze"] * 36 != h["plan"] and not has_free_child:
@@ -394,6 +459,9 @@ def extract(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> dict:
     for r in rows:
         r.pop("_ri", None)
     messages = validate(rows)
+    unknown_weeks = [str(n) for n, w in sorted(semesters.items()) if w is None]
+    if unknown_weeks:
+        messages.append("В документе не указано число учебных недель семестров: " + ", ".join(unknown_weeks))
     if not scanned:
         texts = pdfmod.page_texts(data, max_pages=1)
         title = texts[0].splitlines()[0].strip() if texts and texts[0].strip() else ""

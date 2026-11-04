@@ -47,9 +47,9 @@ def local_file(output, href):
     return path / "index.html" if path.suffix == "" else path
 
 
-def test_static_export_preserves_distinct_queries_and_downloads(tmp_path):
+def test_static_export_preserves_distinct_queries_and_assets(tmp_path):
     output = tmp_path / "site"
-    report = export_site(static_source(), output, "/robo-study/", ["/api/documents/1/json?kind=primary"])
+    report = export_site(static_source(), output, "/robo-study/")
     soup = BeautifulSoup((output / "index.html").read_text(), "html.parser")
     first = soup.find("a", string="Первая")["href"]
     second = soup.find("a", string="Вторая")["href"]
@@ -66,8 +66,8 @@ def test_static_export_preserves_distinct_queries_and_downloads(tmp_path):
             if href.startswith("/robo-study/"):
                 assert local_file(output, href).is_file(), (html, href)
             assert "testserver" not in href and "localhost" not in href
-    json_link = soup.find("a", string="JSON")["href"]
-    assert '"qualification"' in local_file(output, json_link).read_text()
+    assert soup.find("a", string="JSON") is None
+    assert report["json_files"] == 0
     assert (output / ".nojekyll").exists()
     assert report["pages"] >= 5
     update = local_file(output, soup.find("a", string="Обновить данные")["href"]).read_text()
@@ -86,3 +86,12 @@ def test_export_rejects_existing_nonempty_output(tmp_path):
 def test_export_rejects_unexpected_backend_route(tmp_path):
     with pytest.raises(ValueError, match="Unsupported"):
         export_site(static_source('<a href="/api/runs/1">Run</a>'), tmp_path / "site", "/robo-study/")
+
+
+def test_static_site_does_not_publish_json_downloads(tmp_path):
+    output=tmp_path / "site"
+    export_site(static_source(), output, "/robo-study/")
+    assert not (output / "downloads").exists()
+    for file in output.rglob("*.html"):
+        soup=BeautifulSoup(file.read_text(),"html.parser")
+        assert not soup.select('a[href*="/downloads/"], a[href*="/api/documents/"], a[download]')

@@ -31,7 +31,7 @@ e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light'
 try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();"""
 
 
-def export_site(client, output: Path, base_path: str, json_urls=()) -> dict:
+def export_site(client, output: Path, base_path: str) -> dict:
     """Crawl only public read routes; require an empty destination and fail on broken links."""
     output = Path(output)
     if output.exists() and any(output.iterdir()):
@@ -43,9 +43,8 @@ def export_site(client, output: Path, base_path: str, json_urls=()) -> dict:
     (output / ".nojekyll").touch()
     origin = str(client.base_url)
     host = urlsplit(origin).netloc
-    pending, seen = deque(["/", *json_urls]), set()
-    json_urls = set(json_urls)
-    html_count = json_count = 0
+    pending, seen = deque(["/"]), set()
+    html_count = 0
 
     def canonical(href: str, current: str) -> tuple[str | None, str]:
         if not href or href.startswith("#"):
@@ -64,11 +63,6 @@ def export_site(client, output: Path, base_path: str, json_urls=()) -> dict:
         path = u.path.lstrip("/")
         if path.startswith("static/"):
             rel = Path(path)
-            return rel, base_path + rel.as_posix()
-        if re.fullmatch(r"/api/documents/\d+/json", u.path):
-            doc_id = u.path.split("/")[3]
-            digest = hashlib.sha256(u.query.encode()).hexdigest()[:12]
-            rel = Path("downloads") / f"doc-{doc_id}-{digest}.json"
             return rel, base_path + rel.as_posix()
         if not (u.path in ("/", "/programs", "/run") or u.path.startswith("/op/")):
             raise ValueError(f"Unsupported internal route: {key}")
@@ -106,10 +100,6 @@ def export_site(client, output: Path, base_path: str, json_urls=()) -> dict:
             raise ValueError(f"Export request failed: {key}: {response.status_code}")
         target = output / rel
         target.parent.mkdir(parents=True, exist_ok=True)
-        if "application/json" in response.headers.get("content-type", ""):
-            target.write_text(json.dumps(response.json(), ensure_ascii=False, indent=2), encoding="utf-8")
-            json_count += 1
-            continue
         soup = BeautifulSoup(response.text, "html.parser")
         if not soup.body or not soup.head:
             raise ValueError(f"Expected HTML page: {key}")
@@ -121,21 +111,16 @@ def export_site(client, output: Path, base_path: str, json_urls=()) -> dict:
             main.clear()
             section = soup.new_tag("section", attrs={"class": "app-section app-content"})
             section.append(BeautifulSoup('<h2>Просмотр сохранённых результатов</h2><p>На GitHub Pages размещена копия '
-                'результатов обработки. Здесь можно изучать программы, дисциплины и JSON-файлы.</p>'
+                'результатов обработки. Здесь можно изучать программы, дисциплины и учебные планы.</p>'
                 '<p>Запуск робота, распознавание PDF и обновление данных доступны в локальном приложении. '
                 'Для обновления опубликованной версии нужно заново выполнить экспорт.</p>'
                 '<p><a href="/programs">Открыть образовательные программы</a></p>', "html.parser"))
             main.append(section)
-        match = re.fullmatch(r"/op/[^/]+/doc/(\d+)", urlsplit(key).path)
-        if match:
-            aside = soup.select_one(".app-aside")
-            if aside:
-                for kind, title in (("primary", "Первичный JSON"), ("final", "Итоговый JSON")):
-                    url = f"/api/documents/{match[1]}/json?kind={kind}"
-                    if url in json_urls:
-                        a = soup.new_tag("a", href=url, attrs={"class": "ir-btn ir-btn--outline app-aside__btn", "download": ""})
-                        a.string = title
-                        aside.append(a)
+        # JSON remains an internal storage/API format, not a visitor-facing download.
+        for a in soup.select("a[href]"):
+            url, _ = canonical(a["href"], key)
+            if url and re.fullmatch(r"/api/documents/\d+/json(?:\?.*)?", url):
+                a.decompose()
         note = soup.new_tag("div", attrs={"data-static-snapshot": "", "class": "app-footer__note", "style": "padding:12px 24px;text-align:center"})
         note.string = "Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении"
         soup.body.insert(0, note)
@@ -167,7 +152,7 @@ def export_site(client, output: Path, base_path: str, json_urls=()) -> dict:
                         local /= "index.html"
                     if not local.is_file():
                         raise ValueError(f"Broken exported link: {href}")
-    report = {"pages": html_count, "json_files": json_count, "base_path": base_path,
+    report = {"pages": html_count, "json_files": 0, "base_path": base_path,
               "exported_at": datetime.now(timezone.utc).isoformat()}
     (output / "snapshot.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report
@@ -178,7 +163,7 @@ def main():
     from sqlalchemy import select
     from sqlalchemy.engine import make_url
     from .config import load_settings
-    from .models import Document, JsonVersion, Program
+    from .models import Program
     from .web.app import create_app
 
     parser = argparse.ArgumentParser(description=__doc__)
@@ -205,13 +190,10 @@ def main():
             programs = set(ses.scalars(select(Program.id).where(Program.page.is_not(None))))
             if not programs:
                 parser.error("No saved program pages to publish")
-            docs = set(ses.scalars(select(Document.id).where(Document.program_id.in_(programs))))
-            versions = set(ses.execute(select(JsonVersion.document_id, JsonVersion.kind).where(JsonVersion.document_id.in_(docs))))
-        urls = [f"/api/documents/{doc_id}/json?kind={kind}" for doc_id, kind in sorted(versions)]
         # Do not enter lifespan: no worker or interrupted-run updates are needed.
         client = TestClient(app, follow_redirects=True)
         try:
-            report = export_site(client, args.output, args.base_path, urls)
+            report = export_site(client, args.output, args.base_path)
         finally:
             client.close()
             app.state.db.engine.dispose()

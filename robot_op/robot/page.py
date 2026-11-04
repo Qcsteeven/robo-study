@@ -9,6 +9,8 @@ from sqlalchemy import select
 
 from ..catalog import DOC_ORDER, DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE
 from ..extract import curriculum
+from ..extract.quality import validate as validate_fields
+from ..extract.util import discipline_name
 from ..extract.schedule import LEGEND
 from ..extract.tables import vkr_topics
 from ..models import Document, JsonVersion, Program
@@ -25,8 +27,7 @@ def latest_final(ses, doc_id: int) -> dict | None:
 
 
 def _key(name: str) -> str:
-    # Tesseract читает латинское Web в скане как «М/еБ».
-    name = (name or "").lower().replace("ё", "е").replace("м/еб-программирование", "web-программирование")
+    name = discipline_name(name or "").lower().replace("ё", "е")
     return re.sub(r"[^а-яёa-z0-9]", "", name)
 
 
@@ -76,15 +77,16 @@ def calendar_grid(kd: dict, fallback_year: int) -> dict:
     m = re.match(r"(20\d\d)", kd.get("academic_year") or "")
     y0 = int(m.group(1)) if m else fallback_year
     first, last = date(y0, 9, 1), date(y0 + 1, 8, 31)
-    start = first - timedelta(days=first.weekday())
-    n_cols = (last - start).days // 7 + 1
+    weekly = kd.get("mode") == "weekly"
+    start = first if weekly else first - timedelta(days=first.weekday())
+    n_cols = kd["weeks"] if weekly else (last - start).days // 7 + 1
     mondays = [start + timedelta(weeks=i) for i in range(n_cols)]
     n_weeks = kd.get("weeks") or 52
 
     months: list[list] = []
     for mon in mondays:
         inside = [d for d in (mon + timedelta(days=k) for k in range(6)) if first <= d <= last]
-        month = max(dict.fromkeys(d.month for d in inside), key=[d.month for d in inside].count)
+        month = mon.month if weekly else max(dict.fromkeys(d.month for d in inside), key=[d.month for d in inside].count)
         name = MONTH_NAMES[month - 1]
         if months and months[-1][0] == name:
             months[-1][1] += 1
@@ -92,14 +94,14 @@ def calendar_grid(kd: dict, fallback_year: int) -> dict:
             months.append([name, 1])
     header = [{"day": d, "cells": [{"n": (mon + timedelta(days=k)).day,
                                     "out": not first <= mon + timedelta(days=k) <= last} for mon in mondays]}
-              for k, d in enumerate(WEEKDAYS)]
+              for k, d in enumerate(WEEKDAYS)] if not weekly else []
 
     used = set()
     courses = []
     for c in kd["courses"]:
         days = c.get("days") or {}
         rows = []
-        for k, d in enumerate(WEEKDAYS[:6]):
+        for k, d in enumerate(["нед."] if kd.get("mode") == "weekly" else WEEKDAYS[:6]):
             cells = []
             for i, mon in enumerate(mondays):
                 if not first <= mon + timedelta(days=k) <= last:
@@ -108,17 +110,20 @@ def calendar_grid(kd: dict, fallback_year: int) -> dict:
                 codes = days.get(d)
                 # старые JSON-файлы — только по неделям: обозначение недели на каждый её день
                 code = codes[i] if codes and i < len(codes) else (c["weeks"][i] if i < len(c["weeks"]) else "")
-                code = "" if code == "Т" else code
+                code = "out" if kd.get("mode") == "weekly" and code == "*" else "" if code == "Т" else code
                 used.add(code)
                 cells.append(code)
             rows.append({"day": d, "cells": cells})
         courses.append({"course": c["course"], "group": c.get("group", ""), "rows": rows})
     legend = [{"code": "", "label": LEGEND["Т"]}] + [{"code": k, "label": v} for k, v in LEGEND.items() if k in used and k != "Т"]
+    for code in sorted(used):
+        if re.fullmatch(r"(?:УП|ПП)(?:\.\d+)?", code):
+            legend.append({"code": code, "label": "учебная практика" if code.startswith("УП") else "производственная практика"})
     if "*" in used:
         legend.append({"code": "*", "label": "нерабочие праздничные дни"})
     legend.append({"code": "out", "label": "обучение не ведётся"})
     return {"academic_year": kd.get("academic_year") or f"{y0}/{y0 + 1}", "months": months, "header": header,
-            "week_numbers": [i + 1 if i < n_weeks else None for i in range(n_cols)], "courses": courses, "legend": legend}
+            "week_numbers": [i + 1 if i < n_weeks else None for i in range(n_cols)], "courses": courses, "legend": legend, "needs_review": bool(kd.get("messages")), "mode": kd.get("mode", "daily")}
 
 
 def build(ses, prog: Program) -> dict:
@@ -142,7 +147,7 @@ def build(ses, prog: Program) -> dict:
     fos_doc, fos = first_final("fos_gia")
 
     up_data = (up or {}).get("data") or {}
-    oop_data = (oop or {}).get("data") or {}
+    oop_data = validate_fields("oop", (oop or {}).get("data") or {})
     up_rows = {_key(r["name"]): r for r in up_data.get("rows", [])}
 
     op = {
@@ -154,7 +159,7 @@ def build(ses, prog: Program) -> dict:
         "source_url": prog.source_url,
         "summary": program_summary.clean_summary((oop or {}).get("summary")),
         "characteristic": program_summary.fallback(oop_data, {"profile": prog.profile or prog.block_title}),
-        "areas": oop_data.get("areas", []),
+        "areas": program_summary.professional_areas(oop_data.get("areas", [])),
         "task_types": oop_data.get("task_types", []),
     }
 
@@ -185,7 +190,7 @@ def build(ses, prog: Program) -> dict:
         if not sems:
             row = up_rows.get(_key(d.title))
             sems = sorted({s for v in (row or {}).get("control", {}).values() for s in v})
-        practices.append({"id": d.id, "name": d.title, "semester": _sem_text(sems),
+        practices.append({"id": d.id, "name": d.title + (" · " + data["practice_type"] if re.match(r"ПМ[. ]", data.get("practice_type", "")) else ""), "semester": _sem_text(sems),
                           "weeks": data.get("weeks") or "—", "summary": f.get("summary") or "",
                           "url": f"/op/{prog.id}/doc/{d.id}", "pdf_url": d.url, "_order": sems[0] if sems else 99})
     practices.sort(key=lambda p: (p.pop("_order"), p["name"]))
@@ -227,5 +232,6 @@ def build(ses, prog: Program) -> dict:
     links = discipline_links(prog.id, up_data.get("rows", []), docs, finals)
     plan = plan_view.build(up_data, links, key=_key)
 
-    return {"op": op, "plan": plan, "schedule": schedule, "disciplines": disciplines, "practices": practices,
+    unavailable = {kind: bool(by_type.get(kind)) for kind in ("up", "kug")}
+    return {"unavailable": unavailable, "op": op, "plan": plan, "schedule": schedule, "disciplines": disciplines, "practices": practices,
             "gia": gia_ctx, "documents": documents}

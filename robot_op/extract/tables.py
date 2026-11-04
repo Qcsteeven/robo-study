@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import re
 
+from .quality import learning_results
+
 # вид таблицы → признаки шапки (все должны встретиться в первых строках)
 KINDS: list[tuple[str, tuple[str, ...]]] = [
     ("volume", (r"вид\s+учебной\s+работы",)),
@@ -36,26 +38,33 @@ def classify(rows: list[list[str]]) -> str | None:
     return None
 
 
-def group(tables: list[tuple[int, list[list[str]]]]) -> dict[str, list[list[str]]]:
-    """Опознанные таблицы с продолжениями: вид → строки (первая таблица вида; шапка — в первых строках).
+def group(tables: list[tuple[int, list[list[str]]]], sources: dict | None = None) -> dict[str, list[list[str]]]:
+    """Опознанные таблицы с продолжениями: вид → строки, включая повторные шапки семестров.
 
     Продолжение — таблица без шапки сразу после опознанной: с тем же числом колонок или первая на следующей
     странице (у продолжения бывает другое число колонок из-за объединённых ячеек шапки)."""
     out: dict[str, list[list[str]]] = {}
     prev, prev_cols, prev_page = None, 0, -1
     for page, rows in tables:
+        if not rows:
+            continue
         kind = classify(rows)
         cols = max(len(r) for r in rows)
+        adjacent = page in (prev_page, prev_page + 1)
         first_on_page = page != prev_page
-        if kind is None and prev is not None and (cols == prev_cols or (first_on_page and page == prev_page + 1)):
+        if kind is None and prev is not None and adjacent and (cols == prev_cols or (prev == "volume" and first_on_page)):
             out[prev].extend(rows)
-            prev_page = page
+            if sources is not None:
+                sources[prev]["pages"] = sorted(set(sources[prev]["pages"] + [page + 1]))
+            prev_page, prev_cols = page, cols
             continue
         prev, prev_cols, prev_page = (kind, cols, page) if kind and kind != "other" else (None, 0, page)
-        if prev and prev not in out:
-            out[prev] = list(rows)
-        elif prev:
-            prev = None   # повтор вида — не продолжение первой
+        if prev:
+            # Повторная шапка: например, темы второго семестра той же дисциплины.
+            out.setdefault(prev, []).extend(rows)
+            if sources is not None:
+                source = sources.setdefault(prev, {"method": "table", "pages": []})
+                source["pages"] = sorted(set(source["pages"] + [page + 1]))
     return out
 
 
@@ -92,7 +101,7 @@ def volume(rows: list[list[str]]) -> dict:
     hours, sems, control = {}, [], []
     for r in rows[:3]:
         for c in r:
-            for n in re.findall(r"семестр\s*№?\s*(\d{1,2})", c.lower()):
+            for n in re.findall(r"семестр№?(\d{1,2})", re.sub(r"\s+", "", c.lower())):
                 sems.append(int(n))
     for r in rows:
         label = r[0].lower().replace("ё", "е") if r else ""
@@ -116,12 +125,25 @@ def volume(rows: list[list[str]]) -> dict:
 
 def titled(rows: list[list[str]], hours: bool = False) -> list[dict]:
     """Таблица «№ | Наименование | (Краткое содержание или часы)» → [{title, summary} | {title, hours}]."""
-    out = []
-    for r in _numbered(rows):
-        title = _clean(r[1]) if len(r) > 1 else ""
-        rest = [c for c in r[2:] if c.strip()]
-        if not title:
+    records: list[list[str]] = []
+    for row in rows:
+        if not row:
             continue
+        if re.fullmatch(r"\d{1,2}\.?", row[0].strip()) and len(row) > 1 and row[1].strip():
+            if not re.search(r"[A-Za-zА-ЯЁа-яё]", row[1]):
+                continue  # строка с номерами колонок
+            records.append([str(c or "").strip() for c in row])
+        elif records and not row[0].strip() and any(str(c or "").strip() for c in row[1:]):
+            # Пустой номер — продолжение предыдущей строки, а не новая тема.
+            while len(records[-1]) < len(row):
+                records[-1].append("")
+            for i, cell in enumerate(row[1:], 1):
+                if cell:
+                    records[-1][i] = (records[-1][i] + " " + cell.strip()).strip()
+    out = []
+    for row in records:
+        title = _clean(row[1])
+        rest = [c for c in row[2:] if c.strip()]
         if hours:
             out.append({"title": title, "hours": _hours(rest[-1]) if rest else None})
         else:
@@ -152,7 +174,7 @@ def results(rows: list[list[str]]) -> list[str]:
             part = _clean(part)
             if re.match(r"(Знать|Уметь|Владеть)\b", part) and part not in out:
                 out.append(part)
-    return out
+    return learning_results(out)
 
 
 def practice_period(rows: list[list[str]]) -> dict:

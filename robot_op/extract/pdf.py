@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import io
+from statistics import median
 from dataclasses import dataclass
 
 import numpy as np
@@ -61,7 +62,26 @@ def page_tables(data: bytes, max_pages: int = 40) -> list[tuple[int, list[list[s
     out = []
     with pdfplumber.open(io.BytesIO(data)) as pdf:
         for i, page in enumerate(pdf.pages[:max_pages]):
-            for table in page.extract_tables():
+            detected = page.find_tables()
+            extra_lines = []
+            # Продолжающаяся на следующем листе таблица может не иметь нижней
+            # горизонтальной рамки. Восстанавливаем только геометрическую границу
+            # по двум продолжающимся внешним вертикальным рамкам.
+            for table in detected:
+                x0, y0, x1, y1 = table.bbox
+                sides = []
+                for x in (x0, x1):
+                    end = y1
+                    for edge in sorted((e for e in page.edges if e["orientation"] == "v" and abs(e["x0"] - x) < 3), key=lambda e: e["top"]):
+                        if edge["top"] <= end + 3 and edge["bottom"] > end:
+                            end = edge["bottom"]
+                    sides.append(end if end > y1 + 12 else None)
+                if all(v is not None for v in sides) and abs(sides[0] - sides[1]) < 4:
+                    extra_lines.append(min(sides))
+            if extra_lines:
+                detected = page.find_tables({"explicit_horizontal_lines": extra_lines})
+            for found in detected:
+                table = found.extract()
                 rows = [[" ".join((cell or "").replace("-\n", "-").split()) for cell in row] for row in table]
                 rows = [r for r in rows if any(r)]
                 if rows:
@@ -73,7 +93,10 @@ def page_words(data: bytes, index: int, scale: float) -> list[Word]:
     """Слова текстового слоя страницы в координатах растра (scale = dpi / 72)."""
     with pdfplumber.open(io.BytesIO(data)) as pdf:
         page = pdf.pages[index]
-        words = page.extract_words(x_tolerance=1.5, y_tolerance=2, keep_blank_chars=False)
+        # Absolute tolerances merge adjacent lines and columns in plans printed at 2 pt.
+        size = median(c["size"] for c in page.chars) if page.chars else 10
+        words = page.extract_words(x_tolerance=min(1.5, size * .15),
+                                   y_tolerance=min(2, size * .15), keep_blank_chars=False)
     return [Word(w["text"], w["x0"] * scale, w["top"] * scale, w["x1"] * scale, w["bottom"] * scale) for w in words]
 
 
@@ -105,3 +128,22 @@ def scan_dpi(data: bytes, index: int) -> float:
 
 def to_image(arr: np.ndarray) -> Image.Image:
     return Image.fromarray(arr)
+
+
+def resource_links(data: bytes) -> list[dict]:
+    """Внешние URI, в том числе за надписью «ссылка», с контекстом и страницей."""
+    out = []
+    with pdfplumber.open(io.BytesIO(data)) as doc:
+        for number, page in enumerate(doc.pages, 1):
+            for link in page.hyperlinks:
+                if not link.get("uri"):
+                    continue
+                top = max(0, link.get("top", 0))
+                bottom = min(page.height, link.get("bottom", page.height))
+                x0, x1 = max(0, link.get("x0", 0)), min(page.width, link.get("x1", page.width))
+                if bottom <= top or x1 <= x0:
+                    continue
+                label = page.crop((x0, top, x1, bottom)).extract_text() or ""
+                context = page.crop((0, 0, page.width, bottom)).extract_text() or ""
+                out.append({"url": link["uri"], "text": label, "context": context, "page": number})
+    return out

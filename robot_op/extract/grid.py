@@ -187,7 +187,7 @@ def _clusters(flags: np.ndarray, min_gap: int = 2) -> list[tuple[int, int]]:
     return out
 
 
-def detect_grid(arr: np.ndarray, min_row_px: int = 12) -> Grid | None:
+def detect_grid(arr: np.ndarray, min_row_px: int = 12, *, filter_short: bool = True) -> Grid | None:
     dark = binarize(arr)
     h, w = dark.shape
     run = max(40, w // 60)
@@ -209,6 +209,8 @@ def detect_grid(arr: np.ndarray, min_row_px: int = 12) -> Grid | None:
             continue
         m = max(2, (y1 - y0) // 10)
         band = dark[y0 + m:y1 - m + 1, x_min:x_max + 1]
+        if not band.shape[0]:
+            continue
         ratio = band.mean(axis=0)
         # допуск на небольшой наклон скана: максимум по соседним колонкам
         padded = np.pad(ratio, 2)
@@ -222,7 +224,8 @@ def detect_grid(arr: np.ndarray, min_row_px: int = 12) -> Grid | None:
     tops: list[tuple[int, int]] = []          # горизонтальная линия над каждой строкой
     all_v: list[tuple[int, int]] = []
     for i, (y0, y1, top, vlines) in enumerate(bands):
-        vlines = _continued(vlines, bands, i)
+        if filter_short:
+            vlines = _continued(vlines, bands, i)
         if len(vlines) < 2:
             continue
         tops.append(top)

@@ -4,6 +4,13 @@
 {% block content %}
 <div class="app-page">
   <div class="app-content">
+    {% if not final or not final.data %}
+    {{ ui.empty('Сведения не извлечены. Откройте исходный PDF для просмотра документа.') }}
+    {% endif %}
+    {% if view.warnings %}
+    <p class="app-empty" role="status">Некоторые сведения требуют проверки по <a href="{{ doc.url }}">исходному PDF</a>. Сомнительные фрагменты не используются в описании.</p>
+    {% for warning in view.warnings if warning.field == 'hours' %}<p class="app-llm-note">{{ warning.reason }}</p>{% endfor %}
+    {% endif %}
     {%- if final and final.summary %}
     <section class="app-section" aria-labelledby="h-sum">
       <h2 class="section-title" id="h-sum">Кратко</h2>
@@ -25,7 +32,22 @@
       {%- if b.kind == 'topics' %}
       <ol class="app-topics">
         {%- for t in b['items'] %}
-        <li><span class="app-topics__title">{{ t.title }}</span>{% if t.summary %}<span class="app-topics__text">{{ t.summary }}</span>{% endif %}</li>
+        <li><span class="app-topics__title">{{ t.title }}</span>
+        {% if t.subtitles and not t.groups %}<ol class="app-stage-steps">{% for subtitle in t.subtitles %}<li>{{ subtitle }}</li>{% endfor %}</ol>{% endif %}
+        {% if t.summary %}<span class="app-topics__text">{{ t.summary }}</span>{% endif %}
+        {% if t.steps %}
+          {% if t.ordered %}<ol class="app-stage-steps">{% else %}<ul class="app-stage-steps">{% endif %}
+            {% for step in t.steps %}<li>{{ step }}</li>{% endfor %}
+          {% if t.ordered %}</ol>{% else %}</ul>{% endif %}
+        {% endif %}
+        {% for group in t.groups or [] %}
+          <div class="app-stage-group"><h3>{{ group.title }}</h3>
+          {% if group.ordered %}<ol class="app-stage-steps">{% else %}<ul class="app-stage-steps">{% endif %}
+            {% for step in group.steps %}<li>{{ step }}</li>{% endfor %}
+          {% if group.ordered %}</ol>{% else %}</ul>{% endif %}
+          </div>
+        {% endfor %}
+        </li>
         {%- endfor %}
       </ol>
       {%- elif b.kind == 'hours' %}
@@ -35,8 +57,25 @@
         </table>
       </div>
       {%- else %}
-      <ul class="app-list">{% for it in b['items'] %}<li>{{ it }}</li>{% endfor %}</ul>
+      {% if b['items'] %}<ul class="app-list">
+        {% for it in b['items'] %}<li>{% if b.title == 'Литература' %}{{ it | urlize }}{% else %}{{ it }}{% endif %}
+          {% if b.book_origins and b.book_origins[loop.index0] %}
+          {% set origins = b.book_origins[loop.index0] %}
+          <span class="app-resource-origin">{% for origin in origins %}{% if not loop.first %}; {% endif %}Из раздела «{{ origin.section }}», стр. {{ origin.page }}{% endfor %}</span>
+          {% endif %}
+        </li>{% endfor %}
+      </ul>{% endif %}
       {%- endif %}
+      {% if b.resources %}
+      <h3 class="item-title">Электронные ресурсы из документа</h3>
+      <ul class="app-list app-resources">
+        {% for resource in b.resources %}
+        <li>{% if resource.url %}<a class="ir-link" href="{{ resource.url }}">{{ resource.title }}</a>{% else %}<span>{{ resource.title }}</span> <span class="app-llm-note">Адрес в документе не указан.</span>{% endif %}
+          <span class="app-resource-origin">{% for origin in resource.origins %}{% if not loop.first %}; {% endif %}Из раздела «{{ origin.section }}», стр. {{ origin.page }}{% endfor %}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
     </section>
     {%- endfor %}
 

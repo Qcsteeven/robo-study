@@ -66,7 +66,8 @@ def test_oop_llm_receives_only_structured_facts():
     payload = json.loads(compact(primary, 12000, "oop"))
     assert "characteristic" not in payload and "sections" not in payload
     assert "ананни" not in json.dumps(payload, ensure_ascii=False)
-    assert payload["areas"] == facts()["areas"] and payload["program"]["profile"] == "Искусственный интеллект"
+    assert payload["areas"] == ["Связь, информационные и коммуникационные технологии"]
+    assert payload["program"]["profile"] == "Искусственный интеллект"
     empty = json.loads(compact({"characteristic": NOISE, "sections": {"general": {"text": NOISE}}}, 12000, "oop"))
     assert "ананни" not in json.dumps(empty, ensure_ascii=False)
 

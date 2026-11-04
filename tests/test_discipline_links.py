@@ -54,7 +54,7 @@ def test_every_curriculum_position_has_a_working_link(discipline_app):
         assert names and all(n.find("a", href=True) is not None for n in names)
         math = next(n.find("a") for n in names if n.get_text(strip=True) == "Математика")
         assert math["href"] == "/op/test-op/doc/2"
-        web = next(n.find("a") for n in names if n.get_text(strip=True) == "М/еБ-программирование")
+        web = next(n.find("a") for n in names if n.get_text(strip=True) == "Web-программирование")
         assert web["href"] == "/op/test-op/doc/3"
         for name in names:
             assert client.get(name.find("a")["href"]).status_code == 200

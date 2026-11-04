@@ -113,10 +113,10 @@
         <span class="app-course__meta">{{ s.course }} курс{% if s.weeks %} · {{ s.weeks }} учебных недел{{ s.weeks | plural('я', 'и', 'ь') }}{% endif %} · {{ s.count }} дисциплин{{ s.count | plural('а', 'ы', '') }} · {{ s.exams }} экзамен{{ s.exams | plural('', 'а', 'ов') }}</span>
       </div>
       <dl class="app-load">
-        <div class="app-load__total"><dt>Пар за семестр</dt><dd>{{ num(s.pairs) }}</dd>{% if s.per_week %}<span class="app-load__note">≈ {{ num(s.per_week) }} в неделю</span>{% endif %}</div>
-        <div class="app-load--lec"><dt><span class="app-load__mark" aria-hidden="true"></span>Лекции</dt><dd>{{ num(s.lec) }}</dd></div>
-        <div class="app-load--pr"><dt><span class="app-load__mark" aria-hidden="true"></span>Практики</dt><dd>{{ num(s.pr) }}</dd></div>
-        <div class="app-load--lab"><dt><span class="app-load__mark" aria-hidden="true"></span>Лабораторные</dt><dd>{{ num(s.lab) }}</dd></div>
+        <div class="app-load__total"><dt>Пар за семестр</dt><dd>{{ num(s.pairs) }} <span class="app-load__hours">({{ s.hours | clock_hours }})</span></dd>{% if s.per_week %}<span class="app-load__note">≈ {{ num(s.per_week) }} {{ 'пары' if s.per_week != s.per_week | int else s.per_week | plural('пара', 'пары', 'пар') }} ({{ s.hours_per_week | clock_hours }}) в неделю</span>{% endif %}</div>
+        <div class="app-load--lec"><dt><span class="app-load__mark" aria-hidden="true"></span>Лекции</dt><dd>{{ num(s.lec) }} <span class="app-load__hours">({{ (s.lec * 1.5) | clock_hours }})</span></dd></div>
+        <div class="app-load--pr"><dt><span class="app-load__mark" aria-hidden="true"></span>Практики</dt><dd>{{ num(s.pr) }} <span class="app-load__hours">({{ (s.pr * 1.5) | clock_hours }})</span></dd></div>
+        <div class="app-load--lab"><dt><span class="app-load__mark" aria-hidden="true"></span>Лабораторные</dt><dd>{{ num(s.lab) }} <span class="app-load__hours">({{ (s.lab * 1.5) | clock_hours }})</span></dd></div>
       </dl>
       {%- if s.pairs %}
       <div class="app-load__bar" aria-hidden="true">
@@ -172,7 +172,7 @@
 {% macro plan_shelves(plan) -%}
 <div class="app-shares" role="img" aria-label="Доля категорий в объёме программы: {% for sh in plan.shelves %}{{ sh.title }} — {{ sh.share }}%{% if not loop.last %}, {% endif %}{% endfor %}">
   {%- for sh in plan.shelves if sh.share %}
-  <span class="app-shares__part app-cat--{{ sh.key }}" style="flex-grow: {{ sh.ze }}" title="{{ sh.title }}: {{ sh.ze }} з. е."></span>
+  <span class="app-shares__part app-cat--{{ sh.key }}" style="flex-grow: {{ sh.ze }}" title="{{ sh.title }}: {{ sh.ze }} {{ plan.unit or "з. е." }}"></span>
   {%- endfor %}
 </div>
 <ul class="app-shares-legend" aria-hidden="true">
@@ -184,9 +184,9 @@
 
 {#- График учебного процесса как в документе: шапка — месяцы, даты по дням недели и номера недель;
     у каждого курса шесть строк пн…сб, в ячейке — обозначение дня -#}
-{%- set KUG_CLASS = {'': 't', 'Т': 't', 'Э': 'e', 'У': 'u', 'П': 'p', 'Пд': 'p', 'Н': 'p', 'Г': 'd', 'Д': 'd', 'К': 'k', '*': 'h', 'out': 'out'} -%}
+{%- set KUG_CLASS = {'': 't', 'Т': 't', 'Э': 'e', 'У': 'u', 'П': 'p', 'Пд': 'p', 'Н': 'p', 'Г': 'd', 'Д': 'd', 'К': 'k', '*': 'h', 'out': 'out', 'unknown': 'out', 'НИ': 'p', 'ПА': 'e', 'ИА': 'd', 'Пр': 'p', 'ГИА': 'd'} -%}
 {% macro kug_cell(code) -%}
-<td class="app-kug__cell app-kug--{{ KUG_CLASS.get(code, 't') }}">{% if code not in ('', 'out') %}{{ code }}{% endif %}</td>
+<td class="app-kug__cell app-kug--{{ KUG_CLASS.get(code, 't') }}">{% if code == 'unknown' %}—{% elif code not in ('', 'out') %}{{ code }}{% endif %}</td>
 {%- endmacro %}
 {% macro schedule_grid(kug) -%}
 <div class="ir-table-wrap app-scroll" tabindex="0" role="region" aria-label="Календарный учебный график {{ kug.academic_year }}">
@@ -228,7 +228,7 @@
 </div>
 <ul class="app-kug-legend">
   {%- for l in kug.legend %}
-  <li><span class="app-kug__cell app-kug--{{ KUG_CLASS.get(l.code, 't') }}" aria-hidden="true">{% if l.code not in ('', 'out') %}{{ l.code }}{% endif %}</span>{% if l.code and l.code != 'out' %}«{{ l.code }}» — {% endif %}{{ l.label }}</li>
+  <li><span class="app-kug__cell app-kug--{{ KUG_CLASS.get(l.code, 't') }}" aria-hidden="true">{% if l.code == 'unknown' %}—{% elif l.code not in ('', 'out') %}{{ l.code }}{% endif %}</span>{% if l.code and l.code != 'out' %}«{{ l.code }}» — {% endif %}{{ l.label }}</li>
   {%- endfor %}
 </ul>
 {%- endmacro %}

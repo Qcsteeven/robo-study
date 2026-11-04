@@ -51,7 +51,7 @@ TASKS = {
 # поля, которых достаточно для описания; сплошной текст разделов тогда не передаётся
 STRUCTURED = {
     "rpd": ("discipline", "goal", "semesters", "ze", "hours", "control", "topics", "labs", "practicals", "results"),
-    "practice": ("practice_kind", "practice_type", "method", "semesters", "ze", "weeks", "stages", "content", "results", "control"),
+    "practice": ("practice_kind", "practice_type", "method", "form", "semesters", "ze", "weeks", "stages", "content", "results", "control"),
 }
 # абзацев в описании: у ГИА — до двух, у остальных — один; предложений в абзаце — не больше
 PARAGRAPHS = {"gia": 2, "oop": 1}

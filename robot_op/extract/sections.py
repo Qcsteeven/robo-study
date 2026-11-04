@@ -9,7 +9,12 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from .util import unwrap_text
+
 from . import tables as tbl
+from . import quality
+from .lists import stage_lists
+from .resources import collect as collect_resources
 
 NUM = r"^\s*(?:раздел\s+)?(?:\d{1,2}(?:\.\d{1,2})*\.?\s+)?"
 
@@ -120,6 +125,8 @@ def split_sections(text: str, specs: list[Spec]) -> dict[str, dict]:
             continue
         for spec in specs:
             if spec.key in used:
+                continue
+            if spec.key == "literature" and not quality.LITERATURE_HEADER.fullmatch(low):
                 continue
             if re.match(NUM + r"(?:[\w-]+\s+){0,3}?(?:" + spec.pattern + ")", low):
                 found.append((i, spec, line))
@@ -233,11 +240,12 @@ def quoted_title(text: str, word: str) -> str:
     return normal or found[0][:1] + found[0][1:].lower()
 
 
-def extract(doc_type: str, text: str, tables: list | None = None) -> dict:
+def extract(doc_type: str, text: str, tables: list | None = None, hyperlinks: list[dict] | None = None) -> dict:
     """tables — таблицы текстового слоя (pdf.page_tables); сведения из таблиц точнее, чем из текста."""
     specs = TEMPLATES[doc_type]
     sec = split_sections(text, specs)
-    t = tbl.group(tables or [])
+    sources = {}
+    t = tbl.group(tables or [], sources)
     body = lambda key: sec.get(key, {}).get("text", "")
     data: dict = {"sections": {k: {"title": v["title"], "text": v["text"][:4000]} for k, v in sec.items()}}
     if doc_type == "rpd":
@@ -252,19 +260,18 @@ def extract(doc_type: str, text: str, tables: list | None = None) -> dict:
             "semesters": vol.get("semesters") or semesters(body("place") + "\n" + body("volume")),
             "control": vol.get("control") or [c.capitalize() for c in controls(body("volume"))],
             "topics": tbl.titled(t["topics"]) if "topics" in t else
-                      [{"title": x, "summary": ""} for x in (topic_items(body("content")) or numbered_items(body("content")))[:30]],
+                      [{"title": x, "summary": ""} for x in topic_items(body("content"))[:30]],
             "labs": tbl.titled(t["labs"], hours=True) if "labs" in t else [],
             "practicals": tbl.titled(t["practicals"], hours=True) if "practicals" in t else [],
             "self_study": tbl.titled(t["self_study"], hours=True) if "self_study" in t else [],
-            "literature": numbered_items(body("literature"))[:30],
+            "literature": literature_items(body("literature"))[:30],
         })
     elif doc_type == "practice":
         k = body("kind")
         period = tbl.practice_period(t["practice_period"]) if "practice_period" in t else {}
         data.update({
-            "practice_kind": _after(k, r"вид\w*\s+практики\s*[:—–-]\s*"),
-            "practice_type": _after(k, r"тип\w*\s+практики\s*[:—–-]\s*"),
-            "method": _after(k, r"способ\w*\s+проведения\s*[:—–-]\s*"),
+            **{"practice_kind": "", "practice_type": "", "method": "", "form": ""},
+            **practice_details(k),
             "competencies": tbl.competencies(t["competencies"]) if "competencies" in t else competencies(body("results") or text),
             "results": tbl.results(t["indicators"]) if "indicators" in t else [],
             "semesters": period.get("semesters") or semesters(body("place") + "\n" + body("volume")),
@@ -275,13 +282,13 @@ def extract(doc_type: str, text: str, tables: list | None = None) -> dict:
             "content": _lead(body("content")),
             "reporting": [x for x in numbered_items(body("reporting"), r"(?:\d{1,2}[.)]|[—–\-•\uf0b7])") if len(x) < 200][:10],
             "control": period.get("control") or [c.capitalize() for c in controls(body("reporting") + "\n" + body("assessment"))][:1],
-            "literature": numbered_items(body("literature"))[:20],
+            "literature": literature_items(body("literature"))[:20],
         })
     elif doc_type == "oop":
         act = body("activity")
         data.update({
             "characteristic": body("general")[:2500],
-            "qualification": _after(text, r"квалификаци\w+,?\s*(?:присваиваем\w+\s+)?(?:выпускник\w+)?\s*[:—–-]\s*"),
+            "qualification": _oop_qualification(text),
             "duration": _oop_duration(text),
             "ze_total": first(ZE_RE, re.sub(r"_+", " ", body("general") or text)),
             "areas": _oop_areas(act),
@@ -307,6 +314,12 @@ def extract(doc_type: str, text: str, tables: list | None = None) -> dict:
             "tasks": [x for x in numbered_items(body("tasks")) if 10 < len(x) < 250 and "компетенц" not in x.lower()][:40],
             "criteria": body("criteria")[:1500],
         })
+    spo = None
+    if doc_type == "practice":
+        from .spo_practice import extract as spo_extract
+        spo = spo_extract(text, tables or [])
+        if spo:
+            data.update({k: v for k, v in spo.items() if k != "_warnings"})
     found = [s.key for s in specs if s.key in sec]
     missing_required = [s.title for s in specs if s.required and s.key not in sec]
     required_total = sum(1 for s in specs if s.required)
@@ -315,13 +328,51 @@ def extract(doc_type: str, text: str, tables: list | None = None) -> dict:
         "missing_required": missing_required,
         "score": round((required_total - len(missing_required)) / required_total, 2) if required_total else 1.0,
     }
+    if spo:
+        # СПО использует паспорт и тематический план вместо разделов шаблона ВО.
+        data["template"] = {"found": ["passport", "content"], "missing_required": [], "score": 1.0}
+    if doc_type in ("rpd", "practice"):
+        field_map = {"topics": "topics", "stages": "stages", "competencies": "competencies", "results": "indicators",
+                     "hours": "volume", "semesters": "practice_period" if doc_type == "practice" else "volume",
+                     "labs": "labs", "practicals": "practicals", "self_study": "self_study"}
+        data["extraction"] = {"sources": {field: sources[kind] for field, kind in field_map.items() if kind in sources}, "warnings": []}
+        if "competencies" not in t and re.search(r"код,?\s+наименование\s+компетенц", body("results"), re.I):
+            for comp in data.get("competencies", []):
+                comp["description"] = ""
+            data["extraction"]["warnings"].append({"field": "competencies", "reason": "Не распознаны колонки таблицы компетенций"})
+        key = "topics" if doc_type == "rpd" else "stages"
+        if body("content") and not data.get(key):
+            data["extraction"]["warnings"].append({"field": key, "reason": "Не распознана структура содержания"})
+        if spo:
+            data["extraction"]["warnings"].extend(spo["_warnings"])
+            data["extraction"]["sources"]["stages"] = {"method": "table", "pages": sorted({p + 1 for p, rows in tables or [] if any(re.match(r"Раздел\s+\d+", r[0], re.I) for r in rows if r)})}
+        data = quality.validate(doc_type, data)
+    if doc_type == "practice":
+        data["stages"] = stage_lists(data.get("stages", []))
+    data["resources"] = collect_resources(text, hyperlinks)
     return data
 
 
+def _oop_qualification(text: str) -> str:
+    # Сначала отдельная подпись титула; затем формулировка в общей характеристике.
+    patterns = [r"(?im)^\s*квалификация[ \t]*(?:[:—–-][ \t]*)?([^\n.;]{2,160})",
+                r"(?i)квалификация,?\s+присваиваемая\s+выпускник\w*(?:\s+образовательной\s+программы)?\s*[:—–-]\s*([^\n.;]{2,160})"]
+    for pattern in reversed(patterns):
+        for match in re.finditer(pattern, text):
+            if value := quality.qualification(match[1]):
+                return value
+    return ""
+
+
 def _oop_duration(text: str) -> str:
-    m = re.search(r"срок\s+(?:получения\s+образования|обучения|освоения)[^\n]{0,40}?"
-                  r"(\d+(?:[.,]\d+)?\s+(?:года?|лет|месяц\w*))", text, re.I)
-    return m.group(1) if m else ""
+    # Подпись в СПО может занимать несколько строк; срок включает годы и месяцы.
+    for match in re.finditer(r"срок\s+(?:получения\s+образования|обучения|освоения)", text, re.I):
+        block = text[match.end():match.end() + 500]
+        block = re.split(r"\f|\n\s*\d{1,2}\s+[А-ЯЁ]", block)[0]
+        duration = re.search(r"\b(\d+(?:[.,]\d+)?\s+(?:года?|лет|месяц\w*)(?:\s+\d+\s+месяц\w*)?)", block, re.I)
+        if duration:
+            return " ".join(duration[1].split())
+    return ""
 
 
 def _oop_areas(text: str) -> list[str]:
@@ -363,7 +414,8 @@ def _goal(text: str) -> str:
 
 def _lead(text: str, limit: int = 500) -> str:
     """Первый абзац раздела до таблицы или перечня («Содержание этапов приведено в таблице…»)."""
-    lead = re.split(r"\n\s*(?:№\s*п/п|содержание\s+этапов|\d+\.\d|\d+\s+[А-ЯЁ][а-яё]+\s+[а-яё]+\s+по\s)", text, maxsplit=1, flags=re.I)[0]
+    text = re.sub(r"(?m)^\s*\d{1,3}\s*$", "", text)
+    lead = re.split(r"(?:^|\n)\s*(?:№\s*п/п|содержание\s+этапов|\d+\.\d|\d+\s+[А-ЯЁ][а-яё]+\s+[а-яё]+\s+по\s)", text, maxsplit=1, flags=re.I)[0]
     lead = re.sub(r"\s+", " ", lead).strip()
     return lead[:limit].rsplit(". ", 1)[0] + "." if len(lead) > limit else lead
 
@@ -385,3 +437,34 @@ def _list_after(text: str, pattern: str) -> list[str]:
     else:
         parts = raw.split(",")
     return [x.strip(" .") for x in parts if x.strip(" .")]
+
+
+def practice_details(text: str) -> dict[str, str]:
+    """Значение до следующей подписи; пустая строка не поглощает соседнее поле."""
+    label = re.compile(r"(вид\w*\s+практики|тип\w*\s+практики|способ\w*\s+проведения|форма\s+проведения)"
+                       r"\s*[:—–-][ \t]*", re.I)
+    matches = list(label.finditer(text))
+    result = {}
+    for i, match in enumerate(matches):
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        value = unwrap_text(text[match.end():end]).strip(" .;—–-_")
+        name = match[1].lower()
+        key = ("practice_kind" if name.startswith("вид") else "practice_type" if name.startswith("тип")
+               else "method" if name.startswith("способ") else "form")
+        result[key] = value
+    return result
+
+
+def literature_items(text: str) -> list[str]:
+    """Нумерованные источники внутри литературы, без заголовков и номеров страниц."""
+    lines = []
+    for line in text.splitlines():
+        line = line.strip()
+        if re.fullmatch(r"\d{1,3}", line):
+            continue
+        if quality.LITERATURE_HEADER.fullmatch(line):
+            continue
+        if re.match(r"^\d+\s+(?:Ресурсы|Профессиональные\s+базы|Перечень\s+информационных|Материально-техническ)", line, re.I):
+            break
+        lines.append(line)
+    return numbered_items("\n".join(lines))

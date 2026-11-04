@@ -8,6 +8,13 @@ from __future__ import annotations
 
 import re
 
+from ..extract.sections import practice_details
+from ..extract.quality import validate
+from ..extract.lists import stage_lists
+from ..extract.resources import safe_url, repair_url_wraps, URL
+from ..extract.util import unwrap_text
+from .program_summary import professional_areas
+
 MAX_ITEM = 400      # длиннее — склеенный текст таблицы, а не пункт списка
 
 
@@ -46,12 +53,21 @@ def _texts(items, limit: int = 30) -> list[str]:
     return [re.sub(r"\s+", " ", str(x)).strip() for x in (items or []) if x and len(str(x)) <= MAX_ITEM][:limit]
 
 
-def _titled(items) -> list[dict]:
+def _titled(items, stages=False) -> list[dict]:
     """[{title, summary}] — новые JSON; строки старых JSON становятся темами без описания."""
     out = []
-    for it in items or []:
+    for it in stage_lists(items) if stages else items or []:
         if isinstance(it, dict) and it.get("title"):
-            out.append({"title": it["title"], "summary": it.get("summary") or ""})
+            value = {"title": it["title"], "summary": it.get("summary") or ""}
+            if stages and it.get("subtitles"):
+                value["subtitles"] = it["subtitles"]
+            if stages and it.get("steps"):
+                value.update(steps=it["steps"], ordered=it.get("ordered", True))
+            if stages and it.get("groups"):
+                value["groups"] = it["groups"]
+            if stages and it.get("hours") is not None:
+                value["hours"] = it["hours"]
+            out.append(value)
         elif isinstance(it, str) and len(it) <= 200:
             out.append({"title": it, "summary": ""})
     return out
@@ -78,6 +94,7 @@ def _volume(d: dict) -> list[tuple[str, str]]:
 
 def build(doc_type: str, d: dict) -> dict:
     """{facts: [(название, значение)], blocks: [{title, kind: list|topics|hours, items}]}"""
+    d = validate(doc_type, d) if doc_type in ("rpd", "practice", "oop") else d
     facts: list[tuple[str, str]] = []
     blocks: list[dict] = []
 
@@ -99,12 +116,26 @@ def build(doc_type: str, d: dict) -> dict:
         block("Результаты обучения", "list", _texts(d.get("results")))
         block("Литература", "list", _texts(d.get("literature"), 15))
     elif doc_type == "practice":
-        vol = " · ".join(x for x in (f"{_num(d['ze'])} з. е." if d.get("ze") else "",
+        d = dict(d)
+        source = ((d.get("sections") or {}).get("kind") or {}).get("text")
+        if source:
+            d.update(practice_details(source))
+        for field in ("practice_kind", "practice_type", "method", "form"):
+            value = unwrap_text(d.get(field) or "").strip(" .;—–-_")
+            if re.fullmatch(r"(?:способ|форма) проведения[ :—–-]*", value, re.I):
+                value = ""
+            d[field] = value
+        kind = d.get("practice_kind")
+        if kind:
+            d["practice_type"] = re.sub(r"^" + re.escape(kind) + r"\s*:\s*", "", d.get("practice_type", ""), flags=re.I)
+        if d.get("practice_type"):
+            d["practice_type"] = d["practice_type"][:1].upper() + d["practice_type"][1:]
+        vol = " · ".join(x for x in (_hours((d.get("hours") or {}).get("total")), f"{_num(d['ze'])} з. е." if d.get("ze") else "",
                                       f"{_num(d['weeks'])} недел{_plural(d['weeks'], 'я', 'и', 'ь')}" if d.get("weeks") else "") if x)
         facts = [("Вид практики", d.get("practice_kind")), ("Тип практики", d.get("practice_type")),
-                 ("Способ проведения", d.get("method")), ("Семестр", _sems(d.get("semesters"))), ("Объём", vol),
+                 ("Способ проведения", d.get("method")), ("Форма проведения", d.get("form")), ("Семестр", _sems(d.get("semesters"))), ("Объём", vol),
                  ("Промежуточная аттестация", ", ".join(d.get("control") or []))]
-        block("Этапы практики", "topics", _titled(d.get("stages")))
+        block("Этапы практики", "topics", _titled(d.get("stages"), stages=True))
         if not d.get("stages") and d.get("content"):
             block("Содержание практики", "list", [d["content"]])
         block("Отчётные документы", "list", _texts(d.get("reporting") if isinstance(d.get("reporting"), list) else [], 10))
@@ -114,7 +145,7 @@ def build(doc_type: str, d: dict) -> dict:
     elif doc_type == "oop":
         facts = [("Квалификация", d.get("qualification")), ("Срок обучения", d.get("duration")),
                  ("Объём программы", f"{_num(d['ze_total'])} з. е." if d.get("ze_total") else "")]
-        block("Области профессиональной деятельности", "list", _texts(d.get("areas")))
+        block("Области профессиональной деятельности", "list", professional_areas(d.get("areas") or []))
         block("Типы задач", "list", _texts(d.get("task_types")))
         block("Компетенции выпускника", "list", _comps(d.get("competencies")))
     elif doc_type == "gia":
@@ -128,4 +159,32 @@ def build(doc_type: str, d: dict) -> dict:
         facts = [("Семестров", str(len(d["semesters"])))]
     elif doc_type == "kug" and d.get("courses"):
         facts = [("Учебный год", d.get("academic_year")), ("Курсов", str(len(d["courses"])))]
-    return {"facts": [(k, v) for k, v in facts if v], "blocks": blocks}
+    resources = []
+    for resource in d.get("resources") or []:
+        item = dict(resource)
+        raw = item.get("url") or ""
+        item["url"] = safe_url(raw)
+        if raw and not item["url"]:
+            continue
+        resources.append(item)
+    if resources:
+        literature = next((b for b in blocks if b["title"] == "Литература"), None)
+        if literature is None:
+            literature = {"title": "Литература", "kind": "list", "items": []}
+            blocks.append(literature)
+        literature["items"] = [repair_url_wraps(book) for book in literature["items"]]
+        book_urls = set()
+        literature["book_origins"] = []
+        for book in literature["items"]:
+            urls = {safe_url(m.group()) for m in URL.finditer(book)}
+            book_urls.update(urls)
+            origins = []
+            for resource in resources:
+                if resource["url"] and resource["url"] in urls:
+                    for origin in resource.get("origins") or []:
+                        if origin not in origins:
+                            origins.append(origin)
+            literature["book_origins"].append(origins)
+        literature["resources"] = [r for r in resources if not r["url"] or r["url"] not in book_urls]
+    return {"facts": [(k, v) for k, v in facts if v], "blocks": blocks,
+            "warnings": (d.get("extraction") or {}).get("warnings", [])}

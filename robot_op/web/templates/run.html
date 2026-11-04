@@ -1,59 +1,52 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="app-page">
+<div class="app-page app-update">
   <div class="app-content">
-    {%- if site_error %}
-    {% call ui.alert('danger', 'Сайт ИРНИТУ недоступен') %}
-      <p>{{ site_error }}</p>
-      <p>Проверьте доступ к сайту и адрес в настройках робота (config/robot.toml, раздел [site]).</p>
-    {% endcall %}
-    {%- endif %}
-    {%- if message %}{% call ui.alert('info') %}<p>{{ message }}</p>{% endcall %}{% endif %}
-
-    <section class="app-section" aria-labelledby="h-params">
-      <h2 class="section-title" id="h-params">Обновить данные с сайта ИРНИТУ</h2>
-      <p class="app-lead">Робот скачивает документы образовательных программ последнего года набора{% if year %} — {{ year }}{% endif %} — и обновляет их страницы.</p>
-      <form class="app-form" method="post" action="/run" id="run-form">
-        <fieldset class="ir-choices ir-choices--row">
-          <legend class="ir-choices__label">Уровень образования</legend>
-          <div class="ir-choices__list">
-            {%- for lv in levels %}
-            <label class="ir-choice"><input type="radio" name="level" value="{{ lv.level }}" data-nav {% if lv.level == level %}checked{% endif %} required> {{ lv.title }}</label>
-            {%- endfor %}
-          </div>
-        </fieldset>
-        <noscript><button class="ir-btn" type="submit" formmethod="get" formaction="/run">Показать список ОП</button></noscript>
-        {%- if programs is not none %}
-        <fieldset class="ir-choices ir-choices--scroll app-form__programs">
-          <legend class="ir-choices__label">Образовательные программы, набор {{ year }} ({{ programs | length }})</legend>
-          {%- if programs %}
-          <label class="ir-choice"><input type="checkbox" name="all" value="1" id="all-programs"> <b>Все ОП уровня</b><span class="ir-choice__meta">{{ programs | sum(attribute='documents') }} док.</span></label>
-          <div class="ir-choices__list">
-            {%- for p in programs %}
-            <label class="ir-choice"><input type="checkbox" name="programs" value="{{ p.key }}" data-program> <span><span class="app-choice__code">{{ p.code }}</span>{{ p.title }}</span><span class="ir-choice__meta">{% if p.key in on_site %}на сайте, обновлено {{ on_site[p.key] }} · {% endif %}{{ p.documents }} док.</span></label>
-            {%- endfor %}
-          </div>
-          {%- else %}
-          {{ ui.empty('На странице перечня не найдено ОП.') }}
-          {%- endif %}
-        </fieldset>
-        <p class="app-form__hint" style="margin:0">Программы, которые уже на сайте, заново не разбираются: робот только проверяет, не изменились ли их документы на istu.edu.</p>
-        <label class="ir-choice"><input type="checkbox" name="force" value="1"> Разобрать заново и документы, которые не изменились</label>
-        <div class="app-form__actions">
-          <button class="ir-btn ir-btn--primary ir-btn--pill" type="submit" {% if not programs %}disabled{% endif %}>Обновить</button>
-          <span class="app-form__hint">Одна ОП — 60–90 документов, до 20 мин.</span>
+    {% if site_error %}{% call ui.alert('danger', 'Сайт ИРНИТУ недоступен') %}<p>{{ site_error }}</p>{% endcall %}{% endif %}
+    {% if message %}{% call ui.alert('info') %}<p>{{ message }}</p>{% endcall %}{% endif %}
+    <p class="app-lead app-update__intro">Получить документы образовательных программ последнего года набора.</p>
+    <form method="post" action="/run" id="run-form" class="app-update__form">
+      <fieldset class="app-update__levels">
+        <legend>Выберите уровни образования</legend>
+        <p class="app-small">Можно выбрать несколько уровней и программы в каждом из них.</p>
+        <div class="app-update__chips">
+        {% for g in groups %}
+          <label class="app-update__chip"><input type="checkbox" name="level" value="{{ g.level }}" data-level {% if g.selected %}checked{% endif %} {% if not g.year %}disabled{% endif %}><span>{{ g.title }}</span></label>
+        {% endfor %}
         </div>
-        {%- endif %}
-      </form>
-    </section>
+      </fieldset>
+      <noscript><button class="ir-btn" type="submit" formmethod="get">Показать программы выбранных уровней</button></noscript>
+      <div id="program-groups" class="app-update__groups">
+      {% for g in groups %}
+        <section class="app-update__group" data-group="{{ g.level }}" data-year="{{ g.year or '' }}" data-loaded="{{ 'yes' if g.programs is not none else 'no' }}" {% if not g.selected %}hidden{% endif %} aria-labelledby="group-{{ g.level }}">
+          <div class="app-update__group-head"><h2 id="group-{{ g.level }}">{{ g.title }} <span>набор {{ g.year }}</span></h2><span data-group-count class="app-small"></span></div>
+          <p data-loading role="status" {% if g.programs is not none %}hidden{% endif %}>{{ g.error or 'Загрузка списка программ…' }}</p>
+          <div data-program-list {% if not g.selected %}inert{% endif %}>
+          {% if g.programs is not none %}
+            <label class="app-update__all"><input type="checkbox" data-all> Выбрать все программы уровня</label>
+            <div class="app-update__list">
+            {% for p in g.programs %}
+              <label class="app-update__option"><input type="checkbox" name="programs__{{ g.level }}" value="{{ p.key }}" data-program><span class="app-update__program"><span>{{ p.title }}</span><small>{% if p.key in on_site %}на сайте, обновлено {{ on_site[p.key] }} · {% endif %}{{ p.documents }} док.</small></span></label>
+            {% else %}<p class="app-small">Программы последнего года набора не найдены.</p>{% endfor %}
+            </div>
+          {% endif %}
+          </div>
+        </section>
+      {% endfor %}
+      </div>
+      <p class="app-update__empty" id="update-empty">Выберите уровень образования, чтобы увидеть программы.</p>
+      <div class="app-update__footer">
+        <div><strong id="selection-count" role="status" aria-live="polite">Выберите программы</strong><p class="app-small">Сначала проверим документы на сайте ИРНИТУ. Если они изменились, обновим программу; актуальные данные оставим без повторного разбора.</p></div>
+        <button class="ir-btn ir-btn--primary ir-btn--pill" type="submit" id="update-submit" disabled>Обновить</button>
+      </div>
+    </form>
   </div>
-
   <aside class="app-aside">
     {%- if last %}
     {%- set r = last.run %}
     <section class="app-stack">
       <h2 class="card-title" style="margin:0">{{ {'running': 'Идёт обновление', 'queued': 'Обновление в очереди', 'interrupted': 'Обновление прервано', 'failed': 'Обновление не удалось'}.get(r.status, 'Обновление завершено') }}</h2>
-      <p class="app-small" style="margin:0">{{ r.params.level_title }}, набор {{ r.params.year }}</p>
+      <p class="app-small" style="margin:0">{{ r.params.level_title }}{% if r.params.year %}, набор {{ r.params.year }}{% endif %}</p>
       {{ ui.run_progress(r, last.counts) }}
       {%- if r.status == 'failed' and r.error %}<p class="app-small" style="margin:0">{{ r.error }}</p>{% endif %}
       {%- if r.status in ('running', 'queued') %}
@@ -61,7 +54,7 @@
       {%- elif r.status in ('interrupted', 'failed') %}
       <form method="post" action="/run/{{ r.id }}/resume"><button class="ir-btn ir-btn--primary app-aside__btn" type="submit">Продолжить</button></form>
       {%- elif r.status == 'finished' %}
-      <a class="ir-btn ir-btn--outline app-aside__btn" href="/programs?level={{ r.params.level }}">К программам</a>
+      <a class="ir-btn ir-btn--outline app-aside__btn" href="/programs{% if r.params.level %}?level={{ r.params.level }}{% endif %}">К программам</a>
       {%- endif %}
     </section>
     {%- endif %}
@@ -70,26 +63,91 @@
 {% endblock %}
 {% block scripts %}
 <script>
-  (function () {
-    var form = document.getElementById('run-form');
-    form.querySelectorAll('[data-nav]').forEach(function (el) {
-      el.addEventListener('change', function () { location.href = '/run?level=' + encodeURIComponent(el.value); });
+(function () {
+  const form = document.getElementById('run-form');
+  const onSite = {{ on_site | tojson }};
+  const groups = [...form.querySelectorAll('[data-group]')];
+  const submit = document.getElementById('update-submit');
+  function update() {
+    let count = 0;
+    groups.forEach(group => {
+      const items = [...group.querySelectorAll('[data-program]')];
+      const selected = items.filter(input => input.checked).length;
+      const all = group.querySelector('[data-all]');
+      if (all) { all.checked = items.length > 0 && selected === items.length; all.indeterminate = selected > 0 && selected < items.length; }
+      group.querySelector('[data-group-count]').textContent = items.length ? selected + ' из ' + items.length : '';
+      items.forEach(input => input.disabled = group.hidden);
+      if (!group.hidden) count += selected;
     });
-    var all = document.getElementById('all-programs');
-    if (all) all.addEventListener('change', function () {
-      form.querySelectorAll('[data-program]').forEach(function (c) { c.checked = all.checked; c.disabled = all.checked; });
-    });
-  })();
-  {%- if last and last.run.status in ('running', 'queued') %}
-  // ход запуска обновляется, пока робот работает
-  (function () {
-    var last = '{{ last.counts.done }}:{{ last.run.status }}';
-    setInterval(function () {
-      fetch('/api/runs/{{ last.run.id }}').then(function (r) { return r.json(); }).then(function (d) {
-        if (d.counts.done + ':' + d.status !== last) location.reload();
-      }).catch(function () {});
-    }, 2500);
-  })();
-  {%- endif %}
+    document.getElementById('selection-count').textContent = count ? 'Выбрано программ: ' + count : 'Выберите программы';
+    document.getElementById('update-empty').hidden = groups.some(group => !group.hidden);
+    submit.disabled = !count;
+  }
+  async function load(group) {
+    if (group.dataset.loaded === 'yes' || group.dataset.loading === 'yes') return;
+    group.dataset.loading = 'yes';
+    const status = group.querySelector('[data-loading]');
+    status.hidden = false;
+    status.textContent = 'Загрузка списка программ…';
+    try {
+      const response = await fetch('/api/site/programs?level=' + encodeURIComponent(group.dataset.group) + '&year=' + group.dataset.year);
+      if (!response.ok) throw new Error();
+      const programs = await response.json();
+      const container = group.querySelector('[data-program-list]');
+      container.replaceChildren();
+      const all = document.createElement('label');
+      all.className = 'app-update__all';
+      all.innerHTML = '<input type="checkbox" data-all> Выбрать все программы уровня';
+      container.append(all);
+      const list = document.createElement('div'); list.className = 'app-update__list';
+      programs.forEach(program => {
+        const label = document.createElement('label'); label.className = 'app-update__option';
+        label.innerHTML = '<input type="checkbox" data-program><span class="app-update__program"><span></span><small></small></span>';
+        const input = label.querySelector('input');
+        input.name = 'programs__' + group.dataset.group; input.value = program.key;
+        label.querySelector('span > span').textContent = program.title;
+        label.querySelector('small').textContent = (onSite[program.key] ? 'на сайте, обновлено ' + onSite[program.key] + ' · ' : '') + program.documents + ' док.';
+        list.append(label);
+      });
+      if (!programs.length) list.textContent = 'Программы последнего года набора не найдены.';
+      container.append(list);
+      group.dataset.loaded = 'yes'; status.hidden = true;
+    } catch (error) {
+      status.textContent = 'Не удалось загрузить список. ';
+      const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'ir-btn ir-btn--outline'; retry.textContent = 'Повторить';
+      retry.addEventListener('click', () => load(group)); status.append(retry);
+    } finally { delete group.dataset.loading; update(); }
+  }
+  form.addEventListener('change', event => {
+    const input = event.target;
+    if (input.matches('[data-level]')) {
+      const group = groups.find(g => g.dataset.group === input.value);
+      group.hidden = !input.checked;
+      group.querySelector('[data-program-list]').inert = !input.checked;
+      if (input.checked) load(group);
+    }
+    if (input.matches('[data-all]')) input.closest('[data-group]').querySelectorAll('[data-program]').forEach(p => p.checked = input.checked);
+    update();
+  });
+  groups.filter(g => !g.hidden).forEach(load);
+  update();
+})();
+{% if last and last.run.status in ('running', 'queued') %}
+(function () {
+  let last = '{{ last.counts.done }}:{{ last.run.status }}';
+  setInterval(function () {
+    fetch('/api/runs/{{ last.run.id }}').then(r => r.json()).then(d => {
+      if (d.counts.done + ':' + d.status !== last) {
+        // Обновляем только сведения о ходе работы: выбранные программы остаются на месте.
+        last = d.counts.done + ':' + d.status;
+        fetch(location.href).then(r => r.text()).then(html => {
+          const page = new DOMParser().parseFromString(html, 'text/html');
+          document.querySelector('.app-aside').replaceWith(page.querySelector('.app-aside'));
+        });
+      }
+    }).catch(function () {});
+  }, 2500);
+})();
+{% endif %}
 </script>
 {% endblock %}

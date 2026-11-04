@@ -3,6 +3,9 @@ from __future__ import annotations
 
 import re
 
+from ..extract.util import unwrap_text
+from ..extract.quality import qualification
+
 MAX_CHARS = 800
 BOILERPLATE = re.compile(
     r"представляет\s+собой\s+систему\s+документов|федеральн\w*\s+государственн\w*\s+(?:образовательн\w*\s+)?стандарт|"
@@ -28,6 +31,7 @@ def clean_summary(text: str | None) -> str:
 
 def facts(data: dict) -> dict:
     """Разрешённые поля для LLM и описания без LLM. Не подставлять sections при нехватке полей."""
+    data = {**data, "qualification": qualification(data.get("qualification") or "")}
     out = {}
     for key in ("qualification", "duration", "focus"):
         if value := _text(data.get(key)):
@@ -37,6 +41,7 @@ def facts(data: dict) -> dict:
     for key in ("areas", "task_types", "gia_forms"):
         values = data.get(key)
         if isinstance(values, list):
+            values = professional_areas(values) if key == "areas" else values
             clean = [_text(v, 1200 if key == "areas" else 400) for v in values]
             if clean := [v for v in clean if v][:5]:
                 out[key] = clean
@@ -57,7 +62,7 @@ def fallback(data: dict, program: dict) -> str:
     elif name:
         sentences.append(f"Образовательная программа «{name}».")
     volume = []
-    if d.get("duration") and re.fullmatch(r"\d+(?:[.,]\d+)?\s+(?:года?|лет|месяц\w*)", d["duration"]):
+    if d.get("duration") and re.fullmatch(r"\d+(?:[.,]\d+)?\s+(?:года?|лет|месяц\w*)(?:\s+\d+\s+месяц\w*)?", d["duration"]):
         volume.append(f"обучение длится {d['duration']}")
     if d.get("ze_total"):
         volume.append(f"объём программы — {d['ze_total']:g} зачётных единиц")
@@ -88,4 +93,15 @@ def fallback(data: dict, program: dict) -> str:
     for sentence in sentences[:5]:
         if len(out) + len(sentence) + bool(out) <= MAX_CHARS:
             out += (" " if out else "") + sentence
+    return out
+
+
+def professional_areas(values: list) -> list[str]:
+    """Коды областей остаются в исходном JSON, посетителю показывается название."""
+    out = []
+    for value in values:
+        if isinstance(value, str):
+            value = re.sub(r"^\s*\d{2}\.?\s+(?=[А-ЯЁа-яё])", "", value)
+            if value := unwrap_text(value).strip(" ;"):
+                out.append(value)
     return out

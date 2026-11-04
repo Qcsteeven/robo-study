@@ -11,7 +11,6 @@ import logging
 import threading
 import time
 from datetime import datetime
-from email.utils import formatdate
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
@@ -30,7 +29,7 @@ from .http import AuthRequired, SiteClient, SiteError
 from .llm import LlmClient, LlmError, too_long
 from .site import LevelYears, ProgramBlock, parse_education, parse_op_list
 
-PARSER_VERSION = "1.3"   # 1.3 — оглавление сканов ООП и структурированные сведения для характеристики
+PARSER_VERSION = "1.7"   # 1.7 — шаблоны СПО/аспирантуры, результаты обучения и списки
 log = logging.getLogger("robot_op")
 
 
@@ -145,6 +144,22 @@ class Robot:
             ses.commit()
             return run.id
 
+    def create_batch_run(self, selections: list[dict]) -> int:
+        """Один возобновляемый запуск для нескольких уровней образования."""
+        if not selections:
+            raise ValueError("Не выбраны образовательные программы")
+        if len(selections) == 1:
+            x = selections[0]
+            return self.create_run(x["level"], x["year"], x["programs"])
+        with self.db.Session() as ses:
+            run = Run(status="queued", params={
+                "selections": selections, "force": False,
+                "level_title": ", ".join(LEVELS[x["level"]] for x in selections),
+            })
+            ses.add(run)
+            ses.commit()
+            return run.id
+
     def stop(self) -> None:
         self._stop.set()
 
@@ -171,7 +186,7 @@ class Robot:
                      f"LLM: {self.llm.describe()}")
         client = self.site(run_id)
         try:
-            if not resumed:
+            if not resumed or (params.get("selections") and not params.get("planning_complete")):
                 self._plan(run_id, params, client)
             self._process(run_id, params, client)
             self._finish(run_id, "finished", "", t0)
@@ -234,6 +249,16 @@ class Robot:
     # ------------------------------------------------------------------ шаги 2–3: перечень ОП и документы
 
     def _plan(self, run_id: int, params: dict, client: SiteClient) -> None:
+        for selection in params.get("selections") or [params]:
+            if self._stop.is_set():
+                raise RunStopped()
+            self._plan_level(run_id, selection, client)
+        with self.db.Session() as ses:
+            run = ses.get(Run, run_id)
+            run.params = dict(run.params, planning_complete=True)
+            ses.commit()
+
+    def _plan_level(self, run_id: int, params: dict, client: SiteClient) -> None:
         level, year = params["level"], int(params["year"])
         self._stage(run_id, "Открытие страницы перечня ОП")
         url = self.op_list_url(level, year)
@@ -267,8 +292,10 @@ class Robot:
                         ses.flush()
                     else:
                         doc.title, doc.doc_type = link.title, link.doc_type
-                    ses.add(RunItem(run_id=run_id, program_id=b.key, document_id=doc.id, doc_type=link.doc_type,
-                                    title=link.title, url=link.url, status="queued"))
+                    if not ses.scalar(select(RunItem.id).where(RunItem.run_id == run_id,
+                                                               RunItem.document_id == doc.id)):
+                        ses.add(RunItem(run_id=run_id, program_id=b.key, document_id=doc.id, doc_type=link.doc_type,
+                                        title=link.title, url=link.url, status="queued"))
                 self.journal(run_id, "INFO", f"Найдено документов: {len(b.docs)}"
                              + (f"; не обрабатываются: {', '.join(sorted(set(b.excluded)))}" if b.excluded else ""), b.key, ses=ses)
             ses.commit()
@@ -284,13 +311,27 @@ class Robot:
             total = len(items)
         done_before = total - len(todo)
         self._closed_hosts: dict[str, str] = {}   # хост → примечание, если его документы закрыты авторизацией
+        self._prepared_downloads = {}
+        checked_programs = set()
+        refresh_programs = set(params.get("refresh_programs", []))
         for n, (item_id, program_id) in enumerate(todo, 1):
+            if program_id not in checked_programs:
+                # Проверяем все документы до разбора: изменение любого документа
+                # обновляет всю ОП, включая связи между её документами.
+                changed = self._check_program_documents(run_id, program_id, client)
+                checked_programs.add(program_id)
+                if changed:
+                    refresh_programs.add(program_id)
+                    with self.db.Session() as ses:
+                        run = ses.get(Run, run_id)
+                        run.params = dict(run.params, refresh_programs=sorted(refresh_programs))
+                        ses.commit()
             if self._stop.is_set():
                 raise RunStopped()
             self._stage(run_id, f"Обработка документов: {done_before + n} из {total}")
             t = time.monotonic()
             try:
-                status, note = self._document(run_id, item_id, client, force)
+                status, note = self._document(run_id, item_id, client, force or program_id in refresh_programs)
             except Exception as e:   # noqa: BLE001 — ошибка документа не прерывает запуск
                 log.exception("document failed")
                 status, note = "error", f"Сбой обработки: {type(e).__name__}: {e}"
@@ -310,6 +351,31 @@ class Robot:
                 if prog is not None and prog.page is None:
                     self._update_page(run_id, program_id)
 
+    def _check_program_documents(self, run_id: int, program_id: str, client: SiteClient) -> bool:
+        self._stage(run_id, "Проверка изменений документов на сайте ИРНИТУ")
+        changed = False
+        closed_hosts = {}
+        with self.db.Session() as ses:
+            docs = ses.scalars(select(Document).join(RunItem, RunItem.document_id == Document.id).where(
+                RunItem.run_id == run_id, RunItem.program_id == program_id, RunItem.done.is_(False))).all()
+            for doc in docs:
+                if self._stop.is_set():
+                    raise RunStopped()
+                host = urlparse(doc.url).hostname or ""
+                try:
+                    if host in closed_hosts:
+                        raise closed_hosts[host]
+                    data, different = self._download(run_id, doc, client)
+                    changed |= different or (bool(doc.processed_sha256) and doc.processed_sha256 != doc.sha256)
+                    self._prepared_downloads[doc.id] = (Path(doc.file_path) if doc.file_path else data, different)
+                except Exception as e:
+                    # Та же ошибка будет обработана обычным путём отдельного документа.
+                    self._prepared_downloads[doc.id] = e
+                    if isinstance(e, AuthRequired):
+                        closed_hosts[host] = e
+            ses.commit()
+        return changed
+
     def _set_doc(self, item_id: int, status: str, note: str) -> None:
         with self.db.Session() as ses:
             item = ses.get(RunItem, item_id)
@@ -320,9 +386,15 @@ class Robot:
 
     def _download(self, run_id: int, doc: Document, client: SiteClient) -> tuple[bytes, bool]:
         """Шаг 4. Возвращает (содержимое, изменился ли документ). Неизменившийся документ повторно не скачивается."""
+        prepared = getattr(self, "_prepared_downloads", {}).pop(doc.id, None)
+        if isinstance(prepared, Exception):
+            raise prepared
+        if prepared is not None:
+            saved, changed = prepared
+            return (saved.read_bytes() if isinstance(saved, Path) else saved), changed
         path = Path(doc.file_path) if doc.file_path else None
         headers = {}
-        if path and path.exists():
+        if path and path.exists() and doc.parser_version == PARSER_VERSION:
             if doc.etag:
                 headers["If-None-Match"] = doc.etag
             if doc.last_modified:
@@ -338,7 +410,7 @@ class Robot:
         changed = sha != doc.sha256
         doc.sha256, doc.file_path, doc.size = sha, str(target), len(r.content)
         doc.etag = r.headers.get("etag")
-        doc.last_modified = r.headers.get("last-modified") or formatdate(usegmt=True)
+        doc.last_modified = r.headers.get("last-modified")
         doc.downloaded_at = now()
         return r.content, changed
 
@@ -476,6 +548,14 @@ class Robot:
                         return ("needs_review", f"{failed} строк(и) не прошли проверку сумм часов", method, extracted, pages)
                     return "processed", f"{'Скан, OCR' if scanned else 'Текстовый слой'}; дисциплин: {len(extracted['rows'])}", method, extracted, pages
                 extracted = schedule.extract(data, scanned, self.ocr, dpi)
+                if extracted.get("mode") == "weekly":
+                    matched = [c for c in extracted["courses"] if c.get("program_code") == program.get("code")]
+                    if matched:
+                        extracted["courses"] = matched
+                        names = {c["group"] for c in matched}
+                        extracted["messages"] = [m for m in extracted["messages"] if not m.startswith("Группа ") or any(m.startswith("Группа " + g + ":") for g in names)]
+                    else:
+                        return "needs_review", "В сводном графике не найдены группы этой программы", method, {}, pages
                 if extracted["messages"]:
                     return "needs_review", "; ".join(extracted["messages"])[:500], method, extracted, pages
                 return "processed", f"{'Скан, OCR' if scanned else 'Текстовый слой'}; курсов: {len(extracted['courses'])}", method, extracted, pages
@@ -489,13 +569,16 @@ class Robot:
                 self.journal(run_id, "WARNING", f"Содержимое не соответствует типу ({why}) — документ помечен и не обрабатывается",
                              program["id"], label)
                 return "skipped", why[:1].upper() + why[1:], method, {}, pages
-            extracted = sections.extract(doc.doc_type, full, None if scanned else pdfmod.page_tables(data))
+            extracted = sections.extract(doc.doc_type, full, None if scanned else pdfmod.page_tables(data),
+                                         hyperlinks=pdfmod.resource_links(data))
             tpl = extracted["template"]
             if tpl["score"] < 0.5:
                 return "unknown_template", "Разделы документа не соответствуют известному шаблону", method, extracted, pages
             if tpl["missing_required"]:
                 missing = ", ".join(f"«{m}»" for m in tpl["missing_required"])
                 return "partial", f"Не найден раздел {missing}", method, extracted, pages
+            if (extracted.get("extraction") or {}).get("warnings"):
+                return "needs_review", "Некоторые извлечённые поля требуют проверки по PDF", method, extracted, pages
             return "processed", "Скан, OCR" if scanned else "Текстовый слой", method, extracted, pages
         except (curriculum.NoTable, schedule.NoSchedule) as e:
             return "unknown_template", f"{e} — структура таблицы не распознана", method, {}, pages

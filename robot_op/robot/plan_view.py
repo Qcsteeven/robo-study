@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 
 from ..extract import curriculum
+from ..extract.util import discipline_name
 
 # ключ → название, сокращение для значка; порядок — порядок полок на странице
 CATEGORIES = {
@@ -76,7 +77,7 @@ def _items(rows: list[dict]) -> list[dict]:
             continue
         if is_choice(idx):
             options = [x for x in rows if x.get("index", "").startswith(idx + ".")]
-            names = [o["name"] for o in options]
+            names = [discipline_name(o["name"]) for o in options]
             if len(names) > 3:
                 parent = by_index.get(idx.rsplit(".ДВ.", 1)[0])
                 title = f"{parent['name'] if parent else r['name']}: {len(names)} вариантов на выбор"
@@ -102,9 +103,9 @@ def _choice_category(cats: list[str]) -> str:
 
 def _item(r: dict, name: str, cat: str, options: list[str] | None = None) -> dict:
     sems = sorted(set(int(s) for s in r.get("semesters", {})) | {s for v in r.get("control", {}).values() for s in v})
-    return {"name": name, "category": cat, "ze": r.get("ze") or 0, "semesters": sems, "control": r.get("control", {}),
+    return {"name": discipline_name(name), "category": cat, "ze": r.get("ze") or 0, "semesters": sems, "control": r.get("control", {}),
             "elective": options is not None, "optional": r.get("index", "").startswith("ФТД"), "options": options or [],
-            "practice": "(" in r.get("index", "") and r.get("index", "")[:2] in ("Б2", "Б3"),
+            "practice": ("(" in r.get("index", "") and r.get("index", "")[:2] in ("Б2", "Б3")) or r.get("index", "").startswith(("УП.", "ПП.")),
             "hours": r.get("semesters", {}), "match": r["name"]}
 
 
@@ -149,20 +150,24 @@ def build(up_data: dict, links: dict[str, str] | None = None, key=lambda s: s) -
         semesters.append({"number": s, "course": (s + 1) // 2, "weeks": w, "items": entries,
                           **{k: round(v, 1) for k, v in sem_total.items()}, "pairs": pairs,
                           "per_week": round(pairs / w, 1) if w else None,
+                          "hours": pairs * 1.5,
+                          "hours_per_week": pairs * 1.5 / w if w else None,
                           "count": sum(1 for e in entries if not e["practice"] and not e["optional"]),
                           "exams": sum(1 for e in entries if "Экз" in e["control"])})
 
-    total = sum(it["ze"] for it in items if not it["optional"]) or 1
+    credit_based = any(it["ze"] for it in items)
+    weight = lambda it: it["ze"] if credit_based else sum(h.get("total", sum(h.get(k, 0) for k in ("lec", "pr", "lab", "sr", "control"))) for h in it["hours"].values())
+    total = sum(weight(it) for it in items if not it["optional"]) or 1
     shelves = []
     for k, (title, short) in CATEGORIES.items():
         group = [it for it in items if it["category"] == k]
         if not group:
             continue
-        ze = sum(it["ze"] for it in group if not it["optional"])
+        ze = sum(weight(it) for it in group if not it["optional"])
         shelves.append({
             "key": k, "title": title, "short": short, "count": len(group), "ze": ze,
             "share": round(ze / total * 100),
         })
-    return {"semesters": semesters, "shelves": shelves, "total_ze": total,
+    return {"semesters": semesters, "shelves": shelves, "total_ze": total, "unit": "з. е." if credit_based else "акад. ч",
             "categories": [{"key": k, "title": t, "short": s} for k, (t, s) in CATEGORIES.items()
                            if any(sh["key"] == k for sh in shelves)]}

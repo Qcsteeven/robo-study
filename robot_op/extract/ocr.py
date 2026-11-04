@@ -27,7 +27,7 @@ INDEX_CHARS = "БВОДУПНФТКМдпнху0123456789.()"
 _GAP = 64
 _TOP = 96
 _MAX_CANVAS_H = 20000
-_BATCH_MODES = {"digits", "kug"}
+_BATCH_MODES = {"digits", "kug", "kug_full"}
 # Tesseract не должен сам распараллеливаться: потоки запускаются здесь
 os.environ.setdefault("OMP_THREAD_LIMIT", "1")
 
@@ -85,8 +85,18 @@ def _trim_lines(d: np.ndarray, max_px: int) -> np.ndarray:
     def edge(profile: np.ndarray, limit: float) -> tuple[int, int]:
         n = profile.size
         k = min(max_px, n // 3)
-        lo = max((i + 1 for i in range(k) if profile[i] > limit), default=0)
-        hi = min((n - 1 - i for i in range(k) if profile[n - 1 - i] > limit), default=n)
+        def band(values):
+            # Рамка прилегает к краю. Штрих буквы после белого промежутка
+            # внутри ячейки рамкой не является (например, НИ в аспирантуре).
+            start = next((i for i in range(min(3, k)) if values[i] > limit), None)
+            if start is None:
+                return 0
+            end = start
+            while end < k and values[end] > limit:
+                end += 1
+            return end
+        lo = band(profile)
+        hi = n - band(profile[::-1])
         return lo, hi
     t, b = edge(d.mean(axis=1), 0.7)
     d = d[t:b]
@@ -137,7 +147,7 @@ def ocr_cells(arr: np.ndarray, boxes: list[tuple[int, int, int, int]], cfg: OcrC
                 if text:
                     result[i] = " ".join(text.split())
                     break
-    if mode == "kug":
+    if mode in ("kug", "kug_full"):
         result = [_kug_code(t) for t in result]
     return result
 
@@ -160,8 +170,8 @@ def _mode_config(mode: str, cfg: OcrConfig) -> tuple[str, str]:
     config = "--psm 6 -c preserve_interword_spaces=1"
     if mode == "digits":
         return "eng", config + f" -c tessedit_char_whitelist={DIGITS}"
-    if mode == "kug":
-        return "rus", config + f" -c tessedit_char_whitelist={KUG_CHARS}"
+    if mode in ("kug", "kug_full"):
+        return "rus", config + f" -c tessedit_char_whitelist={KUG_CHARS}ИАПр0123456789."
     if mode == "rus":
         return "rus", config
     if mode == "index":
@@ -215,10 +225,16 @@ _NOISE = re.compile(r"^[|\\/\-—–_`'\".,:;°~^•]+$|^[a-zA-Z]$")
 
 def _kug_code(text: str) -> str:
     t = text.replace(" ", "").upper()
+    if re.fullmatch(r"(?:УП|ПП)(?:\.\d+)?|ГИА|ПДП", t):
+        return t
+    if t in ("НИ", "ПА", "ИА", "ТНИ", "НД"):
+        return t
+    if t == "ПР":
+        return "Пр"
     if t.startswith("ПД"):
         return "Пд"
     for ch in t:
-        if ch in "ТЭУПДКГН*":
+        if ch in "ТЭУПДКГНИАР*":
             return ch
     return t[:1]
 

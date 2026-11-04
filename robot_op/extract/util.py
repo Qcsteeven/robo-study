@@ -63,3 +63,27 @@ def semesters_from_code(text: str) -> list[int]:
         elif ch in "ABCАВС":
             out.append(10 + "ABC".find(ch) if ch in "ABC" else 10 + "АВС".find(ch))
     return sorted(set(out))
+
+
+def discipline_name(text: str) -> str:
+    """Исправление подтверждённой ошибки OCR латинского Web в учебном плане."""
+    value = clean_text(text)
+    return re.sub(r"^м/еб(?=-программирование$)", "Web", value, flags=re.I)
+
+
+def unwrap_text(text: str) -> str:
+    """Склеить подтверждённые OCR-переносы, сохраняя неизвестные составные слова."""
+    value = text or ""
+    for fragment, continuation in (("объек", "т"), ("техниче", "ск"), ("ма", "териал")):
+        value = re.sub(r"\b" + fragment + r"-\s+(?=" + continuation + ")", fragment, value, flags=re.I)
+    # «проектно-\nтехнологическая»; союз в «научно- и ...» остаётся отдельным.
+    value = re.sub(r"(?<=[а-яёА-ЯЁ])-\s+(?=[а-яёА-ЯЁ]{2,})", "-", value)
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def normalize_list_markers(text: str) -> str:
+    """Подтверждённые маркеры Symbol/Wingdings; неизвестные PUA-символы сохраняются.
+
+    Заменяем только отдельный знак, а не символ внутри формулы/идентификатора.
+    """
+    return re.sub(r"(?<!\S)[\uf02d\uf0b7\uf0a7](?=\s)", "•", text or "")

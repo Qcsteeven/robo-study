@@ -4,10 +4,10 @@ from __future__ import annotations
 import json
 from contextlib import asynccontextmanager
 from pathlib import Path
-from urllib.parse import quote, urlparse
+from urllib.parse import quote, urlparse, urlencode
 
 import httpx
-from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi import FastAPI, Form, HTTPException, Query, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -19,6 +19,7 @@ from ..models import Database, Document, JsonVersion, Program, Run, RunItem
 from ..robot.http import SiteError
 from ..robot import doc_view, plan_view, page as pagebuilder
 from ..extract import curriculum
+from ..extract.util import discipline_name
 from ..robot.page import latest_final
 from ..robot.pipeline import Robot
 from ..robot.worker import Worker
@@ -33,6 +34,13 @@ def duration(seconds: float | None) -> str:
     if s < 3600:
         return f"{s // 60} мин {s % 60:02d} с" if s < 600 else f"{s // 60} мин"
     return f"{s // 3600} ч {s % 3600 // 60:02d} мин"
+
+
+def clock_hours(hours: float | None) -> str:
+    """Обычное время занятий; округление только при показе, до целой минуты."""
+    minutes = round((hours or 0) * 60)
+    h, m = divmod(minutes, 60)
+    return " ".join(x for x in (f"{h} ч" if h or not m else "", f"{m} мин" if m else "") if x)
 
 
 def plural(n: int, one: str, few: str, many: str) -> str:
@@ -69,6 +77,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
     templates = Jinja2Templates(directory=HERE / "templates")
     templates.env.filters["plural"] = plural
+    templates.env.filters["clock_hours"] = clock_hours
     # версия стилей в адресе — после обновления приложения браузер не берёт старый CSS из кэша
     templates.env.globals["asset_v"] = int(max(p.stat().st_mtime for p in (HERE / "static" / "css").glob("*.css")))
     if settings.app.demo:
@@ -109,45 +118,55 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
         return r
 
     @app.get("/run", response_class=HTMLResponse, include_in_schema=False)
-    def run_page(request: Request, level: str = "", message: str = ""):
-        """Запуск робота: уровень образования и ОП; год набора — всегда последний на сайте."""
+    def run_page(request: Request, level: list[str] = Query(default=[]), message: str = ""):
         site_error = ""
-        levels, year, programs = [], None, None
+        levels, groups = [], []
         try:
             levels = robot.levels()
         except SiteError as e:
             site_error = str(e)
-        lv = next((x for x in levels if x.level == level), None)
-        if lv and lv.years:
-            year = max(lv.years)
-            try:
-                programs = [b.as_dict() for b in robot.programs(level, year)]
-            except SiteError as e:
-                site_error = str(e)
+        for lv in levels:
+            year = max(lv.years) if lv.years else None
+            programs = None
+            error = ""
+            if lv.level in level and year:
+                try:
+                    programs = [b.as_dict() for b in robot.programs(lv.level, year)]
+                except SiteError as e:
+                    error = str(e)
+            groups.append({"level": lv.level, "title": lv.title, "year": year,
+                           "selected": lv.level in level, "programs": programs, "error": error})
         with db.Session() as ses:
             last_run = ses.scalar(select(Run).order_by(Run.id.desc()).limit(1))
             last = run_summary(ses, last_run) if last_run else None
             on_site = {p.id: p.page_updated_at.strftime("%d.%m.%Y") for p in
-                       ses.scalars(select(Program).where(Program.page.is_not(None), Program.year == year)) if p.page_updated_at}
+                       ses.scalars(select(Program).where(Program.page.is_not(None))) if p.page_updated_at}
         return render(request, "run.html", page_title="Обновление данных", crumbs=crumbs(("Обновление данных", None)),
-                      active_nav="run", levels=levels, level=level if lv else "", year=year,
-                      programs=programs, site_error=site_error, message=message, last=last, on_site=on_site)
+                      active_nav="run", groups=groups, site_error=site_error, message=message, last=last, on_site=on_site)
 
     @app.post("/run", include_in_schema=False)
-    def start_run(level: str = Form(...), programs: list[str] = Form(default=[]),
-                  all: str = Form(default=""), force: str = Form(default="")):
-        if level not in LEVELS:
+    async def start_run(request: Request):
+        form = await request.form()
+        levels = list(dict.fromkeys(form.getlist("level")))
+        if any(lv not in LEVELS for lv in levels):
             raise HTTPException(400, "Неизвестный уровень образования")
-        chosen = ["*"] if all else programs
-        if not chosen:
-            return RedirectResponse(f"/run?level={level}&message=Выберите+хотя+бы+одну+ОП", status_code=303)
+        target = "/run" + ("?" + urlencode({"level": levels}, doseq=True) if levels else "")
+        selections = []
         try:
-            year = robot.latest_year(level)
+            for lv in levels:
+                chosen = list(dict.fromkeys(form.getlist("programs__" + lv)))
+                # Совместимость с прежней формой; принудительный разбор посетитель не выбирает.
+                if len(levels) == 1 and not chosen:
+                    chosen = ["*"] if form.get("all") else form.getlist("programs")
+                if chosen:
+                    selections.append({"level": lv, "year": robot.latest_year(lv), "programs": chosen})
         except SiteError as e:
-            return RedirectResponse(f"/run?level={level}&message={quote(str(e))}", status_code=303)
-        run_id = robot.create_run(level, year, chosen, force=bool(force))
+            return RedirectResponse(target + ("&" if "?" in target else "?") + "message=" + quote(str(e)), status_code=303)
+        if not selections:
+            return RedirectResponse(target + ("&" if "?" in target else "?") + "message=Выберите+хотя+бы+одну+ОП", status_code=303)
+        run_id = robot.create_batch_run(selections)
         worker.submit(run_id)
-        return RedirectResponse(f"/run?level={level}", status_code=303)
+        return RedirectResponse(target, status_code=303)
 
     @app.post("/run/{run_id}/resume", include_in_schema=False)
     def resume(run_id: int):
@@ -233,7 +252,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             if row is None:
                 return not_found(request, "Дисциплина не найдена в учебном плане.")
             links = pagebuilder.discipline_links(program_id, rows, docs, finals)
-            options = [{"name": r["name"], "url": links[pagebuilder._key(r["name"])]}
+            options = [{"name": discipline_name(r["name"]), "url": links[pagebuilder._key(r["name"])]}
                        for r in rows if r.get("index", "").startswith(index + ".")]
             target = links.get(pagebuilder._key(row["name"]))
             if not options and target and target.startswith(f"/op/{program_id}/doc/"):
@@ -248,8 +267,8 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                              "control": curriculum.control_label(row.get("control", {}), sem)})
             hours = {"total": row.get("hours", {}).get("plan"), "sr": row.get("hours", {}).get("sr")}
             view = doc_view.build("rpd", {"ze": row.get("ze"), "hours": hours, "semesters": sems})
-        return render(request, "discipline.html", page_title=row["name"],
-                      crumbs=crumbs(("Программы", "/programs"), (prog.code, f"/op/{prog.id}"), (row["name"], None)),
+        return render(request, "discipline.html", page_title=discipline_name(row["name"]),
+                      crumbs=crumbs(("Программы", "/programs"), (prog.code, f"/op/{prog.id}"), (discipline_name(row["name"]), None)),
                       meta=[prog.profile, "Из учебного плана"], active_nav="programs",
                       program=prog, source=source, facts=view["facts"], load=load, options=options)
 

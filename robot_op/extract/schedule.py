@@ -5,7 +5,7 @@ import re
 from collections import Counter
 
 from . import pdf as pdfmod
-from .grid import FineRaster, Grid, assign_words, binarize, detect_grid, rotate, skew_angle
+from .grid import Cell, Row, FineRaster, Grid, assign_words, binarize, detect_grid, rotate, skew_angle
 from .ocr import OcrConfig, ocr_cells, ocr_single
 from .util import norm, to_int
 
@@ -22,6 +22,11 @@ LEGEND = {
     "Г": "подготовка к сдаче и сдача государственного экзамена",
     "Д": "выполнение и защита ВКР",
     "К": "каникулы",
+    "НИ": "научные исследования", "ПА": "промежуточная аттестация аспиранта",
+    "ИА": "итоговая аттестация аспиранта", "Пр": "практика аспирантов",
+    "ГИА": "государственная итоговая аттестация", "ПДП": "преддипломная практика",
+    "unknown": "ячейка не распознана — сверьте с исходным документом",
+
 }
 ALLOWED = set(LEGEND) | {"*", ""}
 YEAR_RE = re.compile(r"(20\d{2})\s*[/\-–]\s*(20\d{2})")
@@ -68,6 +73,17 @@ def ocr_grid(arr, grid: Grid, cfg: OcrConfig, fine: FineRaster | None = None) ->
         c.text = t
     label = _label_col(grid)
     if label is None:
+        # Сводный график СПО: читаем подписи отдельно от обозначений недель.
+        heads = [c for r in grid.rows[:4] for c in r.cells]
+        for c, t in zip(heads, read(heads, "rus")):
+            c.text = t
+        group_col = next((c.col0 for r in grid.rows[:4] for c in r.cells if "групп" in norm(c.text)), 2)
+        labels = [c for r in grid.rows[1:] for c in r.cells if c.col0 <= group_col]
+        for c, t in zip(labels, read(labels, "rus")):
+            c.text = t
+        body = [c for r in grid.rows[4:] for c in r.cells if c.col0 > group_col]
+        for c, t in zip(body, read(body, "kug_full")):
+            c.text = t
         return
     first = [c for c in grid.rows[0].cells if c.col0 > label]
     for c, t in zip(first, read(first, "rus")):
@@ -85,6 +101,15 @@ def ocr_grid(arr, grid: Grid, cfg: OcrConfig, fine: FineRaster | None = None) ->
     body = [c for ri in course_rows for c in grid.rows[ri].cells if c.col0 > label]
     for c, t in zip(body, read(body, "kug")):
         c.text = t
+    if sum(c.text == "НИ" for c in body) > 30:
+        extended = {"НИ", "ПА", "ИА", "Пр", "К", "Э", "Т", "*", ""}
+        for c in body:
+            if c.text not in extended:
+                for mode in ("rus", "kug"):
+                    value = _code(read_one(c, mode, 2.0))
+                    if value in extended and value:
+                        c.text = value
+                        break
 
 
 def _structure(grid: Grid, label: int) -> tuple[int | None, list[int]]:
@@ -123,7 +148,7 @@ def _day_rows(labels: list[str], start: int) -> list[int]:
 def parse_grid(grid: Grid) -> dict:
     label = _label_col(grid)
     if label is None:
-        raise NoSchedule("Не найдена колонка дней недели")
+        return _weekly_grid(grid)
     weeks_row, course_rows = _structure(grid, label)
     week_cols = [i for i in range(label + 1, len(grid.columns))]
     day_cols = list(week_cols)   # по дням — все колонки, включая хвост августа без номера недели
@@ -199,7 +224,7 @@ def _course(grid: Grid, rows: list[int], label: int, week_cols: list[int], day_c
                 unknown.add(t)
             codes.append(t)
         real = [c for c in codes if c and c != "*" and c in LEGEND]
-        code = Counter(real).most_common(1)[0][0] if real and len(real) * 2 >= len([c for c in codes if c != "*"]) else "Т"
+        code = Counter(real).most_common(1)[0][0] if real and len(real) * 2 >= len([c for c in codes if c != "*"]) else "unknown" if sum(c not in ALLOWED for c in codes) * 2 >= len(codes) else "Т"
         weeks.append(code)
     if unknown:
         messages.append(f"Курс {course}: недопустимые обозначения {', '.join(sorted(unknown))}")
@@ -211,7 +236,7 @@ def _course(grid: Grid, rows: list[int], label: int, week_cols: list[int], day_c
         day = DAYS[k] if len(rows) == 6 else norm(grid.rows[ri].text_at(label))
         if day in DAYS and day not in days:
             codes = [_code(grid.rows[ri].text_at(col)) for col in day_cols]
-            days[day] = [c if c in ALLOWED else "" for c in codes]
+            days[day] = [c if c in ALLOWED else "unknown" for c in codes]
     return {"course": course, "group": group, "weeks": weeks, "days": days}
 
 
@@ -250,7 +275,94 @@ def _fix_days(courses: list[dict]) -> None:
 
 def _code(text: str) -> str:
     t = text.replace(" ", "").upper()
-    return "Пд" if t.startswith("ПД") else t[:1]
+    if t in ("ПР", "Пд".upper()):
+        return "Пр" if t == "ПР" else "Пд"
+    if t in LEGEND or re.fullmatch(r"(?:УП|ПП)(?:\.\d+)?", t):
+        return t
+    return t
+
+
+def _weekly_grid(grid: Grid) -> dict:
+    group_votes = Counter(c.col0 for r in grid.rows for c in r.cells if re.search(r"[-–]\d{2}[-–]\d", c.text))
+    if group_votes:
+        label = group_votes.most_common(1)[0][0]
+        first_group = next(i for i,r in enumerate(grid.rows) if re.search(r"[-–]\d{2}[-–]\d", r.text_at(label)))
+        header = first_group - 1
+    else:
+        header = next((i for i, r in enumerate(grid.rows) if any(re.search(r"г[рл]уп", norm(c.text)) for c in r.cells)), None)
+        if header is None:
+            raise NoSchedule("Не найдены дни недели или шапка групп")
+        label = next(c.col0 for c in grid.rows[header].cells if re.search(r"г[рл]уп", norm(c.text)))
+    week_cols = list(range(label + 1, len(grid.columns)))
+    courses = []
+    messages = []
+    inherited_code = ""
+    for r in grid.rows[header + 1:]:
+        group = r.text_at(label).strip()
+        if not re.search(r"[-–]\d{2}[-–]\d", group):
+            continue
+        code = next((c.text.strip() for c in r.cells if c.col1 < label and re.fullmatch(r"\d{2}\.\d{2}\.\d{2}", c.text.strip())), "")
+        inherited_code = code or inherited_code
+        code = inherited_code
+        values = [_code(r.text_at(c)) or "Т" for c in week_cols]
+        unknown = [i for i,v in enumerate(values) if v not in ALLOWED and not re.fullmatch(r"(?:УП|ПП)(?:\.\d+)?", v)]
+        if unknown:
+            messages.append(f"Группа {group}: не распознано ячеек {len(unknown)}")
+            for i in unknown:
+                values[i] = "unknown"
+        courses.append({"course": "", "group": group, "program_code": code, "weeks": values, "days": {}})
+    if not courses:
+        raise NoSchedule("Не найдены строки учебных групп")
+    months = [[_month(c.text), c.col1 - max(c.col0, label + 1) + 1] for r in grid.rows[:header + 1] for c in r.cells if _month(c.text) and c.col1 > label]
+    return {"months": months, "weeks": len(week_cols), "courses": courses, "mode": "weekly", "messages": messages}
+
+
+def _regular_calendar_grid(grid: Grid) -> Grid:
+    """В календарной сетке равная ширина недель. Отсекает штрихи букв,
+    ошибочно принятые за вертикальные линии в очень низких строках скана."""
+    widths = [c.x1-c.x0 for r in grid.rows for c in r.cells if 20 <= c.x1-c.x0 <= 160]
+    if not widths:
+        return grid
+    mode = Counter(round(w / 10) * 10 for w in widths).most_common(1)[0][0]
+    candidates = []
+    for i, row in enumerate(grid.rows):
+        cells = [c for c in row.cells if mode * .8 <= c.x1-c.x0 <= mode * 1.2]
+        if len(cells) < 48:
+            continue
+        gaps = [b.x0-a.x0 for a,b in zip(cells,cells[1:])]
+        if not gaps or max(gaps) > mode * 1.7:
+            continue
+        candidates.append((len(cells)*3 - len(row.cells), -i, cells))
+    if not candidates:
+        return grid
+    _, minus_i, regular = max(candidates, key=lambda x: x[:2])
+    reference = -minus_i
+    prefix = [c for c in grid.rows[0].cells if c.x1 < regular[0].x0]
+    columns = [(c.x0,c.x1) for c in prefix + regular]
+    # Сетка уже правильная: сохраняем её объединённые ячейки.
+    if len(grid.columns) == len(columns):
+        return grid
+    rows = []
+    left = len(prefix)
+    for ri, row in enumerate(grid.rows):
+        cells = []
+        for c in row.cells:
+            if c.x1 < regular[0].x0:
+                indices = [j for j,(a,b) in enumerate(columns[:left]) if a <= (c.x0+c.x1)/2 <= b]
+                if indices:
+                    j=indices[0]; cells.append(Cell(c.x0,c.x1,c.y0,c.y1,j,j,c.text))
+        if ri < reference:
+            used=set()
+            for c in row.cells:
+                indices=[j for j,(a,b) in enumerate(columns) if j>=left and c.x0-3 <= (a+b)/2 <= c.x1+3]
+                if indices:
+                    lo,hi=indices[0],indices[-1]
+                    if not any(j in used for j in indices):
+                        cells.append(Cell(columns[lo][0],columns[hi][1],c.y0,c.y1,lo,hi,c.text)); used.update(indices)
+        else:
+            cells.extend(Cell(a,b,row.y0,row.y1,j,j) for j,(a,b) in enumerate(columns) if j>=left)
+        rows.append(Row(row.y0,row.y1,cells))
+    return Grid(rows,columns,grid.line_px)
 
 
 def extract(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> dict:
@@ -263,6 +375,7 @@ def extract(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> dict:
         grid = detect_grid(arr)
         if grid is None:
             continue
+        grid = _regular_calendar_grid(grid)
         if scanned:
             ocr_grid(arr, grid, cfg, FineRaster.for_scan(data, i, dpi, angle))
             from .ocr import ocr_page_text
@@ -279,6 +392,14 @@ def extract(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> dict:
     if result is None:
         raise NoSchedule("Сетка календарного учебного графика не найдена")
     m = YEAR_RE.search(title_text or "")
+    if not m and scanned:
+        # Печать и подписи над таблицей мешают блочному OCR; заголовок читаем
+        # также как разреженный текст, не объединяя его со штампом.
+        sparse = ocr_page_text(top, cfg, psm=11)
+        compact = re.sub(r"(?<=\d)\s+(?=\d)", "", sparse)
+        m = YEAR_RE.search(compact)
+        if m:
+            title_text = sparse
     result["academic_year"] = f"{m.group(1)}/{m.group(2)}" if m else ""
     result["title"] = " ".join((title_text or "").split())[:300]
     result["legend"] = [{"code": k, "label": v} for k, v in LEGEND.items()]

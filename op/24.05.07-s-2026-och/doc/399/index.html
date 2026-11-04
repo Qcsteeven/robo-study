@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Термодинамика и теплопередача — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Термодинамика и теплопередача</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>4</dd><dt>Трудоёмкость</dt><dd>4 з. е. · 144 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 32 ч, практические 16 ч, лабораторные 16 ч</dd><dt>Самостоятельная работа</dt><dd>44 ч</dd><dt>Промежуточная аттестация</dt><dd>Экзамен</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Уравнения состояния, виды уравнения состояния. Теплоемкость. Основные термодинамические законы</span>
+<span class="app-topics__text">1.1 Основные понятия и определения, исходные положения технической термодинамики.1.2. Параметры состояния идеального газа.1.3. Уравнение состояния идеального газа, виды уравнения состояния.1.4. Теплоемкость газа.1.5. Газовые смеси. Теплоемкость смеси газов.1.6. Основные энергетические характеристики термодинамических систем.1.7. Первый закон термодинамики.1.8. Основные термодинамические процессы в газах.1.9. Политропные процессы и их исследование.1.10. Термодинамические процессы в силовых установках летательных аппаратов.1.11. Второй закон термодинамики. Формулировки второго закона термодинамики. 1.12. Тепловой двигатель. 1.13. Цикл Карно.1.14. Энтропия 1.15 Т,S-координаты</span>
+</li>
+<li><span class="app-topics__title">Основные уравнения термодинамики газового потока</span>
+<span class="app-topics__text">2.1 Исходные положения2.2. Уравнение неразрывности.2.3. Уравнение первого закона термодинамики.2.4. Уравнение сохранения энергии2.5. Обобщенное уравнение Бернулли.2.6. Параметры адиабатно-заторможенного потока.2.7. Применение основных уравнений термодинамики к течению газа в элементах ГТД. Частные случаи уравнения сохранения энергии для элементов авиационных двигателей</span>
+</li>
+<li><span class="app-topics__title">Разгон и торможение газового потока</span>
+<span class="app-topics__text">3.1 Форма канала, необходимая для разгона и торможения газового потока.3.2. Разгон и торможение газового потока при различных воздействиях на него.3.3. Условия разгона и торможения газа при адиабатном течении в канале.3.4. Скорость истечения газа из сопла.3.5. Критические параметры газового потока.3.6. Газодинамические функции.3.7. Условия разгона и торможения газа при адиабатном течении в канале</span>
+</li>
+<li><span class="app-topics__title">Циклы тепловых двигателей</span>
+<span class="app-topics__text">4.1 Типы тепловых двигателей.4.2. Задачи и сущность термодинамического метода исследования циклов тепловых двигателей.4.3. Цикл Брайтона-Стечкина. Его применение в ГТД. 4.4. Цикл Гемфри, его применение в авиационной и космической технике</span>
+</li>
+<li><span class="app-topics__title">Физические основы передачи теплоты. Теплопроводность тел на стационарном режиме</span>
+<span class="app-topics__text">5.1 Виды теплообмена: конвекция, теплопроводность, тепловое излучение.5.2 Основные понятия теплопроводности.5.3 Закон Фурье.5.4 Дифференциальное уравнение теплопроводности.5.5 Теплопроводность на стационарном режиме.5.6 Контактное тепловое сопротивление</span>
+</li>
+<li><span class="app-topics__title">Конвективный теплообмен</span>
+<span class="app-topics__text">6.1 Физическая природа конвективного теплообмена.6.2 Закон Ньютона.6.3 Применение теории подобия физических явлений к исследованию процесса конвективного теплообмена.6.4 Конвективный теплообмен при вынужденном (принудительном обдуве) движения теплоносителя.6.5 Конвективный теплообмен при свободном (естественной конвекции) движении теплоносителя</span>
+</li>
+<li><span class="app-topics__title">Передача теплоты через стенки и методы тепловой защиты</span>
+<span class="app-topics__text">7.1 Общие сведения 7.2 Физическая картина и основные закономерности передачи теплоты через стенку. 7.3 Способы изменения интенсивности передачи теплоты через стенки. 7.4 Способы тепловой защиты элементов и деталей конструкции летательных аппаратов и их силовых установок. 7.5 Конвективный теплообмен при свободном (естественной конвекции) движении теплоносителя</span>
+</li>
+<li><span class="app-topics__title">Теплообмен излучением</span>
+<span class="app-topics__text">8.1 Основные определения теплового излучения.8.2 Основные законы излучения абсолютно-черного тела.8.3 Особенности излучения и поглощения реальных тел.8.4 Лучистый теплообмен 8.5 Влияние экранов на теплообмен излучением</span>
+</li>
+<li><span class="app-topics__title">Теплообменные аппараты. Применение в ГТД и в космической технике</span>
+<span class="app-topics__text">9.1 Общие сведения о теплообменных аппаратах.9.2 Рекуперативные теплообменные аппараты</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Газовые законы, тарировка газового термометра</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Диаграммы состояния реального газа (изучение кривой Ван-дер-Ваальса</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Цикл тепловой машины (прямой и обратный)</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Определение показателя адиабаты по скорости звука в воздухе</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Исследование конвекционной теплоотдачи при естественной конвекции вдоль горизонтального цилиндра</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Исследование процесса конвективного теплообмена при вынужденном движении жидкости</td><td class="ir-num app-nowrap">3 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Практические занятия</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Уравнения состояния, виды уравнения состояния</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Теплоемкость. Основные термодинамические законы</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Основные уравнения термодинамики газового потока</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Разгон и торможение газового потока</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Циклы тепловых двигателей</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Физические основы передачи теплоты. Теплопроводность тел на стационарном режиме</td><td class="ir-num app-nowrap">4 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Подготовка к контрольным работам</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">12 ч</td></tr><tr><td>Подготовка к экзамену</td><td class="ir-num app-nowrap">9 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">19 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ОПК-1 — Способен применять естественнонаучные и общеинженерные знания, методы математического анализа и моделирования, теоретического и экспериментального исследования для решения инженерных задач профессиональной деятельности
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать основные законы термодинамики, уравнения термодинамики газового потока, циклы тепловых авиационных двигателей, физические основы передачи теплоты
+
+        </li><li>Уметь применять законы термодинамики и теплопередачи для решения практических задач
+
+        </li><li>Владеть навыками расчета термодинамических параметров, применения основных уравнений термодинамики к течению газа в элементах ГТД, навыками тепловых расчетов
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Исаев А. И. Термодинамика и теплопередача : учебное пособие / А. И. Исаев, С. В. Молокова, 2011. - 156. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-28281.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-28281.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 11</span>
+</li><li>Термодинамика и теплопередача [Электронный ресурс] : методические указания по лабораторным работам для студентов по направлению 160200 "Авиастроение" / Иркут. гос. техн. ун-т, 2007. - 54. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-5608.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-5608.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 11</span>
+</li><li>Молокова С. В. Термодинамика и теплопередача [Электронный ресурс] : учебное пособие / С. В. Молокова, 2007. - 157. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-5610.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-5610.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 12</span>
+</li><li>Термодинамика и теплопередача [Электронный ресурс] : методические указания по выполнению заданий практических занятий для студентов по направлению специальности: 160201 "Самолето- и вертолетостроение" / Иркут. гос. техн. ун-т, 2008. - 84. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-5611.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-5611.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 12</span>
+</li><li>Захарьева Н. Г. Техническая термодинамика и теплопередача : учебное пособие / Н. Г. Захарьева, В. А. Начигин, 2013. - 171. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-21710.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-21710.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 12</span>
+</li><li>Болгарский А. В. Термодинамика и теплопередача : учебник для студентов авиационных вузов и факультетов / А. В. Болгарский, Г. А. Мухачев, В. К. Щукин, 1964. - 458.
+
+        </li><li>Алабовский Александр Николаевич. Техническая термодинамика и теплопередача : учеб. пособие для технол. специальностей вузов / Александр Николаевич Алабовский, И. Недужий, 1990. - 255.
+
+        </li><li>Мухачев Г. А. Термодинамика и теплопередача : учеб. для авиац. специальностей вузов / Г. А. Мухачев, В. К. Щукин, 1991. - 479.
+
+        </li><li>Болгарский Андрей Владимирович. Термодинамика и теплопередача : учеб. для авиац. специальностей вузов / Андрей Владимирович Болгарский, Г.А. Мухачев, В.К. Щукин, 1975. - 495.
+
+        </li><li>Нащокин Владимир Васильевич. Техническая термодинамика и теплопередача : учеб. пособие для неэнерг. спец. вузов / Владимир Васильевич Нащокин, 1980. - 469.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://el.istu.edu">Все методические материалы по практическим работам приведены в ЭОР по дисциплине</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по практическим занятиям», стр. 7</span>
+</li>
+<li><a class="ir-link" href="http://el.istu.edu/">Все методические материалы по лабораторным работам приведены в ЭОР по дисциплине</a>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по лабораторным работам», стр. 7; Из раздела «6.1 Оценочные средства для проведения текущего контроля», стр. 8</span>
+</li>
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 12</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 12</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 12</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 12</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">13</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%A2%D0%B5%D1%80%D0%BC%D0%BE%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D0%BA%D0%B0_%D0%B8_%D1%82%D0%B5%D0%BF%D0%BB%D0%BE%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%87%D0%B0_19648_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

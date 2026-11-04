@@ -74,28 +74,126 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 <div class="app-content">
 <section aria-labelledby="h-facts" class="app-section">
 <h2 class="section-title" id="h-facts">Сведения</h2>
-<dl class="app-kv"><dt>Семестр</dt><dd>3</dd><dt>Промежуточная аттестация</dt><dd>Курсовой проект, Зачет</dd></dl>
+<dl class="app-kv"><dt>Семестр</dt><dd>3</dd><dt>Трудоёмкость</dt><dd>3 з. е. · 108 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 14 ч, лабораторные 28 ч</dd><dt>Самостоятельная работа</dt><dd>66 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет</dd></dl>
 </section>
 <section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
 <ol class="app-topics">
-<li><span class="app-topics__title">4 Перечень практических занятий Практических занятий не предусмотрено</span></li>
-<li><span class="app-topics__title">1 Методические указания для обучающихся по освоению дисциплины</span></li>
-<li><span class="app-topics__title">1.1 Методические указания для обучающихся по лабораторным работам:</span></li>
-<li><span class="app-topics__title">Руководство по работе в облачном сервисе Colaboratory https://colab.research.google.com/notebooks/welcome.ipynb#scrollTo=GJBs_flRovLc</span></li>
-<li><span class="app-topics__title">AI.Lector.ru: лекции Шамина Р.В. (д. ф.-м. н., МИРЭА) по искусственному интеллекту и машинному обучению http://ai.lector.ru/?go=python.</span></li>
-<li><span class="app-topics__title">1.2 Методические указания для обучающихся по самостоятельной работе:</span></li>
-<li><span class="app-topics__title">Онлайн курс на образовательной платформе Stepik «Введение в Data Science и машинное обучение» https://stepik.org/course/4852/syllabus</span></li>
-<li><span class="app-topics__title">Машинное обучение (курс лекций, К.В.Воронцов, МФТИ). ссылка</span></li>
+<li><span class="app-topics__title">Введение в машинное обучение. Библиотеки машинного обучения</span>
+<span class="app-topics__text">Обзор некоторых распространенных алгоритмов машинного обучения для специалистов по данным. Обзор коллективных методов решения оптимизационных задач: метод роя частиц, генетические алгоритмы. Основные принципы распознавания зашумленных образов при помощи нейронной сети Хопфилда. Обзор методов классификации без учителя: сеть Кохонена, EM-алгоритм (Expectation-Maximization), самоорганизующиеся карты Кохонена. Обзор ядерных методов – группа алгоритмов классификации: метод опорных векторов SVM, метод главных компонент PCA</span>
+</li>
+<li><span class="app-topics__title">Метод имитации отжига</span>
+<span class="app-topics__text">Изучение метода отжига как алгоритма для решения оптимизационных и поисковых задач, основанного на стохастическом поиске. Достоинства метода отжига. Решение задачи о размещении 8 ферзей на шахматной доске 8 х 8. Решение задачи коммивояжера методом отжига</span>
+</li>
+<li><span class="app-topics__title">Генетические алгоритмы</span>
+<span class="app-topics__text">Изучение генетического алгоритма как алгоритма коллективной оптимизации многомерных функций. Основные этапы оптимизации: порождение новых генов случайным образом, скрещивание генов, мутация генов. Задача поиска минимума функции. Задача распределения груза по поездам. Задача прохождения лабиринта</span>
+</li>
+<li><span class="app-topics__title">Байесовское обучение</span>
+<span class="app-topics__text">Основные идеи байесовского обучения. Формула Байеса. Задача фильтрации спама</span>
+</li>
+<li><span class="app-topics__title">Обучение с подкреплением</span>
+<span class="app-topics__text">Понятие об алгоритме обучения с подкреплением на основе обучения интеллектуального агента, действующего во внешней среде. Алгоритмы SARSA и Q-learning. Моделирование игры «Крестики-нолики». Моделирование игры «Пинг-Понг»</span>
+</li>
+<li><span class="app-topics__title">Случайный лес. Деревья решений. Метод градиентного бустинга</span>
+<span class="app-topics__text">Решение задач регрессии и классификации при помощи решающих деревьев. Алгоритм «Случайный лес» (Random Forest). Метод градиентного бустинга. Возможности библиотеки машинного обучения XGBoost. Ансамблирование моделей</span>
+</li>
+<li><span class="app-topics__title">Рекомендательные системы</span>
+<span class="app-topics__text">Понятие о рекомендательных системах как систем для фильтрации контента. Обзор практических задач с применением рекомендательных систем. Основные типы рекомендательных систем, их достоинства и недостатки: коллаборативная фильтрация (collaborative filtering), контентная фильтрация (content-based filtering), экспертные системы (knowledge-based systems)</span>
+</li>
 </ol>
 </section>
 <section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Решение задачи методом k-ближайших соседей (k-Nearest Neighbors). Обзор метрик</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>SVM на наборе данных DataSet Iris. Линейно разделимая выборка. Линейно неразделимая выборка</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Решение задачи о размещении 8 ферзей на шахматной доске 8 х 8 методом отжига</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Решение задачи коммивояжера методом отжига</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Задача распределения груза по поездам при помощи генетического алгоритма</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Задача прохождения лабиринта при помощи генетического алгоритма</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Работа с категориальными признаками на примере датасета Titanic. Байесовская модель. Участие в соревновании на Kaggle «Titanic -Machine Learning from Disaster»</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Байесовская модель для задачи фильтрации спама</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Моделирование игры «Крестики-нолики» при помощи алгоритма обучения с подкреплением</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Моделирование игры «Пинг-Понг» при помощи алгоритма обучения с подкреплением</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Ансамблевые методы bagging, boosting and stacking. Участие в соревновании на Kaggle</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Построение рекомендательных систем. Набор данных MovieLens Dataset (Small)</td><td class="ir-num app-nowrap">4 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">66 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
-<ul class="app-list"><li>ПК-1 — Способен проводить разработку и исследование теоретических и экспериментальных моделей</li><li>ПК-4 — 3 диагностики ошибок в программировании алгоритмов ml программном коде Владеть навыками использования методов поиска и диагностики ошибок при программировании алгоритмов ml 2</li></ul>
+<ul class="app-list">
+<li>ПК-1 — Способен проводить разработку и исследование теоретических и экспериментальных моделей объектов профессиональной деятельности в области искусственного интеллекта (ИИ)
+
+        </li><li>ПК-3 — Способен выполнять работы по обеспечению функционирования инфокоммуникационных систем ИИ
+
+        </li><li>ПК-4 — Способен выполнять поиск и диагностику ошибок инфокоммуникационных систем ИИ, осуществлять процесс оптимизации программного обеспечения
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать основные алгоритмы ml
+
+        </li><li>Уметь применять алгоритмы ml для проведения исследований моделей объектов профессиональной деятельности
+
+        </li><li>Владеть навыками использования алгоритмов ml для проведения исследований моделей объектов профессиональной деятельности
+
+        </li><li>Знать перспективы развития инфокоммуникационных систем для обеспечения их функционирования в сфере машинного обучения
+
+        </li><li>Уметь применять алгоритмы ML в сфере инфокоммуникационных систем
+
+        </li><li>Владеть навыками использования алгоритмов ML в сфере инфокоммуникационных систем
+
+        </li><li>Знать типичные ошибки при работе с алгоритмами ml
+
+        </li><li>Уметь применять методы поиска и диагностики ошибок при программировании алгоритмов ml
+
+        </li><li>Владеть навыками использования методов поиска и диагностики ошибок при программировании алгоритмов ml
+
+        </li>
+</ul>
 </section>
 <section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
-<ul class="app-list"><li>Митяков Е. С. Искусственный интеллект и машинное обучение : учебное пособие для вузов / Е. С. Митяков, А. Г. ,Шмелева, А. И. Ладынин, 2025. - 252. [Сайт] – URL: https://e.lanbook.com/book/450827</li><li>Казанцев Т. Искусственный интеллект и машинное обучение. Основы программирования на Pyton / Т. Казанцев, 2020. - 170. [Сайт] – URL: https://www.litres.ru/book/timur-kazancev/iskusstvennyy-intellekt-i-mashinnoe- obuchenie-osnovy-progra-59162107/ 8 Дополнительная учебная литература и справочная</li><li>Алпайдин Э. Машинное обучение: новый искусственный интеллект : перевод с английского / Э. Алпайдин, 2017. - XII. ; 191.</li><li>Монарх М. Р. Машинное обучение с участием человека. Активное обучение и аннотирование для ориентированного на человека искусственного интеллекта / М. Р. Монарх ; пер. с англ. В. И. Бахур, 2022. - 498.</li></ul>
+<ul class="app-list">
+<li>Митяков Е. С. Искусственный интеллект и машинное обучение : учебное пособие для вузов / Е. С. Митяков, А. Г. ,Шмелева, А. И. Ладынин, 2025. - 252. [Сайт] – URL: <a href="https://e.lanbook.com/book/450827" rel="noopener">https://e.lanbook.com/book/450827</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 8</span>
+</li><li>Казанцев Т. Искусственный интеллект и машинное обучение. Основы программирования на Pyton / Т. Казанцев, 2020. - 170. [Сайт] – URL: <a href="https://www.litres.ru/book/timur-kazancev/iskusstvennyy-intellekt-i-mashinnoe-obuchenie-osnovy-progra-59162107/" rel="noopener">https://www.litres.ru/book/timur-kazancev/iskusstvennyy-intellekt-i-mashinnoe-obuchenie-osnovy-progra-59162107/</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 8</span>
+</li><li>Алпайдин Э. Машинное обучение: новый искусственный интеллект : перевод с английского / Э. Алпайдин, 2017. - XII. ; 191.
+
+        </li><li>Монарх М. Р. Машинное обучение с участием человека. Активное обучение и аннотирование для ориентированного на человека искусственного интеллекта / М. Р. Монарх ; пер. с англ. В. И. Бахур, 2022. - 498.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="https://colab.research.google.com/notebooks/welcome.ipynb#scrollTo=GJBs_flRovLc">Руководство по работе в облачном сервисе Colaboratory</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по лабораторным работам», стр. 6</span>
+</li>
+<li><a class="ir-link" href="http://ai.lector.ru/?go=python">AI.Lector.ru: лекции Шамина Р.В. (д. ф.-м. н., МИРЭА) по искусственному интеллекту и машинному обучению</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по лабораторным работам», стр. 6</span>
+</li>
+<li><a class="ir-link" href="https://stepik.org/course/4852/syllabus">Онлайн курс на образовательной платформе Stepik «Введение в Data Science и машинное обучение»</a>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по самостоятельной работе», стр. 6</span>
+</li>
+<li><span>Машинное обучение (курс лекций, К.В.Воронцов, МФТИ)</span> <span class="app-llm-note">Адрес в документе не указан.</span>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по самостоятельной работе», стр. 6</span>
+</li>
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 8</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 8</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 8</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 8</span>
+</li>
+</ul>
 </section>
 </div>
 <aside class="app-aside">
@@ -105,7 +203,7 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 </section>
 <a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%98%D0%98%D0%A2%D0%BC_2026_%D0%90%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC%D1%8B_ML_14007_accepted.pdf">PDF на сайте ИРНИТУ</a>
 <a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/09.04.01-ii-2026-och/">Страница ОП</a>
-<a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-239-5a9957dc35c6.json">Первичный JSON</a><a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-239-6c88044d2652.json">Итоговый JSON</a></aside>
+</aside>
 </div>
 </main>
 <footer class="app-footer">
@@ -113,7 +211,7 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 <div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
 <div class="app-footer__note">
           Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
-          
+
         </div>
 <div class="app-footer__note">
 <a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>

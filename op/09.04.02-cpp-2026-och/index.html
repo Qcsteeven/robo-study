@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>09.04.02 Цифровизация промышленных предприятий — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/programs/query-28a49646c490/">Магистратура, набор 2026</a></li>
+<li><span aria-current="page">09.04.02</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Цифровизация промышленных предприятий</h1>
+<div class="ir-pagehead__meta"><span>09.04.02 </span><span>Магистратура</span><span>Очная форма</span><span>Набор 2026</span></div>
+<div class="ir-pagehead__actions">
+<a class="ir-btn ir-btn--pill ir-btn--onband" href="https://www.istu.edu/sveden/education/napravleniya_table?level=3&amp;year=2026&amp;nosubdiv=17">Исходные документы на istu.edu</a>
+</div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-svedeniya" class="app-section" id="svedeniya">
+<h2 class="section-title" id="h-svedeniya">Сведения о программе</h2>
+<section class="ir-info ir-info--lite">
+<div class="ir-info__item"><span class="ir-info__label">Уровень образования</span><span class="ir-info__value">Магистратура</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Направление</span><span class="ir-info__value">09.04.02 </span></div>
+<div class="ir-info__item"><span class="ir-info__label">Профиль</span><span class="ir-info__value">Цифровизация промышленных предприятий</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Квалификация</span><span class="ir-info__value">Магистр</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Форма обучения</span><span class="ir-info__value">Очная</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Год набора</span><span class="ir-info__value">2026</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Срок обучения</span><span class="ir-info__value">2 года</span></div>
+</section>
+<h3 class="card-title app-subhead">Краткая характеристика</h3>
+<p class="app-empty">Характеристика программы пока не опубликована.</p>
+</section>
+<section aria-labelledby="h-up" class="app-section" id="up">
+<h2 class="section-title" id="h-up">Учебный план</h2>
+<h3 class="card-title app-subhead app-subhead--first">По семестрам</h3>
+<p class="app-lead">Нагрузка каждого семестра: сколько пар лекций, практических и лабораторных занятий за семестр. Одна пара — 1 час 30 минут. В скобках указано обычное время занятий. Название дисциплины открывает её рабочую программу или сведения из учебного плана.</p>
+<div class="app-catfilter" data-catfilter="" hidden="">
+<span class="app-catfilter__label">Показать:</span>
+<button aria-pressed="true" class="app-catbtn app-cat--prof" data-cat="prof" type="button"><span aria-hidden="true" class="app-cat__mark"></span>Профессиональные дисциплины</button>
+<button aria-pressed="true" class="app-catbtn app-cat--it" data-cat="it" type="button"><span aria-hidden="true" class="app-cat__mark"></span>Программирование и ИТ</button>
+<button aria-pressed="true" class="app-catbtn app-cat--ai" data-cat="ai" type="button"><span aria-hidden="true" class="app-cat__mark"></span>ИИ и анализ данных</button>
+<button aria-pressed="true" class="app-catbtn app-cat--hum" data-cat="hum" type="button"><span aria-hidden="true" class="app-cat__mark"></span>Языки, гуманитарные и экономика</button>
+<button aria-pressed="true" class="app-catbtn app-cat--prac" data-cat="prac" type="button"><span aria-hidden="true" class="app-cat__mark"></span>Практика, проекты и ВКР</button>
+</div>
+<div aria-label="Учебный план по семестрам" aria-roledescription="карусель" class="app-carousel" data-carousel="" role="region">
+<div class="app-carousel__bar" data-carousel-bar="" hidden="">
+<button aria-label="Предыдущий семестр" class="app-carousel__arrow" data-prev="" type="button">←</button>
+<div class="app-carousel__tabs">
+<button aria-current="true" aria-label="1 семестр" class="app-carousel__tab" data-go="0" type="button">1<span class="app-carousel__tab-sub"> сем.</span></button>
+<button aria-label="2 семестр" class="app-carousel__tab" data-go="1" type="button">2<span class="app-carousel__tab-sub"> сем.</span></button>
+<button aria-label="3 семестр" class="app-carousel__tab" data-go="2" type="button">3<span class="app-carousel__tab-sub"> сем.</span></button>
+<button aria-label="4 семестр" class="app-carousel__tab" data-go="3" type="button">4<span class="app-carousel__tab-sub"> сем.</span></button>
+</div>
+<button aria-label="Следующий семестр" class="app-carousel__arrow" data-next="" type="button">→</button>
+</div>
+<div class="app-carousel__track app-scroll" data-track="" tabindex="0">
+<section aria-label="1 семестр из 4" aria-roledescription="слайд" class="app-carousel__slide" role="group">
+<div class="app-course__head">
+<h4 class="item-title app-course__title">1 семестр</h4>
+<span class="app-course__meta">1 курс · 14 учебных недель · 9 дисциплин · 4 экзамена</span>
+</div>
+<dl class="app-load">
+<div class="app-load__total"><dt>Пар за семестр</dt><dd>105 <span class="app-load__hours">(157 ч 30 мин)</span></dd><span class="app-load__note">≈ 7,5 пары (11 ч 15 мин) в неделю</span></div>
+<div class="app-load--lec"><dt><span aria-hidden="true" class="app-load__mark"></span>Лекции</dt><dd>42 <span class="app-load__hours">(63 ч)</span></dd></div>
+<div class="app-load--pr"><dt><span aria-hidden="true" class="app-load__mark"></span>Практики</dt><dd>63 <span class="app-load__hours">(94 ч 30 мин)</span></dd></div>
+<div class="app-load--lab"><dt><span aria-hidden="true" class="app-load__mark"></span>Лабораторные</dt><dd>0 <span class="app-load__hours">(0 ч)</span></dd></div>
+</dl>
+<div aria-hidden="true" class="app-load__bar"><span class="app-load--lec" style="flex-grow: 42.0"></span><span class="app-load--pr" style="flex-grow: 63.0"></span>
+</div>
+<div class="ir-table-wrap app-scroll">
+<table class="ir-table app-semtable">
+<caption class="sr-only">1 семестр: дисциплины и число пар</caption>
+<thead><tr>
+<th scope="col">Дисциплина</th>
+<th class="ir-num" scope="col" title="Лекции, пар за семестр">Лек</th>
+<th class="ir-num" scope="col" title="Практические занятия, пар за семестр">Пр</th>
+<th class="ir-num" scope="col" title="Лабораторные работы, пар за семестр">Лаб</th>
+<th class="ir-num" scope="col">Пар</th>
+<th scope="col">Контроль</th>
+</tr></thead>
+<tbody>
+<tr class="app-semrow app-cat--prof" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/286/">Проектирование системы личностного и профессионального развития</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">7</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--it" data-cat="it">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/294/">Введение в программирование</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/287/">Моделирование процессов и систем. Нелинейные динамические системы</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/302/">Нейронные сети и их применение в научных исследованиях</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-c961e9a2533d/">Основы программирования и анализа данных Ha Python</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--hum" data-cat="hum">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/264/">Академическое письмо</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">7</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--hum" data-cat="hum">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/265/">Иностранный язык для магистрантов</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">7</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--hum" data-cat="hum">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/263/">Проектный менеджмент</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--hum" data-cat="hum">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/262/">Философия науки</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--prac" data-cat="prac">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/257/">Учебная практика: технологическая (проектно-технологическая) практика</a></span></span></td>
+<td class="app-semtable__practice" colspan="4">практика · 6 з. е.</td>
+<td class="app-nowrap">ЗаО</td>
+</tr>
+</tbody>
+<tfoot><tr>
+<th scope="row">Итого</th>
+<td class="ir-num">42</td><td class="ir-num">63</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">105</td><td></td>
+</tr></tfoot>
+</table>
+</div>
+</section>
+<section aria-label="2 семестр из 4" aria-roledescription="слайд" class="app-carousel__slide" role="group">
+<div class="app-course__head">
+<h4 class="item-title app-course__title">2 семестр</h4>
+<span class="app-course__meta">1 курс · 14 учебных недель · 10 дисциплин · 4 экзамена</span>
+</div>
+<dl class="app-load">
+<div class="app-load__total"><dt>Пар за семестр</dt><dd>147 <span class="app-load__hours">(220 ч 30 мин)</span></dd><span class="app-load__note">≈ 10,5 пары (15 ч 45 мин) в неделю</span></div>
+<div class="app-load--lec"><dt><span aria-hidden="true" class="app-load__mark"></span>Лекции</dt><dd>70 <span class="app-load__hours">(105 ч)</span></dd></div>
+<div class="app-load--pr"><dt><span aria-hidden="true" class="app-load__mark"></span>Практики</dt><dd>77 <span class="app-load__hours">(115 ч 30 мин)</span></dd></div>
+<div class="app-load--lab"><dt><span aria-hidden="true" class="app-load__mark"></span>Лабораторные</dt><dd>0 <span class="app-load__hours">(0 ч)</span></dd></div>
+</dl>
+<div aria-hidden="true" class="app-load__bar"><span class="app-load--lec" style="flex-grow: 70.0"></span><span class="app-load--pr" style="flex-grow: 77.0"></span>
+</div>
+<div class="ir-table-wrap app-scroll">
+<table class="ir-table app-semtable">
+<caption class="sr-only">2 семестр: дисциплины и число пар</caption>
+<thead><tr>
+<th scope="col">Дисциплина</th>
+<th class="ir-num" scope="col" title="Лекции, пар за семестр">Лек</th>
+<th class="ir-num" scope="col" title="Практические занятия, пар за семестр">Пр</th>
+<th class="ir-num" scope="col" title="Лабораторные работы, пар за семестр">Лаб</th>
+<th class="ir-num" scope="col">Пар</th>
+<th scope="col">Контроль</th>
+</tr></thead>
+<tbody>
+<tr class="app-semrow app-cat--prof" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/293/">Системная аналитика</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--it" data-cat="it">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/284/">Проектирование и разработка систем промышленного интернета вещей</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--it" data-cat="it">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/288/">Цифровая трансформация промышленных предприятий</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-52bf0aefc05c/">Анализ и оптимизация сетей и протоколов связи в системах Пот</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-5a6b2ee5d88a/">Индивидуальная образовательная траектория: 31 вариантов на выбор</a></span></span></td>
+<td class="ir-num">14</td><td class="ir-num">14</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">28</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/292/">Методы искусственного интеллекта в теории управления</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/277/">Прикладное применение машинного зрения</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--hum" data-cat="hum">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/265/">Иностранный язык для магистрантов</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">7</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--hum" data-cat="hum">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/266/">Менеджмент непрерывности бизнеса</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--hum" data-cat="hum">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/263/">Проектный менеджмент</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--prof app-semtable__opt" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/279/">Научно-исследовательский семинар</a> <span class="app-chip__tag">факультатив</span></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">7</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--prac" data-cat="prac">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/258/">Производственная практика: научно-исследовательская работа</a></span></span></td>
+<td class="app-semtable__practice" colspan="4">практика · 6 з. е.</td>
+<td class="app-nowrap">ЗаО</td>
+</tr>
+</tbody>
+<tfoot><tr>
+<th scope="row">Итого <span class="app-chip__tag">без факультативов</span></th>
+<td class="ir-num">70</td><td class="ir-num">77</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">147</td><td></td>
+</tr></tfoot>
+</table>
+</div>
+</section>
+<section aria-label="3 семестр из 4" aria-roledescription="слайд" class="app-carousel__slide" role="group">
+<div class="app-course__head">
+<h4 class="item-title app-course__title">3 семестр</h4>
+<span class="app-course__meta">2 курс · 14 учебных недель · 14 дисциплин · 7 экзаменов</span>
+</div>
+<dl class="app-load">
+<div class="app-load__total"><dt>Пар за семестр</dt><dd>231 <span class="app-load__hours">(346 ч 30 мин)</span></dd><span class="app-load__note">≈ 16,5 пары (24 ч 45 мин) в неделю</span></div>
+<div class="app-load--lec"><dt><span aria-hidden="true" class="app-load__mark"></span>Лекции</dt><dd>112 <span class="app-load__hours">(168 ч)</span></dd></div>
+<div class="app-load--pr"><dt><span aria-hidden="true" class="app-load__mark"></span>Практики</dt><dd>119 <span class="app-load__hours">(178 ч 30 мин)</span></dd></div>
+<div class="app-load--lab"><dt><span aria-hidden="true" class="app-load__mark"></span>Лабораторные</dt><dd>0 <span class="app-load__hours">(0 ч)</span></dd></div>
+</dl>
+<div aria-hidden="true" class="app-load__bar"><span class="app-load--lec" style="flex-grow: 112.0"></span><span class="app-load--pr" style="flex-grow: 119.0"></span>
+</div>
+<div class="ir-table-wrap app-scroll">
+<table class="ir-table app-semtable">
+<caption class="sr-only">3 семестр: дисциплины и число пар</caption>
+<thead><tr>
+<th scope="col">Дисциплина</th>
+<th class="ir-num" scope="col" title="Лекции, пар за семестр">Лек</th>
+<th class="ir-num" scope="col" title="Практические занятия, пар за семестр">Пр</th>
+<th class="ir-num" scope="col" title="Лабораторные работы, пар за семестр">Лаб</th>
+<th class="ir-num" scope="col">Пар</th>
+<th scope="col">Контроль</th>
+</tr></thead>
+<tbody>
+<tr class="app-semrow app-cat--prof" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/267/">Инженерия данных</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--prof" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-b6539ed39a25/">Промышленные протоколы и стандарты обмена данных в системах Пот</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--it" data-cat="it">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-74550e2d4385/">Исследование и разработка методов защиты и обеспечения кибербезопасности в Пот</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/291/">Анализ данных</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-5a6b2ee5d88a/">Индивидуальная образовательная траектория: 31 вариантов на выбор</a></span></span></td>
+<td class="ir-num">35</td><td class="ir-num">35</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">70</td>
+<td class="app-nowrap">Экз, Зач, КР</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/268/">Инфографика и визуализация данных</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/295/">Математика для анализа данных</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/289/">Машинное обучение для решения прикладных задач</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач, КР</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/289/">Машинное обучение для решения прикладных задач</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Экз, КР</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-a5592f606506/">На выбор: Пот в интеллектуальной робототехнике или построение цифровых двойников на основе Пот</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-b2c9c1863718/">На выбор: Создание интеллектуальных систем управления логистическими процессами или моделирование бизнес-процессов инновационного предприятия</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-6726070c0b0c/">Проектирование и оптимизация архитектуры систем Пот</a></span></span></td>
+<td class="ir-num">7</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">14</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--hum" data-cat="hum">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/265/">Иностранный язык для магистрантов</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">7</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">7</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--prac" data-cat="prac">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-5a6b2ee5d88a/">Индивидуальная образовательная траектория: 4 вариантов на выбор</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">—</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">—</td>
+<td class="app-nowrap">ЗаО</td>
+</tr>
+<tr class="app-semrow app-cat--prof app-semtable__opt" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/275/">Технологии беспроводной передачи данных</a> <span class="app-chip__tag">факультатив</span></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">—</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">—</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--prac" data-cat="prac">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/258/">Производственная практика: научно-исследовательская работа</a></span></span></td>
+<td class="app-semtable__practice" colspan="4">практика · 6 з. е.</td>
+<td class="app-nowrap">ЗаО</td>
+</tr>
+<tr class="app-semrow app-cat--prac" data-cat="prac">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/261/">Производственная практика: технологическая (проектно-технологическая) практика</a></span></span></td>
+<td class="app-semtable__practice" colspan="4">практика · 6 з. е.</td>
+<td class="app-nowrap">ЗаО</td>
+</tr>
+</tbody>
+<tfoot><tr>
+<th scope="row">Итого <span class="app-chip__tag">без факультативов</span></th>
+<td class="ir-num">112</td><td class="ir-num">119</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">231</td><td></td>
+</tr></tfoot>
+</table>
+</div>
+</section>
+<section aria-label="4 семестр из 4" aria-roledescription="слайд" class="app-carousel__slide" role="group">
+<div class="app-course__head">
+<h4 class="item-title app-course__title">4 семестр</h4>
+<span class="app-course__meta">2 курс · 8 учебных недель · 10 дисциплин · 7 экзаменов</span>
+</div>
+<dl class="app-load">
+<div class="app-load__total"><dt>Пар за семестр</dt><dd>88 <span class="app-load__hours">(132 ч)</span></dd><span class="app-load__note">≈ 11 пар (16 ч 30 мин) в неделю</span></div>
+<div class="app-load--lec"><dt><span aria-hidden="true" class="app-load__mark"></span>Лекции</dt><dd>32 <span class="app-load__hours">(48 ч)</span></dd></div>
+<div class="app-load--pr"><dt><span aria-hidden="true" class="app-load__mark"></span>Практики</dt><dd>56 <span class="app-load__hours">(84 ч)</span></dd></div>
+<div class="app-load--lab"><dt><span aria-hidden="true" class="app-load__mark"></span>Лабораторные</dt><dd>0 <span class="app-load__hours">(0 ч)</span></dd></div>
+</dl>
+<div aria-hidden="true" class="app-load__bar"><span class="app-load--lec" style="flex-grow: 32.0"></span><span class="app-load--pr" style="flex-grow: 56.0"></span>
+</div>
+<div class="ir-table-wrap app-scroll">
+<table class="ir-table app-semtable">
+<caption class="sr-only">4 семестр: дисциплины и число пар</caption>
+<thead><tr>
+<th scope="col">Дисциплина</th>
+<th class="ir-num" scope="col" title="Лекции, пар за семестр">Лек</th>
+<th class="ir-num" scope="col" title="Практические занятия, пар за семестр">Пр</th>
+<th class="ir-num" scope="col" title="Лабораторные работы, пар за семестр">Лаб</th>
+<th class="ir-num" scope="col">Пар</th>
+<th scope="col">Контроль</th>
+</tr></thead>
+<tbody>
+<tr class="app-semrow app-cat--prof" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-045072ca3156/">Мониторинг систем Пот</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">—</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">—</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--prof" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-5cc857c11538/">На выбор: Основные модели данных в аналитической деятельности или социальные аспекты применениях технологии Пот</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">—</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">—</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--prof" data-cat="prof">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/270/">Программная инженерия</a></span></span></td>
+<td class="ir-num">4</td><td class="ir-num">4</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">8</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--it" data-cat="it">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/285/">Разработка интеллектуальных систем контроля качества продукции</a></span></span></td>
+<td class="ir-num">4</td><td class="ir-num">8</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">12</td>
+<td class="app-nowrap">Экз, КР</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/298/">Введение в глубокое обучение</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">—</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">—</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/296/">Введение в обработку естественного языка и анализ текстов</a></span></span></td>
+<td class="ir-num">4</td><td class="ir-num">8</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">12</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-5a6b2ee5d88a/">Индивидуальная образовательная траектория: 31 вариантов на выбор</a></span></span></td>
+<td class="ir-num">16</td><td class="ir-num">28</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">44</td>
+<td class="app-nowrap">Экз, Зач, КР</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/289/">Машинное обучение для решения прикладных задач</a></span></span></td>
+<td class="ir-num">4</td><td class="ir-num">8</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">12</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-2c1e4ed1f380/">На выбор: Введение в глубокое обучение или компьютерное зрение в промышленности</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">—</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">—</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--ai" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/301/">Нейронные сети и их практическое применение</a></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">—</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">—</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--ai app-semtable__opt" data-cat="ai">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/276/">Этические аспекты применения искусственного интеллекта</a> <span class="app-chip__tag">факультатив</span></span></span></td>
+<td class="ir-num">—</td><td class="ir-num">—</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">—</td>
+<td class="app-nowrap">Зач</td>
+</tr>
+<tr class="app-semrow app-cat--prac" data-cat="prac">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/discipline/query-dc63a7270b1d/">Выполнение и защита выпускной квалификационной работы</a></span></span></td>
+<td class="app-semtable__practice" colspan="4">практика · 9 з. е.</td>
+<td class="app-nowrap">Экз</td>
+</tr>
+<tr class="app-semrow app-cat--prac" data-cat="prac">
+<td><span class="app-semtable__name"><span aria-hidden="true" class="app-cat__mark"></span>
+<span><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/260/">Производственная практика: преддипломная практика</a></span></span></td>
+<td class="app-semtable__practice" colspan="4">практика · 6 з. е.</td>
+<td class="app-nowrap">ЗаО</td>
+</tr>
+</tbody>
+<tfoot><tr>
+<th scope="row">Итого <span class="app-chip__tag">без факультативов</span></th>
+<td class="ir-num">32</td><td class="ir-num">56</td><td class="ir-num">—</td>
+<td class="ir-num app-semtable__sum">88</td><td></td>
+</tr></tfoot>
+</table>
+</div>
+</section>
+</div>
+</div>
+<h3 class="card-title app-subhead">Из чего состоит программа</h3>
+<p class="app-lead">Доля категорий в объёме программы (198 з. е. без факультативов).</p>
+<div aria-label="Доля категорий в объёме программы: Профессиональные дисциплины — 12%, Программирование и ИТ — 9%, ИИ и анализ данных — 49%, Языки, гуманитарные и экономика — 7%, Практика, проекты и ВКР — 23%" class="app-shares" role="img">
+<span class="app-shares__part app-cat--prof" style="flex-grow: 23" title="Профессиональные дисциплины: 23 з. е."></span>
+<span class="app-shares__part app-cat--it" style="flex-grow: 18" title="Программирование и ИТ: 18 з. е."></span>
+<span class="app-shares__part app-cat--ai" style="flex-grow: 98" title="ИИ и анализ данных: 98 з. е."></span>
+<span class="app-shares__part app-cat--hum" style="flex-grow: 14" title="Языки, гуманитарные и экономика: 14 з. е."></span>
+<span class="app-shares__part app-cat--prac" style="flex-grow: 45" title="Практика, проекты и ВКР: 45 з. е."></span>
+</div>
+<ul aria-hidden="true" class="app-shares-legend">
+<li class="app-cat--prof"><span class="app-cat__mark"></span><span class="app-shares-legend__title">Профессиональные дисциплины</span><b>12%</b></li>
+<li class="app-cat--it"><span class="app-cat__mark"></span><span class="app-shares-legend__title">Программирование и ИТ</span><b>9%</b></li>
+<li class="app-cat--ai"><span class="app-cat__mark"></span><span class="app-shares-legend__title">ИИ и анализ данных</span><b>49%</b></li>
+<li class="app-cat--hum"><span class="app-cat__mark"></span><span class="app-shares-legend__title">Языки, гуманитарные и экономика</span><b>7%</b></li>
+<li class="app-cat--prac"><span class="app-cat__mark"></span><span class="app-shares-legend__title">Практика, проекты и ВКР</span><b>23%</b></li>
+</ul>
+</section>
+<section aria-labelledby="h-kug" class="app-section" id="kug">
+<h2 class="section-title" id="h-kug">Календарный учебный график</h2>
+<p class="app-lead">На 2026/2027 учебный год. У каждого курса строки по дням недели, колонки — недели, в ячейке — вид деятельности в этот день. Таблица прокручивается по горизонтали.</p>
+<div aria-label="Календарный учебный график 2026/2027" class="ir-table-wrap app-scroll" role="region" tabindex="0">
+<table class="app-kug">
+<caption class="sr-only">Календарный учебный график на 2026/2027 учебный год</caption>
+<thead>
+<tr>
+<th class="app-kug__course" rowspan="9" scope="col"><span class="app-kug__vertical">Курс</span></th>
+<th class="app-kug__group" rowspan="9" scope="col">Набор</th>
+<td class="app-kug__day"></td><th class="app-kug__month" colspan="5" scope="colgroup">Сентябрь</th><th class="app-kug__month" colspan="4" scope="colgroup">Октябрь</th><th class="app-kug__month" colspan="4" scope="colgroup">Ноябрь</th><th class="app-kug__month" colspan="5" scope="colgroup">Декабрь</th><th class="app-kug__month" colspan="4" scope="colgroup">Январь</th><th class="app-kug__month" colspan="4" scope="colgroup">Февраль</th><th class="app-kug__month" colspan="5" scope="colgroup">Март</th><th class="app-kug__month" colspan="4" scope="colgroup">Апрель</th><th class="app-kug__month" colspan="4" scope="colgroup">Май</th><th class="app-kug__month" colspan="5" scope="colgroup">Июнь</th><th class="app-kug__month" colspan="4" scope="colgroup">Июль</th><th class="app-kug__month" colspan="5" scope="colgroup">Август</th>
+</tr>
+<tr class="app-kug__dates">
+<th class="app-kug__day" scope="row">пн</th><td class="app-kug__out-date">31</td><td>7</td><td>14</td><td>21</td><td>28</td><td>5</td><td>12</td><td>19</td><td>26</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>7</td><td>14</td><td>21</td><td>28</td><td>4</td><td>11</td><td>18</td><td>25</td><td>1</td><td>8</td><td>15</td><td>22</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>5</td><td>12</td><td>19</td><td>26</td><td>3</td><td>10</td><td>17</td><td>24</td><td>31</td><td>7</td><td>14</td><td>21</td><td>28</td><td>5</td><td>12</td><td>19</td><td>26</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td>
+</tr>
+<tr class="app-kug__dates">
+<th class="app-kug__day" scope="row">вт</th><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>6</td><td>13</td><td>20</td><td>27</td><td>3</td><td>10</td><td>17</td><td>24</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>5</td><td>12</td><td>19</td><td>26</td><td>2</td><td>9</td><td>16</td><td>23</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>6</td><td>13</td><td>20</td><td>27</td><td>4</td><td>11</td><td>18</td><td>25</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>6</td><td>13</td><td>20</td><td>27</td><td>3</td><td>10</td><td>17</td><td>24</td><td>31</td>
+</tr>
+<tr class="app-kug__dates">
+<th class="app-kug__day" scope="row">ср</th><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>7</td><td>14</td><td>21</td><td>28</td><td>4</td><td>11</td><td>18</td><td>25</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>6</td><td>13</td><td>20</td><td>27</td><td>3</td><td>10</td><td>17</td><td>24</td><td>3</td><td>10</td><td>17</td><td>24</td><td>31</td><td>7</td><td>14</td><td>21</td><td>28</td><td>5</td><td>12</td><td>19</td><td>26</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>7</td><td>14</td><td>21</td><td>28</td><td>4</td><td>11</td><td>18</td><td>25</td><td class="app-kug__out-date">1</td>
+</tr>
+<tr class="app-kug__dates">
+<th class="app-kug__day" scope="row">чт</th><td>3</td><td>10</td><td>17</td><td>24</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>5</td><td>12</td><td>19</td><td>26</td><td>3</td><td>10</td><td>17</td><td>24</td><td>31</td><td>7</td><td>14</td><td>21</td><td>28</td><td>4</td><td>11</td><td>18</td><td>25</td><td>4</td><td>11</td><td>18</td><td>25</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>6</td><td>13</td><td>20</td><td>27</td><td>3</td><td>10</td><td>17</td><td>24</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>5</td><td>12</td><td>19</td><td>26</td><td class="app-kug__out-date">2</td>
+</tr>
+<tr class="app-kug__dates">
+<th class="app-kug__day" scope="row">пт</th><td>4</td><td>11</td><td>18</td><td>25</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>6</td><td>13</td><td>20</td><td>27</td><td>4</td><td>11</td><td>18</td><td>25</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>5</td><td>12</td><td>19</td><td>26</td><td>5</td><td>12</td><td>19</td><td>26</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>7</td><td>14</td><td>21</td><td>28</td><td>4</td><td>11</td><td>18</td><td>25</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>6</td><td>13</td><td>20</td><td>27</td><td class="app-kug__out-date">3</td>
+</tr>
+<tr class="app-kug__dates">
+<th class="app-kug__day" scope="row">сб</th><td>5</td><td>12</td><td>19</td><td>26</td><td>3</td><td>10</td><td>17</td><td>24</td><td>31</td><td>7</td><td>14</td><td>21</td><td>28</td><td>5</td><td>12</td><td>19</td><td>26</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>6</td><td>13</td><td>20</td><td>27</td><td>6</td><td>13</td><td>20</td><td>27</td><td>3</td><td>10</td><td>17</td><td>24</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>5</td><td>12</td><td>19</td><td>26</td><td>3</td><td>10</td><td>17</td><td>24</td><td>31</td><td>7</td><td>14</td><td>21</td><td>28</td><td class="app-kug__out-date">4</td>
+</tr>
+<tr class="app-kug__dates app-kug__dates--sun">
+<th class="app-kug__day" scope="row">вс</th><td>6</td><td>13</td><td>20</td><td>27</td><td>4</td><td>11</td><td>18</td><td>25</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td>6</td><td>13</td><td>20</td><td>27</td><td>3</td><td>10</td><td>17</td><td>24</td><td>31</td><td>7</td><td>14</td><td>21</td><td>28</td><td>7</td><td>14</td><td>21</td><td>28</td><td>4</td><td>11</td><td>18</td><td>25</td><td>2</td><td>9</td><td>16</td><td>23</td><td>30</td><td>6</td><td>13</td><td>20</td><td>27</td><td>4</td><td>11</td><td>18</td><td>25</td><td>1</td><td>8</td><td>15</td><td>22</td><td>29</td><td class="app-kug__out-date">5</td>
+</tr>
+<tr class="app-kug__weeks">
+<td class="app-kug__day"></td><th class="app-kug__week" scope="col">1</th><th class="app-kug__week" scope="col">2</th><th class="app-kug__week" scope="col">3</th><th class="app-kug__week" scope="col">4</th><th class="app-kug__week" scope="col">5</th><th class="app-kug__week" scope="col">6</th><th class="app-kug__week" scope="col">7</th><th class="app-kug__week" scope="col">8</th><th class="app-kug__week" scope="col">9</th><th class="app-kug__week" scope="col">10</th><th class="app-kug__week" scope="col">11</th><th class="app-kug__week" scope="col">12</th><th class="app-kug__week" scope="col">13</th><th class="app-kug__week" scope="col">14</th><th class="app-kug__week" scope="col">15</th><th class="app-kug__week" scope="col">16</th><th class="app-kug__week" scope="col">17</th><th class="app-kug__week" scope="col">18</th><th class="app-kug__week" scope="col">19</th><th class="app-kug__week" scope="col">20</th><th class="app-kug__week" scope="col">21</th><th class="app-kug__week" scope="col">22</th><th class="app-kug__week" scope="col">23</th><th class="app-kug__week" scope="col">24</th><th class="app-kug__week" scope="col">25</th><th class="app-kug__week" scope="col">26</th><th class="app-kug__week" scope="col">27</th><th class="app-kug__week" scope="col">28</th><th class="app-kug__week" scope="col">29</th><th class="app-kug__week" scope="col">30</th><th class="app-kug__week" scope="col">31</th><th class="app-kug__week" scope="col">32</th><th class="app-kug__week" scope="col">33</th><th class="app-kug__week" scope="col">34</th><th class="app-kug__week" scope="col">35</th><th class="app-kug__week" scope="col">36</th><th class="app-kug__week" scope="col">37</th><th class="app-kug__week" scope="col">38</th><th class="app-kug__week" scope="col">39</th><th class="app-kug__week" scope="col">40</th><th class="app-kug__week" scope="col">41</th><th class="app-kug__week" scope="col">42</th><th class="app-kug__week" scope="col">43</th><th class="app-kug__week" scope="col">44</th><th class="app-kug__week" scope="col">45</th><th class="app-kug__week" scope="col">46</th><th class="app-kug__week" scope="col">47</th><th class="app-kug__week" scope="col">48</th><th class="app-kug__week" scope="col">49</th><th class="app-kug__week" scope="col">50</th><th class="app-kug__week" scope="col">51</th><th class="app-kug__week" scope="col">52</th><th class="app-kug__week" scope="col"></th>
+</tr>
+</thead>
+<tbody class="app-kug__block">
+<tr>
+<th class="app-kug__course" rowspan="6" scope="rowgroup">1</th>
+<th class="app-kug__group" rowspan="6" scope="rowgroup">ЦИИПм-26</th>
+<th class="app-kug__day" scope="row">пн</th><td class="app-kug__cell app-kug--out"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">вт</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">ср</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--out"></td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">чт</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--out"></td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">пт</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--out"></td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">сб</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--u">У</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--out"></td>
+</tr>
+</tbody>
+<tbody class="app-kug__block">
+<tr>
+<th class="app-kug__course" rowspan="6" scope="rowgroup">2</th>
+<th class="app-kug__group" rowspan="6" scope="rowgroup">ЦИПм-25</th>
+<th class="app-kug__day" scope="row">пн</th><td class="app-kug__cell app-kug--out"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">вт</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">ср</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--out"></td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">чт</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--out"></td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">пт</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--out"></td>
+</tr>
+<tr>
+<th class="app-kug__day" scope="row">сб</th><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--p">П</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--t"></td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--e">Э</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--p">Пд</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--h">*</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--d">Д</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--k">К</td><td class="app-kug__cell app-kug--out"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul class="app-kug-legend">
+<li><span aria-hidden="true" class="app-kug__cell app-kug--t"></span>теоретическое обучение</li>
+<li><span aria-hidden="true" class="app-kug__cell app-kug--e">Э</span>«Э» — экзаменационная сессия</li>
+<li><span aria-hidden="true" class="app-kug__cell app-kug--u">У</span>«У» — учебная практика</li>
+<li><span aria-hidden="true" class="app-kug__cell app-kug--p">П</span>«П» — производственная практика</li>
+<li><span aria-hidden="true" class="app-kug__cell app-kug--p">Пд</span>«Пд» — производственная (преддипломная) практика</li>
+<li><span aria-hidden="true" class="app-kug__cell app-kug--d">Д</span>«Д» — выполнение и защита ВКР</li>
+<li><span aria-hidden="true" class="app-kug__cell app-kug--k">К</span>«К» — каникулы</li>
+<li><span aria-hidden="true" class="app-kug__cell app-kug--h">*</span>«*» — нерабочие праздничные дни</li>
+<li><span aria-hidden="true" class="app-kug__cell app-kug--out"></span>обучение не ведётся</li>
+</ul>
+</section>
+<section aria-labelledby="h-praktiki" class="app-section" id="praktiki">
+<h2 class="section-title" id="h-praktiki">Практики</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<thead><tr><th scope="col">Практика</th><th class="ir-num" scope="col">Семестр</th><th class="ir-num" scope="col">Недель</th><th scope="col">Кратко</th></tr></thead>
+<tbody>
+<tr>
+<td><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/257/">Учебная практика: технологическая (проектно-технологическая) практика</a></td>
+<td class="ir-num">1</td>
+<td class="ir-num">4</td>
+<td class="ir-muted app-small">—</td>
+</tr>
+<tr>
+<td><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/258/">Производственная практика: научно-исследовательская работа</a></td>
+<td class="ir-num">2</td>
+<td class="ir-num">4</td>
+<td class="ir-muted app-small">—</td>
+</tr>
+<tr>
+<td><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/259/">Производственная практика: научно-исследовательская работа</a></td>
+<td class="ir-num">3</td>
+<td class="ir-num">4</td>
+<td class="ir-muted app-small">—</td>
+</tr>
+<tr>
+<td><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/261/">Производственная практика: технологическая (проектно-технологическая) практика</a></td>
+<td class="ir-num">3</td>
+<td class="ir-num">4</td>
+<td class="ir-muted app-small">—</td>
+</tr>
+<tr>
+<td><a class="ir-link" href="/robo-study/op/09.04.02-cpp-2026-och/doc/260/">Производственная практика: преддипломная практика</a></td>
+<td class="ir-num">4</td>
+<td class="ir-num">4</td>
+<td class="ir-muted app-small">—</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section aria-labelledby="h-gia" class="app-section" id="gia">
+<h2 class="section-title" id="h-gia">Государственная итоговая аттестация</h2>
+<p class="app-empty">Программа ГИА пока не опубликована.</p>
+</section>
+<section aria-labelledby="h-docs" class="app-section" id="docs">
+<h2 class="section-title" id="h-docs">Исходные документы</h2>
+<ul class="app-docs">
+<li class="app-doc">
+<span class="app-doc__type"><span class="ir-tag ir-tag--outline" title="УП">УП</span></span>
+<span class="app-doc__main">
+<a class="ir-link ir-doclink" href="https://app.istu.edu/oop/uploads/files/%D0%A6%D0%9F%D0%9F%D0%BC-26/%D0%A3%D1%87%D0%B5%D0%B1%D0%BD%D1%8B%D0%B9_%D0%BF%D0%BB%D0%B0%D0%BD_%D0%A6%D0%9F%D0%9F%D0%BC-26.pdf">Учебный план</a>
+</span>
+</li>
+<li class="app-doc">
+<span class="app-doc__type"><span class="ir-tag ir-tag--outline" title="КУГ">КУГ</span></span>
+<span class="app-doc__main">
+<a class="ir-link ir-doclink" href="https://app.istu.edu/oop/uploads/files/%D0%A6%D0%9F%D0%9F%D0%BC-26/%D0%9A%D0%B0%D0%BB%D0%B5%D0%BD%D0%B4%D0%B0%D1%80%D0%BD%D1%8B%D0%B9_%D1%83%D1%87%D0%B5%D0%B1%D0%BD%D1%8B%D0%B9_%D0%B3%D1%80%D0%B0%D1%84%D0%B8%D0%BA_%D0%A6%D0%9F%D0%9F%D0%BC-26.pdf">Календарный учебный график</a>
+</span>
+</li>
+<li class="app-doc">
+<span class="app-doc__type"><span class="ir-tag ir-tag--outline" title="ООП">ООП</span></span>
+<span class="app-doc__main">
+<a class="ir-link ir-doclink" href="https://app.istu.edu/oop/uploads/files/%D0%A6%D0%9F%D0%9F%D0%BC-26/%D0%9E%D0%9E%D0%9F_%D0%A6%D0%9F%D0%9F%D0%BC-26.pdf">Основная образовательная программа</a>
+</span>
+</li>
+<li class="app-doc">
+<span class="app-doc__type"><span class="ir-tag ir-tag--outline" title="РПД">РПД</span></span>
+<span class="app-doc__main">
+<a class="ir-link" href="#up">Рабочие программы дисциплин — 42</a>
+</span>
+</li>
+<li class="app-doc">
+<span class="app-doc__type"><span class="ir-tag ir-tag--outline" title="Практика">Практика</span></span>
+<span class="app-doc__main">
+<a class="ir-link" href="#praktiki">Рабочие программы практик — 5</a>
+</span>
+</li>
+<li class="app-doc">
+<span class="app-doc__type"><span class="ir-tag ir-tag--outline" title="ФОС ГИА">ФОС ГИА</span></span>
+<span class="app-doc__main">
+<a class="ir-link ir-doclink" href="https://app.istu.edu/oop/uploads/files/%D0%A6%D0%9F%D0%9F%D0%BC-26/%D0%A4%D0%9E%D0%A1_%D0%93%D0%98%D0%90_%D0%A6%D0%9F%D0%9F%D0%BC-26.pdf">Фонд оценочных средств ГИА</a>
+</span>
+</li>
+<li class="app-doc">
+<span class="app-doc__type"><span class="ir-tag ir-tag--outline" title="ГИА">ГИА</span></span>
+<span class="app-doc__main">
+<a class="ir-link ir-doclink" href="https://app.istu.edu/oop/uploads/files/%D0%A6%D0%9F%D0%9F%D0%BC-26/%D0%9F%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B0_%D0%93%D0%98%D0%90_%D0%A6%D0%9F%D0%9F%D0%BC-26.pdf">Программа государственной итоговой аттестации</a>
+</span>
+</li>
+</ul>
+</section>
+<section class="app-section"><h2 class="card-title">Другие сохранённые документы</h2><ul class="app-list"><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/252/">Учебный план</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/253/">Календарный учебный график</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/254/">ООП</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/255/">ФОС ГИА</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/256/">Программа ГИА</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/269/">Моделирование бизнес-процессов инновационного предприятия</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/271/">Анализ и оптимизация сетей и протоколов связи в системах IIoT</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/272/">Исследование и разработка методов защиты и обеспечения кибербезопасности в IIoT</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/273/">Построение цифровых двойников на основе IIoT</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/274/">Мониторинг систем IIoT</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/278/">Создание интеллектуальных систем управления логистическими процессами</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/280/">Промышленные протоколы и стандарты обмена данных в системах IIoT</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/281/">Проектирование и оптимизация архитектуры систем IIoT</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/282/">IIoT в интеллектуальной робототехнике</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/283/">Социальные аспекты применениях технологии IIoT</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/290/">Машинное обучение для решения прикладных задач</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/297/">Компьютерное зрение в промышленности</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/299/">Введение в глубокое обучение</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/300/">Основные модели данных в аналитической деятельности</a></li><li><a href="/robo-study/op/09.04.02-cpp-2026-och/doc/303/">Основы программирования и анализа данных на Python</a></li></ul></section></div>
+<aside class="app-aside">
+<nav aria-label="Программа" class="ir-snav" data-scrollspy="">
+<div class="ir-snav__title">Программа</div>
+<ul>
+<li class="ir-snav__item is-active"><a aria-current="true" href="#svedeniya">Сведения о программе</a></li>
+<li class="ir-snav__item"><a href="#up">Учебный план</a></li>
+<li class="ir-snav__item"><a href="#kug">Календарный учебный график</a></li>
+<li class="ir-snav__item"><a href="#praktiki">Практики</a></li>
+<li class="ir-snav__item"><a href="#gia">ГИА</a></li>
+<li class="ir-snav__item"><a href="#docs">Исходные документы</a></li>
+</ul>
+</nav>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+          Страница обновлена 04.11.2026.
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+<script>
+  (function () {
+    var nav = document.querySelector('[data-scrollspy]');
+    if (!nav || !('IntersectionObserver' in window)) return;
+    var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+    var byId = {};
+    links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+    function activate(id) {
+      links.forEach(function (a) {
+        var on = a === byId[id];
+        a.parentNode.classList.toggle('is-active', on);
+        if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      });
+    }
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) activate(e.target.id); });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    Object.keys(byId).forEach(function (id) { var el = document.getElementById(id); if (el) obs.observe(el); });
+  })();
+
+  // Карусель семестров: переключатель семестров, стрелки, клавиши ← →; без скрипта остаётся прокрутка
+  (function () {
+    var root = document.querySelector('[data-carousel]');
+    if (!root) return;
+    var track = root.querySelector('[data-track]');
+    var slides = Array.prototype.slice.call(track.children);
+    var tabs = Array.prototype.slice.call(root.querySelectorAll('[data-go]'));
+    var bar = root.querySelector('[data-carousel-bar]');
+    var current = 0;
+    bar.hidden = false;
+    function show(i, smooth) {
+      current = Math.max(0, Math.min(slides.length - 1, i));
+      track.scrollTo({ left: slides[current].offsetLeft - track.offsetLeft, behavior: smooth === false ? 'auto' : 'smooth' });
+      mark();
+    }
+    // высота карусели — по текущему семестру, а не по самому длинному
+    function fit() { track.style.height = slides[current].offsetHeight + 'px'; }
+    window.addEventListener('resize', fit);
+    function mark() {
+      fit();
+      tabs.forEach(function (t, k) { if (k === current) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
+      root.querySelector('[data-prev]').disabled = current === 0;
+      root.querySelector('[data-next]').disabled = current === slides.length - 1;
+    }
+    tabs.forEach(function (t) { t.addEventListener('click', function () { show(+t.dataset.go); }); });
+    root.querySelector('[data-prev]').addEventListener('click', function () { show(current - 1); });
+    root.querySelector('[data-next]').addEventListener('click', function () { show(current + 1); });
+    track.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(current - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); show(current + 1); }
+    });
+    var timer;
+    track.addEventListener('scroll', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        var i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+        if (i !== current) { current = i; mark(); }
+      }, 80);
+    });
+    mark();
+
+    // фильтр категорий: скрывает дисциплины выключенных категорий во всех семестрах
+    var filter = document.querySelector('[data-catfilter]');
+    if (!filter) return;
+    filter.hidden = false;
+    filter.querySelectorAll('[data-cat]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var on = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        root.querySelectorAll('[data-cat="' + b.dataset.cat + '"]').forEach(function (c) { c.hidden = !on; });
+        fit();
+      });
+    });
+  })();
+</script>
+</body>
+</html>

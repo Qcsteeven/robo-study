@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>ООП — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">ООП</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">ООП</h1>
+<div class="ir-pagehead__meta"><span>Основная образовательная программа</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Квалификация</dt><dd>инженер</dd><dt>Срок обучения</dt><dd>5,5 лет</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Области профессиональной деятельности</h2>
+<ul class="app-list">
+<li>Авиастроение (в сферах проектирования, конструирования, исследования и производства летательных аппаратов, способных устойчиво перемещаться в атмосфере и транспортировать различные грузы в соответствии с целевым назначением)
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Типы задач</h2>
+<ul class="app-list">
+<li>проектно-конструкторские
+
+        </li><li>производственно-технологические
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Компетенции выпускника</h2>
+<ul class="app-list">
+<li>УК-1 — Способен осуществлять | Выполняет поиск информации о проблемной критическое мышление критический анализ | ситуации, проводит аргументированный проблемных ситуаций на основе | критический анализ проблемной ситуации, системного подхода, | предлагает стратегию действий на основе вырабатывать стратегию
+
+        </li><li>УК-3 — Способен организовывать | Организует и руководит работой в команде, и руководить работой команды, | вырабатывает командную стратегию Командная работа 4H | вырабатывая командную | достижения поставленной цели, и контролирует лидерство стратегию для достижения | ее достижение, используя основные спосо
+
+        </li><li>УК-5 — Способен анализировать и | Понимает и адекватно воспринимает учитывать разнообразие культур | межкультурное разнообразие общества, Межкультурное в процессе межкультурного | комплексно анализирует причины и последствия взаимодействие взаимодействия культурных различий, знает и учитывает особенности р
+
+        </li><li>УК-7 — Способен поддерживать | Применяет на практике средства и методы Самоорганизация и | должный уровень физической | физической культуры для сохранения и саморазвитие (в том | подготовленности для | укрепления здоровья, личного физического числе обеспечения полноценной | совершенствования, ведения здоро
+
+        </li><li>УК-9 — Способен использовать | Владеет навыками взаимодействия с людьми с компетентность базовые дефектологические | ограниченными возможностями здоровья, знает знания в социальной и | принципы организации инклюзивной среды в профессиональной сферах социальной и профессиональной сферах
+
+        </li><li>УК-11 — Способен формировать | Имеет представление об основных принципах, нетерпимое отношение к | направлениях противодействия экстремизму, проявлениям экстремизма, | терроризму, коррупции и мерах их терроризма, коррупционному | профилактики поведению и противодействовать ИМ B профессиональной деятельности
+
+        </li><li>ОПК-1 — Способен применять Применяет естественнонаучные и естественнонаучные и общеинженерные, | общеинженерные знания, методы знания, методы математического анализа | математического анализа и и моделирования, теоретического и моделирования, теоретического и экспериментального исследования для эксперимента
+
+        </li><li>ОПК-2 — Способен понимать принципы Понимает принципы работы работы современных информационных современных информационных технологий и использовать их для технологий и использует их для решения задач профессиональной решения задач профессиональной деятельности деятельности
+
+        </li><li>ОПК-4 — Способен осуществлять Осуществляет профессиональную профессиональную деятельность с деятельность с учётом ограничений, в учётом ограничений, в том числе том числе экономических, экономических, экологических и экологических, социальных, на всех социальных, на всех этапах жизненного этапах жизненного
+
+        </li><li>ОПК-5 — Способен разрабатывать Разрабатывает физические и физические и математические модели математические модели исследуемых исследуемых процессов, явлений и процессов, явлений и объектов, объектов, относящихся к относящихся к профессиональной профессиональной сфере деятельности сфере деятельности для реш
+
+        </li><li>ОПК-7 — Способен критически и системно | Критически и системно анализирует анализировать достижения авиационной | достижения авиационной отрасли и отрасли и способы их применения в способы их применения в профессиональном контексте профессиональном контексте |
+
+        </li><li>ПК-1 — Способность | Участвует в | 32.002: H/01.7
+
+        </li><li>ПК-2 — Способность | Участвует в | 32.003: D/01.7
+
+        </li><li>ПК-3 — Способность | Проводит 32.002: H/01.7
+
+        </li><li>ПК-4 — Способность | Разрабатывает 32.002: H/02.7
+
+        </li><li>ПК-5 — Способность | Участвует в | 32.002: H/02.7
+
+        </li><li>ПК-6 — Способность | Разрабатывает 32.003: D/02.7
+
+        </li><li>ПК-7 — Способность | Участвует в | 32.003: D/02.7
+
+        </li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Основная образовательная программа</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">14</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/files/%D0%A1%D0%9C-26/%D0%9E%D0%9E%D0%9F_%D0%A1%D0%9C-26.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

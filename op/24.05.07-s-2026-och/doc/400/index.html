@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Аэродинамика — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Аэродинамика</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестры</dt><dd>5, 6</dd><dt>Трудоёмкость</dt><dd>7 з. е. · 252 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 48 ч, лабораторные 64 ч</dd><dt>Самостоятельная работа</dt><dd>140 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет с оценкой, Зачет, Курсовая работа</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Основные постулаты аэродинамики</span>
+<span class="app-topics__text">Роль отечественных ученых и конструкторов в создании авиационной техники. Методы исследования задач аэродинамики. Постулаты обращенного движения и гипотеза сплошности. Локальный метод Эйлера и субстанциальный метод Лагранж</span>
+</li>
+<li><span class="app-topics__title">Уравнения динамики идеальной жидкости</span>
+<span class="app-topics__text">Уравнения неразрывности. Расход и средняя скорость. Уравнения Бернулли. Дифференциальные уравнения динамики невязкой жидкости в форме Эйлера</span>
+</li>
+<li><span class="app-topics__title">Вихревые движения жидкости. Циркуляция скорости</span>
+<span class="app-topics__text">Вихревая линия, вихревая трубка, вихревой шнур.Теорема Стокса и теорема Гельмгольца. Поле скоростей около вихревого шнура</span>
+</li>
+<li><span class="app-topics__title">Лобовое сопротивление и подъемная сила крыла</span>
+<span class="app-topics__text">Лобовое сопротивление цилиндрического тела. Парадокс Эйлера - Даламбера. Теорема Жуковского о подъемной силе крыла</span>
+</li>
+<li><span class="app-topics__title">Основы теории течения вязкой жидкости</span>
+<span class="app-topics__text">Уравнения динамики вязкой жидкости Навье-Стокса. Частные случаи уравнения Навье-Стокса для несжимаемой жидкости и для потенциального потока несжимаемой жидкости</span>
+</li>
+<li><span class="app-topics__title">Элементы теории подобия. Метод размерностей</span>
+<span class="app-topics__text">Критерии подобия потоков. Геометрическое,кинематическое и динамическое подобие. Числа Эйлера, Фруда, Рейнольдса. Размерности физических параметров. Метод размерностей</span>
+</li>
+<li><span class="app-topics__title">Пограничный слой</span>
+<span class="app-topics__text">Ламинарный и турбулентный режимы течения жидкостей. Профиль скоростей в ламинарном погранслое на плоской пластине. Турбулентный погранслой. Толщина вытеснения</span>
+</li>
+<li><span class="app-topics__title">Аэродинамические коэффициенты и качество профиля</span>
+<span class="app-topics__text">Аэродинамическая сила и момент крыла. Аэродинамические коэффициенты и качество профиля. Распределение давления по профилю.Зависимость аэродинамических коэффициентов от угла атаки</span>
+</li>
+<li><span class="app-topics__title">Поляра первого рода</span>
+<span class="app-topics__text">Зависимость коэффициента подъемной силы и коэффициента лобового сопротивления. Центр давления. Фокус профиля. Геометрические характеристики крыла</span>
+</li>
+<li><span class="app-topics__title">Вихревая схема крыла конечного размаха</span>
+<span class="app-topics__text">Аэродинамическая модель и вихревая схема крыла конечного размаха. Скос потока у крыла.Индуктивное сопротивление</span>
+</li>
+<li><span class="app-topics__title">Механизация крыла</span>
+<span class="app-topics__text">Назначение механизации крыла. Механизация передней кромки. Предкрылки и их эффективность. Механизация задней кромки.Щиток, закрылок. Интерцептор</span>
+</li>
+<li><span class="app-topics__title">Подъемная сила и лобовое сопротивление самолета в дозвуковом потоке</span>
+<span class="app-topics__text">Подъемная сила тел вращения. Сопротивление тел вращения. Аэродинамическая интерференция частей самолета. Лобовое сопротивление и подъемная сила самолета в дозвуковом потоке</span>
+</li>
+<li><span class="app-topics__title">Особенности аэродинамики винтов самолета и вертолета</span>
+<span class="app-topics__text">Аэродинамика винта самолета. Особенности работы несущего винта вертолета. Влияние косой обдувки на аэродинамику винта. Аэродинамические характеристики несущего винта</span>
+</li>
+<li><span class="app-topics__title">Основные уравнения газовой динамики</span>
+<span class="app-topics__text">Уравнение Бернулли для течения идеального газа. Характерные скорости при течении газов. Зависимость параметров состояния газа от скорости его течения. Удельный расход газа.Режимы течения газа в сверхзвуковых соплах</span>
+</li>
+<li><span class="app-topics__title">Уравнения течения газа через поверхность скачка уплотнения</span>
+<span class="app-topics__text">Ударная волна. Скачек уплотнения. Прямые и косые скачки уплотнения. Уравнение неразрывности для косого скачка уплотнения. Уравнение импульсов и уравнение энергии для течения идеального газа</span>
+</li>
+<li><span class="app-topics__title">Ударная поляра</span>
+<span class="app-topics__text">Скорость газа за скачком уплотнения. Соотношение нормальных скоростей газа до и после скачка уплотнения. Прямой скачек уплотнения. Годограф вектора скорости за скачком уплотнения. Обтеканием клина сверхзвуковым потоком</span>
+</li>
+<li><span class="app-topics__title">Пластина и стреловидное крыло в сверхзвуковом потоке</span>
+<span class="app-topics__text">Поворот потока на малый угол. Тонкий профиль в сверхзвуковом потоке. Аэродинамические характеристики профиля в сверхзвуковом потоке.Скользящее и стреловидное крылья и их аэродинамические характеристики</span>
+</li>
+<li><span class="app-topics__title">Аэродинамика самолета в сверхзвуковом потоке</span>
+<span class="app-topics__text">Тело вращения в сверхзвуковом потоке. Лобовое сопротивление и подъемная сила самолета при сверхзвуковых скоростях полета</span>
+</li>
+<li><span class="app-topics__title">Основы аэродинамика разреженной среды</span>
+<span class="app-topics__text">Пределы применимости теории движения сплошной среды. Схема взаимодействия молекул с поверхностью в свободномолекулярном потоке. Аэродинамическая сила в свободномолекулярном потоке</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Определение поля статических и динамических давлений в рабочей части аэродинамической трубы</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Тарировка приёмника воздушного давления</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Определение степени начальной турбулентности по методу перепада давления на поверхности шара</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Исследование силового воздействия воздушного потока на шар</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Определение основных аэродинамических характеристик крыла</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Влияние предкрылка на основные аэродинамические характеристики крыла</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Исследование аэродинамических характеристик крыла с убранными и выпущенными закрылками</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Влияние обледенения крыла на его аэродинамические характеристики</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Моделирование течения воды в шаровом кране</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Моделирование сопряженного теплообмена</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Моделирование обтекания цилиндра</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Исследование пограничного слоя на продольно обтекаемой пластине</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Сверхзвуковое обтекания конуса на различных углах атаки</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Моделирование кавитации в трубопроводе</td><td class="ir-num app-nowrap">6 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Написание курсового проекта (работы)</td><td class="ir-num app-nowrap">40 ч</td></tr><tr><td>Оформление отчетов по лабораторным и практическим работам</td><td class="ir-num app-nowrap">10 ч</td></tr><tr><td>Подготовка к зачёту</td><td class="ir-num app-nowrap">20 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">10 ч</td></tr><tr><td>Оформление отчетов по лабораторным и практическим работам</td><td class="ir-num app-nowrap">20 ч</td></tr><tr><td>Подготовка к зачёту</td><td class="ir-num app-nowrap">20 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">20 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ОПК-1 — Способен применять естественнонаучные и общеинженерные знания, методы математического анализа и моделирования, теоретического и экспериментального исследования для решения инженерных задач профессиональной деятельности
+
+        </li><li>ПК-3 — Способность и готовность к проведению проектировочных расчётов аэродинамики, динамики полёта, прочности и экономики проектируемой авиационной техники
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать основные понятия, законы и модели аэромеханики, основные аэродинамические характеристики летательных аппаратов и методы их расчета
+
+        </li><li>Уметь применять знания аэродинамики для решения практических задач и анализа аэродинамических характеристик летательных аппаратов; осуществлять расчеты лобового сопротивления и подъемной силы самолета, построение поляры самолета
+
+        </li><li>Владеть навыками применения известных методик расчета аэродинамических характеристик самолета
+
+        </li><li>Знать основные понятия, законы и модели аэромеханики, основные аэродинамические характеристики сверхзвуковых летательных аппаратов и методы их расчета
+
+        </li><li>Уметь применять знания аэродинамики для решения практических задач и анализа различных эксплуатационных факторов, влияющих на аэродинамические характеристики сверхзвуковых летательных
+
+        </li><li>Владеть навыками применения известных методик расчета аэродинамических характеристик сверхзвуковых самолета
+
+        </li><li>Знать основные понятия, законы и модели аэромеханики, основные аэродинамические характеристики элементов летательных аппаратов и методы их расчета
+
+        </li><li>Уметь применять знания аэродинамики для решения практических задач расчета аэродинамических характеристик элементов летательных аппаратов
+
+        </li><li>Владеть навыками применения известных методик расчета аэродинамических характеристик элементов самолета
+
+        </li><li>Уметь применять знания аэродинамики для решения практических задач расчета аэродинамических характеристик летательных аппаратов
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Хрюкина Р. Ф. Аэродинамика. Аэромеханика : лаб. практикум / Р. Ф. Хрюкина, М. Г. Соболева, А. А. Лодыгин, 2007. - 63. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-1581.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-1581.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 14</span>
+</li><li>Мхитарян А. М. Аэродинамика : учеб. для авиац. специальностей вузов / А. М. Мхитарян, 1976. - 446.
+
+        </li><li>Фабрикант Н. Я. Аэродинамика : общ. курс / Н. Я. Фабрикант, 1964. - 814.
+
+        </li><li>Петров Константин Павлович. Аэродинамика элементов летательных аппаратов / Константин Павлович Петров, 1985. - 271.
+
+        </li><li>Краснов. Аэродинамика : учебник для втузов. Ч. 1 : Основные теории. Аэродинамика профиля и крыла, 1976. - 383.
+
+        </li><li>Краснов. Аэродинамика : учебник для втузов. Ч. 2 : Методы аэродинамического расчета, 1976. - 368.
+
+        </li><li>Краснов. Аэродинамика : учебник. Ч. 1 : Основы теории. Аэродинамика профиля и крыла, 2015. - 496.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 14</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 14</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 14</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 14</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">15</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%90%D1%8D%D1%80%D0%BE%D0%B4%D0%B8%D0%BD%D0%B0%D0%BC%D0%B8%D0%BA%D0%B0_19617_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

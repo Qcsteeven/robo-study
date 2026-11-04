@@ -74,31 +74,156 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 <div class="app-content">
 <section aria-labelledby="h-facts" class="app-section">
 <h2 class="section-title" id="h-facts">Сведения</h2>
-<dl class="app-kv"><dt>Цель</dt><dd>изображение при сохранении его содержимого</dd><dt>Семестр</dt><dd>3</dd><dt>Промежуточная аттестация</dt><dd>Курсовой проект, Экзамен, Курсовая работа</dd></dl>
+<dl class="app-kv"><dt>Семестр</dt><dd>3</dd><dt>Трудоёмкость</dt><dd>5 з. е. · 180 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 28 ч, лабораторные 28 ч</dd><dt>Самостоятельная работа</dt><dd>88 ч</dd><dt>Промежуточная аттестация</dt><dd>Экзамен, Курсовая работа</dd></dl>
 </section>
 <section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
 <ol class="app-topics">
-<li><span class="app-topics__title">4 Перечень практических занятий Практических занятий не предусмотрено</span></li>
-<li><span class="app-topics__title">1 Методические указания для обучающихся по освоению дисциплины</span></li>
-<li><span class="app-topics__title">1.1 Методические указания для обучающихся по курсовому проектированию/работе: Обучающие курсы на платформе Kaggle https://www.kaggle.com/learn/overview</span></li>
-<li><span class="app-topics__title">1.2 Методические указания для обучающихся по лабораторным работам:</span></li>
-<li><span class="app-topics__title">Онлайн курс «Нейронные сети и компьютерное зрение» от экспертов Samsung AI Center. [Электронный ресурс]. – Режим доступа: https://stepik.org/course/50352/info . – (дата обращения 20.05.2020).</span></li>
-<li><span class="app-topics__title">Тьюториалы (примеры кода на Python) на официальных сайтах изучаемых библиотек для глубокого обучения:</span></li>
-<li><span class="app-topics__title">1. Keras https://keras.io/examples/</span></li>
-<li><span class="app-topics__title">2. TensorFlow https://www.tensorflow.org/tutorials</span></li>
-<li><span class="app-topics__title">3. PyTorch https://pytorch.org/tutorials/</span></li>
-<li><span class="app-topics__title">4. Caffe http://caffe.berkeleyvision.org/</span></li>
-<li><span class="app-topics__title">1.3 Методические указания для обучающихся по самостоятельной работе: 8 Обучающие курсы на платформе Kaggle https://www.kaggle.com/learn/overview</span></li>
+<li><span class="app-topics__title">Введение в компьютерное зрение</span>
+<span class="app-topics__text">Обзор сфер применения компьютерного зрения. Обзор типов задач компьютерного зрения: классификация (Classification), семантическая сегментация (Semantic segmentation), сегментация экземпляра (Instance segmentation), обнаружение объектов (Object detection). Метрики. Известные наборы данных. Обзор современных сверточных сетей: MobileNet, ResNet, EfficientNet и др</span>
+</li>
+<li><span class="app-topics__title">Обучение сверточной нейронной сети на небольшом наборе данных. Операция свертки. Задача классификации</span>
+<span class="app-topics__text">Операция свертки. Параметры свертки. Карта признаков. Pooling слои. Применение сверточной модели для решения задачи классификации изображений. Аугментация данных. Использование ImageDataGenerator фреймворка Keras</span>
+</li>
+<li><span class="app-topics__title">Использование предварительно обученных нейронных сетей. Технологии fine tuning и Transfer Learning</span>
+<span class="app-topics__text">Изучение типичного подхода к глубокому обучению на небольших наборах изображений – использование предварительно обученной сети. Приемы использования предварительно обученных сетей: выделение признаков (feature extraction) и дообучение (fine-tuning). Набор данных ImageNet. Обзор архитектур популярных предобученных моделей: VGG, ResNet, Inception, Inception-ResNet, Xception и др</span>
+</li>
+<li><span class="app-topics__title">Визуализация промежуточных результатов обработки изображений сверточной нейронной сетью</span>
+<span class="app-topics__text">Изучение методов визуализации обработки изображений сверточной нейронной сетью: визуализация промежуточных выводов сверточной нейронной сети, визуализация фильтров сверточной нейронной сети, визуализация тепловых карт активации класса в изображении</span>
+</li>
+<li><span class="app-topics__title">Стилизация изображений. Алгоритм DeepDream</span>
+<span class="app-topics__text">Реализация алгоритма DeepDream в Keras. Разбор процесса моделирования изображений. Нейронная передача стиля. Идея переноса стиля изображения-образца на целевое изображение при сохранении его содержимого</span>
+</li>
+<li><span class="app-topics__title">Детектирование и сегментация объектов</span>
+<span class="app-topics__text">Понятие о детектировании и сегментации объектов. Подходы к решению задачи детектирования объекта на изображении: двухэтапные и одноэтапные методы. Алгоритм Selective Search. Понятие ключевых рамок: алгоритм нахождения объектов: anchor boxes. Обзор архитектур нейронных сетей для детектирования и сегментации объектов на изображении: R-CNN. Fast-RCNN, Fast R-CNN, YOLO, RetinaNET, Mask R-CNN.Методы для сегментации изображений: кластеризация, выделение краев и др. Подготовка данных для детектирования и сегментации изображений</span>
+</li>
+<li><span class="app-topics__title">Основы библиотеки компьютерного зрения OpenCV</span>
+<span class="app-topics__text">Основы библиотеки компьютерного зрения OpenCV: загрузка изображения, доступ к отдельным пикселям, обезка массива, пороговое значение, обнаружение контура и формы и др. Устранение ошибок NoneType. Создание мини-проекта с OpenCV: поиск фигур в изображениях с использованием Python и OpenCV</span>
+</li>
+<li><span class="app-topics__title">Задача распознавания лиц средствами OpenCV</span>
+<span class="app-topics__text">Обзор приложений компьютерного зрения для лица: распознавание лиц, создание виртуального преобразования (маски, макияж и т.п.). Детектирование лиц на фотографии. Понятие дескриптора. Афинные преобразования. Процесс распознавания лица. Алгоритм обаружения лица при помощи OpenCV</span>
+</li>
+<li><span class="app-topics__title">Распознавание лиц при помощи нейронных сетей</span>
+<span class="app-topics__text">Распознавание лица при помощи сверточной нейронной сети. Функции потерь: Triplet, Contrastive и др</span>
+</li>
+<li><span class="app-topics__title">Работа с видеоизображениями</span>
+<span class="app-topics__text">Отслеживание объекта. Обзор методов сопровождения объектов на видео</span>
+</li>
+<li><span class="app-topics__title">Автоэнкодеры. Вариационные автокодировщики. Генеративные состязательные сети</span>
+<span class="app-topics__text">Генерирование изображений с применением глубокого обучения. Понятия о вариационных автокодировщиках(VAE) и генеративно-состязательных сетях (GAN). Генерация изображений</span>
+</li>
+<li><span class="app-topics__title">Кластеризация изображений</span>
+<span class="app-topics__text">Практическое назначение кластеризации изображений. Метод K-средних, Пакет кластеризации в SciPy. Кластеризация пикселей. Алгоритм иерархической кластеризации. Спектральная кластеризация</span>
+</li>
+<li><span class="app-topics__title">Технология оптического распознавания символов. Применение компьютерного зрения и глубокого обучения к встроенным приложениям: Raspberry Pi, NVIDIA Jetson Nano, Coral Platform от Google и др</span>
+<span class="app-topics__text">Приложение компьютерного зрения «Оптическое распознавание символов» (Optical Character Recognition (OCR)). Применение компьютерного зрения и глубокого обучения к встроенным приложениям: Raspberry Pi, NVIDIA Jetson Nano, Coral Platform от Google и др</span>
+</li>
 </ol>
 </section>
 <section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Знакомство с основными средствами обработки изображений: PIL, Matplolib, SciPy</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Обучение сверточной нейронной сети на данных из набора «Dogs vs. Cats». Проверка результатов обучения на платформе Kaggle</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Применение предобученных моделей VGG-16, ResNet для решения задачи классификации</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Визуализация промежуточных активаций сверточной нейронной сети и тепловых карт активации класса при помощи фреймворка Keras</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Реализация алгоритма DeepDream при помощи модели Inception V3, входящей в состав Keras. Изучение блокнота «Style Transfer» на Kaggle</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Детектирование объектов при помощи TensorFlow Object Detection API</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Детектирование объектов при помощи YOLO и RetinaNET</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Создание мини-проекта с OpenCV: поиск фигур в изображениях с использованием Python и OpenCV</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Распознавание лиц средствами OpenCV</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Распознавание лица при помощи сверточной нейронной сети</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Отслеживание объекта в видео-потоке</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Применение метода К-средних к изображению буквы в разных шрифтах. Кластеризация по цвету методом иерархической кластеризации</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Генерация изображений при помощи вариационных автокодировщиков</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Поиск изображений по содержанию (Content-based image retrieval)</td><td class="ir-num app-nowrap">2 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Написание курсового проекта (работы)</td><td class="ir-num app-nowrap">52 ч</td></tr><tr><td>Подготовка к сдаче и защите отчетов</td><td class="ir-num app-nowrap">36 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
-<ul class="app-list"><li>ПК-1 — Способен проводить разработку и исследование теоретических и экспериментальных моделей</li><li>ПК-5 — Способен разрабатывать требования, проектировать программное обеспечение</li><li>ПК-2 — 1 конструкторскую работы в сфере конструкторской работы к компьютерного зрения. сферам их применения в Владеть навыками адаптировать профессиональной деятельности результаты проведенной научно- исследовательской и опытно- конструкторской работы в сфере компьютерного зрения</li></ul>
+<ul class="app-list">
+<li>ПК-1 — Способен проводить разработку и исследование теоретических и экспериментальных моделей объектов профессиональной деятельности в области искусственного интеллекта (ИИ)
+
+        </li><li>ПК-2 — Способен определять сферы применения результатов научно-исследовательских и опытно-конструкторских работ в области ИИ
+
+        </li><li>ПК-3 — Способен выполнять работы по обеспечению функционирования инфокоммуникационных систем ИИ
+
+        </li><li>ПК-5 — Способен разрабатывать требования, проектировать программное обеспечение, используемое в области ИИ
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать основы глубокого обучения в технологиях компьютерного зрения
+
+        </li><li>Уметь применять методы глубокого обучения для проведения исследований в области компьютерного зрения
+
+        </li><li>Владеть навыками использования методов глубокого обучения для проведения исследований в области компьютерного зрения
+
+        </li><li>Знать основы проведения научно-исследовательской и опытно-конструкторской работы в сфере компьютерного зрения
+
+        </li><li>Уметь проводить научно-исследовательскую и опытно-конструкторскую работы в сфере компьютерного зрения
+
+        </li><li>Владеть навыками адаптировать результаты проведенной научно-исследовательской и опытно-конструкторской работы в сфере компьютерного зрения
+
+        </li><li>Знать основы инфокоммуникационных систем для
+
+        </li><li>Уметь применять основы инфокоммуникационных систем для обеспечения их функционирования в сфере компьютерного зрения
+
+        </li><li>Владеть навыками обеспечения функционирования инфокоммуникационных систем в сфере компьютерного зрения
+
+        </li><li>Знать основы проектирования программного обеспечения для решения прикладных задач компьютерного зрения
+
+        </li><li>Уметь применять методы проектирования программного обеспечения для решения прикладных задач компьютерного зрения
+
+        </li><li>Владеть навыками использования и проектирования программного обеспечения для решения прикладных задач компьютерного зрения
+
+        </li>
+</ul>
 </section>
 <section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
-<ul class="app-list"><li>Келлехер Дж. Д. Глубокое обучение. Самый краткий и понятный курс / Дж. Д. Келлехер ; пер. М. Райтман, 2022. - 162. [Сайт] – URL: https://www.litres.ru/book/dzhon-d-kelleher/glubokoe-obuchenie-samyy-kratkiy- i-ponyatnyy-kurs-67858422/ 8 Дополнительная учебная литература и справочная</li><li>Николенко С. Глубокое обучение / С. Николенко, А. Кадурин, Е. Архангельская, 2022. - 480.</li><li>Фостер Д. Генеративное глубокое обучение. Как не мы рисуем картины, пишем романы и музыку / Д. Фостер, 2024. - 448.</li></ul>
+<ul class="app-list">
+<li>Келлехер Дж. Д. Глубокое обучение. Самый краткий и понятный курс / Дж. Д. Келлехер ; пер. М. Райтман, 2022. - 162. [Сайт] – URL: <a href="https://www.litres.ru/book/dzhon-d-kelleher/glubokoe-obuchenie-samyy-kratkiy-i-ponyatnyy-kurs-67858422/" rel="noopener">https://www.litres.ru/book/dzhon-d-kelleher/glubokoe-obuchenie-samyy-kratkiy-i-ponyatnyy-kurs-67858422/</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 13</span>
+</li><li>Николенко С. Глубокое обучение / С. Николенко, А. Кадурин, Е. Архангельская, 2022. - 480.
+
+        </li><li>Фостер Д. Генеративное глубокое обучение. Как не мы рисуем картины, пишем романы и музыку / Д. Фостер, 2024. - 448.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="https://www.kaggle.com/learn/overview">проектированию/работе: Обучающие курсы на платформе Kaggle</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по курсовому», стр. 8; Из раздела «5.1.3 Методические указания для обучающихся по самостоятельной работе», стр. 9</span>
+</li>
+<li><a class="ir-link" href="https://stepik.org/course/50352/info">Онлайн курс «Нейронные сети и компьютерное зрение» от экспертов Samsung AI Center. [Электронный ресурс]. – Режим доступа</a>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по лабораторным работам», стр. 8</span>
+</li>
+<li><a class="ir-link" href="https://keras.io/examples/">Тьюториалы (примеры кода на Python) на официальных сайтах изучаемых библиотек для глубокого обучения: 2.1. Keras</a>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по лабораторным работам», стр. 8</span>
+</li>
+<li><a class="ir-link" href="https://www.tensorflow.org/tutorials">2.2. TensorFlow</a>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по лабораторным работам», стр. 8</span>
+</li>
+<li><a class="ir-link" href="https://pytorch.org/tutorials/">2.3. PyTorch</a>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по лабораторным работам», стр. 8</span>
+</li>
+<li><a class="ir-link" href="http://caffe.berkeleyvision.org/">2.4. Caffe</a>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по лабораторным работам», стр. 8</span>
+</li>
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 13</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 13</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 13</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 13</span>
+</li>
+</ul>
 </section>
 </div>
 <aside class="app-aside">
@@ -108,7 +233,7 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 </section>
 <a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%98%D0%98%D0%A2%D0%BC_2026_%D0%93%D0%BB%D1%83%D0%B1%D0%BE%D0%BA%D0%BE%D0%B5_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B2_%D1%82%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F%D1%85_%D0%BA%D0%BE%D0%BC%D0%BF%D1%8C%D1%8E%D1%82%D0%B5%D1%80%D0%BD%D0%BE%D0%B3%D0%BE_%D0%B7%D1%80%D0%B5%D0%BD%D0%B8%D1%8F_20150_accepted.pdf">PDF на сайте ИРНИТУ</a>
 <a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/09.04.01-ii-2026-och/">Страница ОП</a>
-<a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-232-5a9957dc35c6.json">Первичный JSON</a><a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-232-6c88044d2652.json">Итоговый JSON</a></aside>
+</aside>
 </div>
 </main>
 <footer class="app-footer">
@@ -116,7 +241,7 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 <div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
 <div class="app-footer__note">
           Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
-          
+
         </div>
 <div class="app-footer__note">
 <a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>

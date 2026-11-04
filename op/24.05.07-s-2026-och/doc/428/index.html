@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Проектирование испытательных стендов — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Проектирование испытательных стендов</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>10</dd><dt>Трудоёмкость</dt><dd>3 з. е. · 108 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 16 ч, лабораторные 32 ч</dd><dt>Самостоятельная работа</dt><dd>60 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет с оценкой</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Основные требования, предъявляемые к контрольно-испытательным стендам, их разновидности и классификация</span>
+<span class="app-topics__text">Требования к конструкции и технологичности. Задачи выполняемые испытательными стендами. Разновидности стендов по роду проверяемых параметров, по виду технологически самостоятельных элементов бортовых систем (БС)</span>
+</li>
+<li><span class="app-topics__title">Устройства для воспроизведения механических нагрузок используемые в составе контрольно-испытательных стендов (КИС)</span>
+<span class="app-topics__text">Классификация механических нагружателей. Воспроизведение статических нагрузок. Воспроизведение линейных законов нагружения. Пневмопружины, конструкция, основные расчетные соотношения. Нагружатели на механических пружинах, их конструкция характеристика, область применения</span>
+</li>
+<li><span class="app-topics__title">Методы и средства воспроизведения переменных, циклически изменяющихся нагрузок</span>
+<span class="app-topics__text">Методы определения режимов проведения испытаний. Испытания с одноступенчатым нагружением. Испытания с комбинированным нагружением. Многоступенчатые программные испытания</span>
+</li>
+<li><span class="app-topics__title">Комплексное использование механических нагружателей в конструкции КИС</span>
+<span class="app-topics__text">Конструкции стендов для испытания гидроагрегатов, принципиальные схемы, принципы работы. Стенды для испытания механических систем, конструкция используемые симуляторы</span>
+</li>
+<li><span class="app-topics__title">Методы и средства воспроизведения динамических нагрузок в КИС</span>
+<span class="app-topics__text">Основные показатели динамических нагрузок. Имитаторы массы для определения мгновенного импульса сил. Вертикальный способ. Траекторный метод. Маятниковый способ. Динамические поворотные установки. Тормозные устройства и имитаторы трения</span>
+</li>
+<li><span class="app-topics__title">Принципы построения и расчет стендов для испытания систем и их элементов на воздействие гидрогазовых нагрузок</span>
+<span class="app-topics__text">Классификация гидрогазовых нагрузок. Законы изменения гидрогазовых нагрузок. Стенды для испытаний систем, узлов и агрегатов при воздействии гидрогазовых нагрузок</span>
+</li>
+<li><span class="app-topics__title">Общие вопросы проектирования контрольно-испытательных стендов</span>
+<span class="app-topics__text">Учет требований охраны труда, техники безопасности, охраны окружающей среды. Применение стандартных и нормализованных элементов в компоновках стендов, автоматизация проектирования КИС</span>
+</li>
+<li><span class="app-topics__title">Проектирование пультов управления контрольно-испытательными стендами</span>
+<span class="app-topics__text">Создание геометрической формы и габаритно -компоновочных размеров пульта. Выбор средств отображения информации. Выбор органов управления</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Универсальный гидравлический стенд. Универсальный гидравлический стенд. Изучение конструкции и принципа действия стенда. Изучение гидравлической и электрической схемы стенда</td><td class="ir-num app-nowrap">8 ч</td></tr><tr><td>Стенд для автоматического контроля электрожгутов. Изучение конструкции и принципа действия стенда. Проверка жгута на обрыв, короткое замыкание и перепутывание проводов</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Изучение принципа работы и конструкции галогенного течеискателя ПТИ-10</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Эргономическая оценка контрольно-испытательных стендов. Изучение метода экспертной оценки эргономических характеристик</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Эргономическая оценка средств отображения информации (СОИ)</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Эргономическая оценка органов управления (ОУ)</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Эргономическая экспертиза инженерных решений</td><td class="ir-num app-nowrap">4 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Оформление отчетов по лабораторным и практическим работам</td><td class="ir-num app-nowrap">5 ч</td></tr><tr><td>Подготовка к зачёту</td><td class="ir-num app-nowrap">25 ч</td></tr><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Подготовка к сдаче и защите отчетов</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">18 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ПК-6 — Способность и готовность к разработке средств технологического оснащения производства и мест их размещения
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать задачи, выполняемые испытательными стендами, принципы построения и расчета стендов для испытания систем и их элементов на воздействие гидрогазовых нагрузок, принципы построения и методы расчета устройств для измерения, оценки и анализа информации, принципы и методы эргономической оценки контрольно-испытательных стендов
+
+        </li><li>Уметь самостоятельно изучать и осваивать новые технологические процессы, используемые при монтаже и испытаниях ла. самостоятельно изучать и осваивать новое оборудование, используемое при монтаже и испытаниях ЛА
+
+        </li><li>Владеть основными методами составления принципиальных схем и проведения расчетов элементов кис, предназначенных для контроля и испытаний механических систем ЛА. основными методами составления принципиальных схем и проведения расчетов элементов кис, предназначенных для контроля и испытаний гидрогазовых систем ЛА
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Гущин С. В. Проектирование испытательных стендов : электронный курс / С. В. Гущин, 2022 [Сайт] – URL: <a href="https://el.istu.edu/course/view.php?id=5601" rel="noopener">https://el.istu.edu/course/view.php?id=5601</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 14</span>
+</li><li>Гущин С. В. Проектирование стендов для испытаний бортовых систем летательных аппаратов [Электронный ресурс] : курс лекций / С. В. Гущин, 2007. - 68. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-3991.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-3991.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 14</span>
+</li><li>ЭОР "Проектирование испытательны стендов" [Сайт] – URL: <a href="https://el.istu.edu/course/view.php?id=162" rel="noopener">https://el.istu.edu/course/view.php?id=162</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по лабораторным работам», стр. 7; Из раздела «5.1.2 Методические указания для обучающихся по самостоятельной работе», стр. 7; Из раздела «6.1 Оценочные средства для проведения текущего контроля», стр. 9; Из раздела «7 Основная учебная литература», стр. 14</span>
+</li><li>Промежуточные тесты по курсу и итоговый тест для дифференциального зачета. [Сайт] – URL: <a href="https://el.istu.edu/course/view.php?id=600" rel="noopener">https://el.istu.edu/course/view.php?id=600</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 14</span>
+</li><li>Рожков В. Н. Контроль качества при производстве летательных аппаратов : учеб. пособие для вузов по направлению подгот. бакалавров и магистров 551000 "Авиа- и ракетостроение" / В. Н. Рожков, 2007. - 415.
+
+        </li><li>Безопасность и надежность технических систем : учебное пособие для вузов по специальности "Испытание летательных аппаратов" / Л. Н. Александровская [и др.], 2008.
+
+        </li><li>375.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 14</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 14</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 15</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 15</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">15</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D0%B8%D1%81%D0%BF%D1%8B%D1%82%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D1%85_%D1%81%D1%82%D0%B5%D0%BD%D0%B4%D0%BE%D0%B2_19634_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

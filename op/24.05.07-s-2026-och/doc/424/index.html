@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Системы радиооборудования — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Системы радиооборудования</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>8</dd><dt>Трудоёмкость</dt><dd>3 з. е. · 108 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 32 ч, лабораторные 16 ч</dd><dt>Самостоятельная работа</dt><dd>60 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет с оценкой</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Радиосвязное оборудование</span>
+<span class="app-topics__text">Радиосвязное оборудование. Состав. Приемники. Передатчики</span>
+</li>
+<li><span class="app-topics__title">Радионавигационное оборудование</span>
+<span class="app-topics__text">Радионавигационные параметры. Радиодальномеры. Методы измерения угловых координат. Радиопеленгаторы. Радиосистемы ближней и дальней навигации. Измерение путевой скорости</span>
+</li>
+<li><span class="app-topics__title">Радиолокационное оборудование</span>
+<span class="app-topics__text">Состав, классификация РЛО. Станция наблюдения земной поверхности. Станция обнаружения и наведения. Самолетный ответчик</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Командная радиостанция Р-832</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Командная радиостанция «Баклан»</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Самолетное переговорное устройство СПУ-9</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Радиовысотомер малых высот</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Станция предупреждения облучения СПО-10</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Радиолокационная станция гроза</td><td class="ir-num app-nowrap">2 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Написание отчета</td><td class="ir-num app-nowrap">10 ч</td></tr><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">30 ч</td></tr><tr><td>Подготовка к экзамену</td><td class="ir-num app-nowrap">20 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ПК-1 — Способность и готовность участвовать в разработке проектов авиационной техники различного целевого назначения
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать состав, назначение и принципы работы систем радиооборудования самолетов различного целевого назначения
+
+        </li><li>Уметь определить системы радиооборудования для конкретного самолета и определить ее основные параметры
+
+        </li><li>Владеть представлением о новых, технологических и конструктивных решениях в конструкциях существующих системах радиооборудования ЛА
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Гусев. Пособие по выполнению лабораторных работ по дисциплинам "Авиационное и радиоэлектронное оборудование, "Системы оборудования" [Электронный ресурс] . Ч. 2 : Радиоэлектронное оборудование летательных аппаратов, 2007. - 53. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-5533.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-5533.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 6</span>
+</li><li>Гусев И. Н. Системы самолетов. Системы вертолетов. Системы приборного оборудования : учебное пособие / И. Н. Гусев, И. О. Бобарика, И. Н. Зотов, 2015. - 153.
+
+        </li><li>Акимов Радиооборудование летательных аппаратов : учебное пособие. Ч. 1 : Связное радиооборудование самолетов, 1971. - 167 с.
+
+        </li><li>Власов О. В. Радиооборудование летательных аппаратов / О. В. Власов, И. В. Смокин, 1971. - 360.
+
+        </li><li>Дунина Р. А. Авиационное и радиоэлектронное оборудование самолета Як-18Т : учебное пособие для летных училищ гражданской авиации / Р. А. Дунина, А. Н. Наумов, 1982. - 168.
+
+        </li><li>Бондарчук И. Е. Авиационное и радиоэлектронное оборудование самолета АН-24 / И. Е. Бондарчук, В. И. Харин, 1975. - 280.
+
+        </li><li>Днепровский. Линейные радиотехнические цепи , используемые в ГА : учеб. пособие для вузов гражд. авиации. Ч. 2 : Фильтры и длинные линии, 1978. - 74.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 6</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 6</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 6</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 6</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">7</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%A1%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D1%8B_%D1%80%D0%B0%D0%B4%D0%B8%D0%BE%D0%BE%D0%B1%D0%BE%D1%80%D1%83%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F_19646_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

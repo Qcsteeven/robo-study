@@ -74,28 +74,109 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 <div class="app-content">
 <section aria-labelledby="h-facts" class="app-section">
 <h2 class="section-title" id="h-facts">Сведения</h2>
-<dl class="app-kv"><dt>Цель</dt><dd>используется менеджер пакетов npm</dd><dt>Семестр</dt><dd>3</dd><dt>Промежуточная аттестация</dt><dd>Курсовой проект, Зачет</dd></dl>
+<dl class="app-kv"><dt>Семестр</dt><dd>3</dd><dt>Трудоёмкость</dt><dd>3 з. е. · 108 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 14 ч, лабораторные 28 ч</dd><dt>Самостоятельная работа</dt><dd>66 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет</dd></dl>
 </section>
 <section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
 <ol class="app-topics">
-<li><span class="app-topics__title">4 Перечень практических занятий Практических занятий не предусмотрено</span></li>
-<li><span class="app-topics__title">1 Методические указания для обучающихся по освоению дисциплины</span></li>
-<li><span class="app-topics__title">1.1 Методические указания для обучающихся по лабораторным работам:</span></li>
-<li><span class="app-topics__title">Григорьев С.В. Распределённые вычисления и блокчейн-приложения / Электронный курс/ URL: https://el.istu.edu/course/view.php?id=7417</span></li>
-<li><span class="app-topics__title">Григорьев С.В. Blockchain Applications / Электронный курс/ URL: https://el.istu.edu/course/view.php?id=7323</span></li>
-<li><span class="app-topics__title">1.2 Методические указания для обучающихся по самостоятельной работе:</span></li>
-<li><span class="app-topics__title">Susanne Chishti, Janos Barberis. The FinTech Book: the Financial Technology Handbook for Investors, Entrepreneurs and Visionaries. - John Wiley and Sons, Ltd, 2016.</span></li>
-<li><span class="app-topics__title">James Haycock, Shane Richmondю Bye Bye Banks: How Retail Banks are Being Displaced, Diminished and Disintermediated by Tech Startups and What They Can Do to Survive. - Wunderkammer, 2015.</span></li>
+<li><span class="app-topics__title">Базовая теория, методы и технологии блокчейна</span>
+<span class="app-topics__text">Технологии блокчейн: децентрализация, распределенный реестр, консенсус и безопасность. Различие между блокчейн и базой данных. Особенности закрытого Blockchain. Централизованное хранение данных. Использование технологии распределенного реестра DLT. Преимущества технологии блокчейн для финансовых институтов. Финансовая терминология и терминология блокчейн</span>
+</li>
+<li><span class="app-topics__title">Использование платформы Ethereum для построения блокчейн-приложений</span>
+<span class="app-topics__text">Основные различия Эфириума и Биткоина. Отличие системы utxo от балансов. Базовая теория Эфириума. Виды узлов. Транзакции. Газ. Пользовательский аккаунт. Metamask. Основная сеть, тестовые сети. Faucet. Теория смарт-контрактов. Аккаунт смарт-контракта. Газ в смарт-контрактах. Создание контракта. Языки для написания смарт-контрактов (Solidity). Oracles. Bytecode, OPcode, ABI. Виртуальная машина Эфириума (EVM). Различные способы хранения данных. Stack-machine</span>
+</li>
+<li><span class="app-topics__title">Основы программирования смарт-контрактов на языке Solidity в IDE Remix</span>
+<span class="app-topics__text">Remix - онлайн среда разработки для Solidity. Основы Solidity. Version pragma, import, комментарии. Переменные состояния. Основные типы. Конструкторы. Функции, типы функций. Настройки Remix. Выпуск смарт-контрактов в Remix. Вызов функций. Повторный запуск контракта. Разные виды вызова выполнения функций (вызов, отправка транзакций). Подробности Solidity. Типы (struct, enum, mapping). Модификаторы view и pure. Видимость функций. Модификатор payable, fallback функции. Продвинутые смарт-контракты. Свойства блока и транзакций. Обработка ошибок (assert, require, revert и exceptions). Модификаторы функций. Наследование, интерфейсы. События. Библиотеки. Calls, delegated calls. Разбор существующих имплементаций</span>
+</li>
+<li><span class="app-topics__title">Разработка блокчейн-приложений на основе прикладных библиотек</span>
+<span class="app-topics__text">Среды разработки смарт-контрактов. Настройка среды. Структура проекта. Truffle framework. Тестовые фреймворки. Генерация ключей. Подпись/отправка транзакций. Библиотека web3. Компиляция. Тестирование. Mocha. Запуск контрактов с web3. Запуск контрактов с infura. Пример приложения</span>
+</li>
 </ol>
 </section>
 <section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Ознакомление с примерами кодов и написание простых смарт-контрактов</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Основы программирования смарт-контрактов на Solidity в Remix</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Работа с платформой Ethereum для разработки приложений</td><td class="ir-num app-nowrap">8 ч</td></tr><tr><td>Разработка блокчейн-приложений на основе прикладных библиотек</td><td class="ir-num app-nowrap">8 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Оформление отчетов по лабораторным и практическим работам</td><td class="ir-num app-nowrap">18 ч</td></tr><tr><td>Подготовка к зачёту</td><td class="ir-num app-nowrap">16 ч</td></tr><tr><td>Подготовка к сдаче и защите отчетов</td><td class="ir-num app-nowrap">16 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">16 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
-<ul class="app-list"><li>ПК-4 — Способен выполнять поиск и диагностику ошибок инфокоммуникационных систем ИИ</li></ul>
+<ul class="app-list">
+<li>ПК-4 — Способен выполнять поиск и диагностику ошибок инфокоммуникационных систем ИИ, осуществлять процесс оптимизации программного обеспечения
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать принципы оценки эффективности деятельности в рамках создания и развития проектов с применением блокчейн
+
+        </li><li>Уметь пользоваться инструментами сбора, обработки и анализа информации в рамках создания и развития проектов с применением технологии блокчейн
+
+        </li><li>Владеть методами анализа состояния и перспектив международного банковского бизнеса, биржевой и страховой деятельности и реализации проектов в указанных областях с применением технологии блокчейн
+
+        </li>
+</ul>
 </section>
 <section class="app-section">
 <h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
-<ul class="app-list"><li>Башлы П. Н. Современные сетевые технологии : учеб. пособие для вузов по специальности 351400 "Прикладная информатика (по областям)" и др. междисплинар. специальностям / П. Н. Башлы, 2006. - 334.</li><li>Клементьев И. П. Введение в облачные вычисления / И. П. Клементьев, В. А. Устинов, 2016. - 310. [Сайт] – URL: https://e.lanbook.com/book/100686#authors</li><li>Пирогов В. Ю. Информационные системы и базы данных: организация и проектирование : учебное пособие по специальности 010503 "Мат. обеспечение и администрирование информационных систем" / В. Ю. Пирогов, 2009. - 528.</li><li>Молокова С. В. Базы данных и сетевые технологии : учебное пособие / С. В. Молокова, В. Б. Распопина, 2013. - 139. [Сайт] – URL: http://elib.istu.edu/viewer/view.php?file=/files/er-2651.pdf 8 Дополнительная учебная литература и справочная</li><li>Колесов Ю. Б. Моделирование систем. Объектно-ориентированный подход : учеб. пособие для вузов по направлению подгот. 220100 "Систем. анализ и упр." / Ю. Б. Колесов, Ю. Б. Сениченков, 2006. - 185.</li><li>Фрост Р. Базы данных. Проектирование и разработка : учебник / Р. Фрост, Д. Дей, К. Ван Слайк, 2007. - 590.</li><li>Внуков А. А. Защита информации в банковских системах : учебное пособие для бакалавриата и магистратуры по инженерно-техническим направлениям / А. А. Внуков, 2017. - 245.</li><li>Блокчейн в платежных системах, цифровые финансовые активы и цифровые валюты : учебное пособие для магистратуры / под редакцией Т. Э. Рождественской, А. А. Ситника, 2022. - 128.</li><li>Криптографические основы блокчейн-технологий / Е. А. Ищукова [и др.], 2022. - 302.</li><li>Баланов А. Н. Блокчейн : учебное пособие для вузов / А. Н. Баланов, 2024. - 212.</li><li>Петренко А. С. Квантово-устойчивый блокчейн / А. С. Петренко, 2023. - 320.</li></ul>
+<ul class="app-list">
+<li>Башлы П. Н. Современные сетевые технологии : учеб. пособие для вузов по специальности 351400 "Прикладная информатика (по областям)" и др. междисплинар. специальностям / П. Н. Башлы, 2006. - 334.
+
+        </li><li>Клементьев И. П. Введение в облачные вычисления / И. П. Клементьев, В. А. Устинов, 2016. - 310. [Сайт] – URL: <a href="https://e.lanbook.com/book/100686#authors" rel="noopener">https://e.lanbook.com/book/100686#authors</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 9</span>
+</li><li>Пирогов В. Ю. Информационные системы и базы данных: организация и проектирование : учебное пособие по специальности 010503 "Мат. обеспечение и администрирование информационных систем" / В. Ю. Пирогов, 2009. - 528.
+
+        </li><li>Молокова С. В. Базы данных и сетевые технологии : учебное пособие / С. В. Молокова, В. Б. Распопина, 2013. - 139. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-2651.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-2651.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 9</span>
+</li><li>Колесов Ю. Б. Моделирование систем. Объектно-ориентированный подход : учеб. пособие для вузов по направлению подгот. 220100 "Систем. анализ и упр." / Ю. Б. Колесов, Ю. Б. Сениченков, 2006. - 185.
+
+        </li><li>Фрост Р. Базы данных. Проектирование и разработка : учебник / Р. Фрост, Д. Дей, К. Ван Слайк, 2007. - 590.
+
+        </li><li>Внуков А. А. Защита информации в банковских системах : учебное пособие для бакалавриата и магистратуры по инженерно-техническим направлениям / А. А. Внуков, 2017. - 245.
+
+        </li><li>Блокчейн в платежных системах, цифровые финансовые активы и цифровые валюты : учебное пособие для магистратуры / под редакцией Т. Э. Рождественской, А. А. Ситника, 2022. - 128.
+
+        </li><li>Криптографические основы блокчейн-технологий / Е. А. Ищукова [и др.], 2022. - 302.
+
+        </li><li>Баланов А. Н. Блокчейн : учебное пособие для вузов / А. Н. Баланов, 2024. - 212.
+
+        </li><li>Петренко А. С. Квантово-устойчивый блокчейн / А. С. Петренко, 2023. - 320.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="https://el.istu.edu/course/view.php?id=7417">Григорьев С.В. Распределённые вычисления и блокчейн-приложения / Электронный курс/ URL</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по лабораторным работам», стр. 6</span>
+</li>
+<li><a class="ir-link" href="https://el.istu.edu/course/view.php?id=7323">Григорьев С.В. Blockchain Applications / Электронный курс/ URL</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по лабораторным работам», стр. 6</span>
+</li>
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 9</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 9</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 10</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 10</span>
+</li>
+</ul>
 </section>
 </div>
 <aside class="app-aside">
@@ -105,7 +186,7 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 </section>
 <a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%98%D0%98%D0%A2%D0%BC_2026_%D0%A0%D0%B0%D1%81%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D1%91%D0%BD%D0%BD%D1%8B%D0%B5_%D0%B2%D1%8B%D1%87%D0%B8%D1%81%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B8_%D0%B1%D0%BB%D0%BE%D0%BA%D1%87%D0%B5%D0%B9%D0%BD-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F_14024_accepted.pdf">PDF на сайте ИРНИТУ</a>
 <a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/09.04.01-ii-2026-och/">Страница ОП</a>
-<a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-248-5a9957dc35c6.json">Первичный JSON</a><a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-248-6c88044d2652.json">Итоговый JSON</a></aside>
+</aside>
 </div>
 </main>
 <footer class="app-footer">
@@ -113,7 +194,7 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 <div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
 <div class="app-footer__note">
           Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
-          
+
         </div>
 <div class="app-footer__note">
 <a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>

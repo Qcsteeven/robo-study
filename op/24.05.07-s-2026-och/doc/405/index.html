@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Прочность конструкций — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Прочность конструкций</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>8</dd><dt>Трудоёмкость</dt><dd>4 з. е. · 144 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 32 ч, практические 32 ч</dd><dt>Самостоятельная работа</dt><dd>44 ч</dd><dt>Промежуточная аттестация</dt><dd>Экзамен, Курсовая работа</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Введение. Общие сведения и понятия</span>
+<span class="app-topics__text">Основные задачи курса. Общие понятия и определения. Агрегаты самолёта. Классификация самолётов. Требования к конструкции самолёта. Авиационные материалы. Жизненный цикл самолёта</span>
+</li>
+<li><span class="app-topics__title">Действие нагрузок на самолёт</span>
+<span class="app-topics__text">Классификация нагрузок, действующих на самолёт. Силы, действующие на самолёт в полёте, их схематизация. Полная перегрузка. Требование прочности. Требование жёсткости</span>
+</li>
+<li><span class="app-topics__title">Крыло самолёта</span>
+<span class="app-topics__text">Общие сведения. Внешняя геометрия крыла. Конструкция крыла. Схематизация нагрузок, действующих на крыло в полёте. Основные положения и допущения для формирования расчётной схемы крыла. Балочная теория. Усилия в сечениях крыла. Конструктивно-силовые схемы крыльев, их типы. Работа силовых элементов нагруженного крыла. Основы метода редукционных коэффициентов. Средства механизации крыла</span>
+</li>
+<li><span class="app-topics__title">Фюзеляж самолёта</span>
+<span class="app-topics__text">Общие сведения. Силы, действующие на фюзеляж. Конструктивно-силовые схемы фюзеляжа. Конструкция и работа основных элементов фюзеляжа. Основы расчёта на прочность стрингерного фюзеляжа</span>
+</li>
+<li><span class="app-topics__title">Колебания и аэроупругость конструкции самолёта</span>
+<span class="app-topics__text">Виды колебаний элементов конструкции самолёта. Акустические вибрации. Бафтинг. Флаттер. Перекручивание и дивергенция крыла. Реверс. Основы расчёта на выносливость</span>
+</li>
+<li><span class="app-topics__title">Оперение</span>
+<span class="app-topics__text">Назначение оперения. Требования, предъявляемые к нему. Внешняя геометрия оперения. Нагрузки, действующие на оперение. Конструктивно-силовые схемы оперения. Типовые расчётные схемы элементов. Прочностные расчёты</span>
+</li>
+<li><span class="app-topics__title">Итог курса</span>
+<span class="app-topics__text">Системный анализ изученных тем курса</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Практические занятия</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Введение. Входной контроль</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение нормальной перегрузки</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Расчёт конструкции по предельным состояниям</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Типовые расчётные схемы для анализа прочности крыла. Методики их расчёта</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Усилия в сечениях крыла. Основы проектировочного расчёта крыла</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Анализ параметров напряжённо-деформированного состояния панельной конструкции</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Основы проверочного расчёта конструкции крыла</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение потока касательных сил в сечениях оболочек с открытым и замкнутым контурами</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Анализ параметров напряжённо-деформированного состояния элементов обшивки</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Основы расчёта на прочность стрингерного фюзеляжа</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Упругие колебания</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Подведение итога изучения курса</td><td class="ir-num app-nowrap">2 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Написание курсового проекта (работы)</td><td class="ir-num app-nowrap">28 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">10 ч</td></tr><tr><td>Решение специальных задач</td><td class="ir-num app-nowrap">6 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ОПК-5 — Способен разрабатывать физические и математические модели исследуемых процессов, явлений и объектов, относящихся к профессиональной сфере деятельности для решения инженерных задач
+
+        </li><li>ПК-3 — Способность и готовность к проведению проектировочных расчётов аэродинамики, динамики полёта, прочности и экономики проектируемой авиационной техники
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать основные физические явления и законы механики, прочности конструкций летательных аппаратов; способы и методы расчета напряжений и деформаций при простых и сложных видах нагружения
+
+        </li><li>Уметь применять основные физические законы, методы расчета прочности конструкций при решении проблем профессиональной деятельности; применять соответствующие знания при решении проблем моделирования напряжённо-деформированного отклика элемента конструкции
+
+        </li><li>Владеть навыками решения сложных инженерных задач, опираясь на основы теории расчёта элементов конструкции самолёта
+
+        </li><li>Уметь применять основные физические законы, методы расчета
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Авдонин А. С. Расчет на прочность летательных аппаратов : учеб. пособие для авиац. специальностей вузов / А. С. Авдонин, В. И. Фигуровский, 1985. - 439. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-22738.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-22738.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 12</span>
+</li><li>Авдонин А. С. Прикладные методы расчета оболочек и тонкостенных конструкций / А. С. Авдонин, 1969. - 402. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-8001.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-8001.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 12</span>
+</li><li>Строительная механика летательных аппаратов : учеб. для авиац. специальностей вузов / И. Ф. Образцов, Л. А. Булычев, В. В. Васильев и др., 1986. - 535.
+
+        </li><li>Артамонов О. В. Прочность конструкций : учебное пособие для всех форм обучения по специальности 160201 - "Самолето- и вертолетостроение" / О. В. Артамонов, 2009. - 96.
+
+        </li><li>Артамонов О. В. Прочность конструкций : учебное пособие по решению задач по расчету самолета на прочность для всех форм обучения по специальности 160201 - "Самолето- и вертолетостроение" / О. В. Артамонов, 2009. - 32.
+
+        </li><li>Руководство по курсовому проектированию и задания по курсу "Строительная механика летательных аппаратов" / Иркут. политехн. ин-т, 1972. - 98.
+
+        </li><li>Калинин Н. Г. Строительная механика летательных аппаратов / Н. Г. Калинин, И. Е. Дышлер, 1969. - 307.
+
+        </li><li>Оболенский Евгений Прокофьевич. Прочность агрегатов оборудования и элементов систем жизнеобеспечения летательных аппаратов / Евгений Прокофьевич Оболенский, Борис Иванович Сахаров, Николай Петрович Стрекозов, 1989. - 247.
+
+        </li><li>Оболенский Евгений Прокофьевич. Прочность летательных аппаратов и их агрегатов : учебник для авиац. спец. вузов / Е. П. Оболенский, Б. И. Сахаров, В. А. Сибиряков, 1995. - 504.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="https://el.istu.edu/course/view.php?id=1868">проектированию/работе</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по курсовому», стр. 6; Из раздела «5.1.2 Методические указания для обучающихся по практическим занятиям», стр. 6; Из раздела «5.1.3 Методические указания для обучающихся по самостоятельной работе», стр. 6</span>
+</li>
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 13</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 13</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 13</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 13</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">13</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%9F%D1%80%D0%BE%D1%87%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%D0%BA%D0%BE%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BA%D1%86%D0%B8%D0%B9_19641_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

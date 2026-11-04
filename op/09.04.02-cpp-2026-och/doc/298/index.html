@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Введение в глубокое обучение — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/09.04.02-cpp-2026-och/">09.04.02</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Введение в глубокое обучение</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>09.04.02 Цифровизация промышленных предприятий</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>4</dd><dt>Трудоёмкость</dt><dd>3 з. е. · 108 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 8 ч, практические 8 ч</dd><dt>Самостоятельная работа</dt><dd>92 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Введение в глубокое обучение</span>
+<span class="app-topics__text">История и эволюция: от классических методов ML к глубокому обучению; прорыв 2010-х годов благодаря трем факторам: мощная вычислительная аппаратура (GPU), большие данные и разработка приемов обучения нейросетей . Базовые понятия: нейроны, архитектура как комбинация слоев , глубина сети. Основы работы: нейронные сети работают через умножение признаков на веса с последующим сложением, образуя формулу со сложным видом Основные сферы применения: компьютерное зрение, обработка естественного языка, анализ аудио и другие</span>
+</li>
+<li><span class="app-topics__title">Полносвязные нейронные сети и обучение</span>
+<span class="app-topics__text">MLP: устройство, функции активации (Sigmoid, ReLU, Tanh, Softmax), ограничения. Алгоритм обучения: градиентный спуск — в начале все веса устанавливаются в произвольные значения, затем много раз повторяется шаг обновления, чтобы ошибка предсказания уменьшилась . Обратное распространение ошибки: вычислительный граф, проблема затухающего и взрывающегося градиента . Переобучение и борьба с ним: нейросети легко переобучаются, запоминая ответы на обучающих данных и плохо работая на новых . Приемы борьбы: Dropout, Batch Normalization, Early Stopping</span>
+</li>
+<li><span class="app-topics__title">Сверточные нейронные сети</span>
+<span class="app-topics__text">Основные операции: свертка (convolution), отступы (padding), шаг (stride), пулинг (pooling) — агрегация и субдискретизация . Задачи анализа изображений: Классификация — определение метки класса для всего изображения . Детекция — выделение прямоугольниками всех объектов на изображении . Сегментация — определение для каждого пикселя, к какой области он относится . Архитектуры: LeNet, AlexNet, VGG, ResNet, UNET . Transfer learning — использование предобученных моделей для быстрого решения новых задач</span>
+</li>
+<li><span class="app-topics__title">Современные архитектуры и перспективы</span>
+<span class="app-topics__text">Рекуррентные нейронные сети (RNN): обработка последовательностей, LSTM, GRU для борьбы с затухающим градиентом . Трансформеры: механизм внимания (attention) , архитектуры ViT для компьютерного зрения . BERT, T5 — языковые модели на основе трансформеров . Генеративные модели: GAN (Генеративно-состязательные сети) — две сети соревнуются: одна генерирует изображения, другая определяет подлинность . Автокодировщики (VAE), диффузионные модели — для создания новых данных . Перспективы и вызовы: интерпретируемость моделей, вычислительная сложность, этические аспекты применения</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Практические занятия</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Знакомство с библиотеками глубокого обучения и реализация полносвязной нейронной сети</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Реализация и обучение сверточной нейронной сети (CNN)</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Обработка последовательных данных с использованием RNN/LSTM</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Генеративные модели и трансформеры</td><td class="ir-num app-nowrap">2 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Подготовка к практическим занятиям</td><td class="ir-num app-nowrap">92 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ПК-2 — Способен планировать работы по разработке и интеграции информационных систем
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Уметь Разрабатывать архитектурные спецификации для ИС с использованием глубокого обучения Выбирать оптимальную архитектуру нейронной сети под конкретную задачу Обосновывать выбор архитектурных решений на основе анализа требований Проектировать конвейеры обработки данных для обучения нейросетей
+
+        </li><li>Владеть Навыками проектирования архитектур глубоких нейронных сетей Инструментами визуализации архитектур (Netron, TensorBoard) Методами сравнения и оценки различных архитектурных вариантов Техниками оптимизации архитектур (Pruning, Quantization, Knowledge Distillation) Способами интеграции моделей глубокого обучения в ИС (ONNX, TensorRT, Docker)
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Казанцев Т. Искусственный интеллект и машинное обучение. Основы программирования на Pyton / Т. Казанцев, 2020. - 170. [Сайт] – URL: <a href="https://www.litres.ru/book/timur-kazancev/iskusstvennyy-intellekt-i-mashinnoe-obuchenie-osnovy-progra-59162107/" rel="noopener">https://www.litres.ru/book/timur-kazancev/iskusstvennyy-intellekt-i-mashinnoe-obuchenie-osnovy-progra-59162107/</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 10</span>
+</li><li>Демиденко А. Машинное обучение. Погружение в технологию / А. Демиденко, 2023. - 110. [Сайт] – URL: <a href="https://www.litres.ru/book/artem-demidenko/mashinnoe-obuchenie-pogruzhenie-v-tehnologiu-69295048/" rel="noopener">https://www.litres.ru/book/artem-demidenko/mashinnoe-obuchenie-pogruzhenie-v-tehnologiu-69295048/</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 10</span>
+</li><li>Баланов А. Н. Машинное обучение и искусственный интеллект : учебное пособие для вузов / А. Н. Баланов, 2024. - 172. [Сайт] – URL: <a href="https://e.lanbook.com/book/414920" rel="noopener">https://e.lanbook.com/book/414920</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 10</span>
+</li><li>Алпайдин Э. Машинное обучение: новый искусственный интеллект : перевод с английского / Э. Алпайдин, 2017. - XII. ; 191.
+
+        </li><li>Платонов А. В. Машинное обучение : учебное пособие для вузов / А. В. Платонов, 2022.
+
+        </li><li>85.
+
+        </li><li>Монарх М. Р. Машинное обучение с участием человека. Активное обучение и аннотирование для ориентированного на человека искусственного интеллекта / М. Р. Монарх ; пер. с англ. В. И. Бахур, 2022. - 498.
+
+        </li><li>Брантон С. Л. Анализ данных в науке и технике. Машинное обучение, динамические системы и управление / С. Л. Брантон, Дж. Н. Куц, 2021. - 542.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 10</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 10</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 11</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 11</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">11</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A6%D0%9F%D0%9F%D0%BC_2026_%D0%92%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B2_%D0%B3%D0%BB%D1%83%D0%B1%D0%BE%D0%BA%D0%BE%D0%B5_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_24425_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/09.04.02-cpp-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

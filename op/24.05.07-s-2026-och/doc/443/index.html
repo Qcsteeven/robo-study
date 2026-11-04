@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Моделирование систем и процессов — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Моделирование систем и процессов</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестры</dt><dd>5, 6</dd><dt>Трудоёмкость</dt><dd>7 з. е. · 252 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 48 ч, лабораторные 64 ч</dd><dt>Самостоятельная работа</dt><dd>104 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет с оценкой, Экзамен</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Введение в дисциплину</span>
+<span class="app-topics__text">Понятие модели. Математическое моделирование процессов различной природы. Современные системы моделирования, применяемые в инженерной практике</span>
+</li>
+<li><span class="app-topics__title">Основная идея метода конечных элементов</span>
+<span class="app-topics__text">Дискретизация. Типы конечных элементов. Нумерация узлов. Понятие интерполяции. Интерполяционные полиномы и функции формы на примере одномерного конечного элемента первого порядка. Двумерный треугольный конечный элемент первого порядка. Интерполирование векторных величин. Интерполяционные полиномы для группы конечных элементов</span>
+</li>
+<li><span class="app-topics__title">Основные положения механики твердого деформируемого тела, необходимые для конечно-элементного моделирования при решении задач статики</span>
+<span class="app-topics__text">Составляющие напряжения. Составляющие деформации. Закон Гука. Энергия деформации. Вариационные принципы. Принцип возможной работы. Теорема Кастилиано. Принцип стационарности потенциальной энергии</span>
+</li>
+<li><span class="app-topics__title">Решение простейших задач статики деформируемого твердого тела методом конечных элементов</span>
+<span class="app-topics__text">Предпосылки матричной записи выражения энергии деформации. Матрица дифференцирования функций формы. Матрица упругости. Матричная запись энергии деформации. Составляющие потенциальной энергии внешних сил. Матрица жесткости. Учет граничных условий. Решение одномерной задачи статики методом конечных элементов</span>
+</li>
+<li><span class="app-topics__title">Конечные элементы более сложной формы (криволинейные, четырехугольные, объемные)</span>
+<span class="app-topics__text">Естественная система координат. Четырехугольный конечный элемент. Объемный конечный элемент</span>
+</li>
+<li><span class="app-topics__title">Численное интегрирование и его применение в методе конечных элементов</span>
+<span class="app-topics__text">Интерполяционная формула Лагранжа. Задача численного интегрирования функции. Квадратурные формулы</span>
+</li>
+<li><span class="app-topics__title">Некоторые аспекты вариационного исчисления</span>
+<span class="app-topics__text">Задача вариационного исчисления. Понятие функционала</span>
+</li>
+<li><span class="app-topics__title">Задачи о стационарных полях</span>
+<span class="app-topics__text">Общее дифференциальное уравнение в задачах о стационарных полях. Понятие функционала. Конечно-элементные преобразования функционала и построение системы линейных алгебраических уравнений. Уравнение теплопроводности</span>
+</li>
+<li><span class="app-topics__title">Нестационарные задачи теории поля</span>
+<span class="app-topics__text">Общее дифференциальное уравнение в нестационарных задачах. Матрица демпфирования элемента. Моделирование теплопроводности при нестационарном режиме</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Простейшая конечно-элементная модель деформирования тела</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Модель одноосного напряженного состояния из трехмерных конечных элементов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Модель плоского напряженного состояния из двумерных конечных элементов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Модели плоского напряженного и плоского деформируемого состояний из трехмерных конечных элементов</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Конечный элемент типа Beam</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Модель консольной рамы из элементов типа BEAM. Эпюры внутренних силовых факторов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Модель свободно опертой балки из элементов типа BEAM</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Конечно-элементная модель косого изгиба балки</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Конечно-элементная модель изгиба тонкостенной балки</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Конечно-элементная модель растянутой пластины с круглым отверстием</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Конечно-элементная модель выпучивания центрально сжатого стержня</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Конечно-элементная модель выпучивания свободно опертой сжатой пластинки</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Конечно-элементная модель выпучивания свободно опертой пластинки в условиях сдвига</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Проектирование легкой пластинки с элементами жесткости</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Конечно-элементная модель температурного расширения</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Конечно-элементная модель цилиндрической посадки с натягом</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Конечно-элементная модель передачи теплоты через плоскую стенку при стационарном режиме</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Конечно-элементная модель нестационарного процесса теплопередачи</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Определение количества теплоты, воспринятой твердым телом за отрезок времени при нестационарном режиме</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Исследование влияния толщины слоя теплозащитного покрытия на температуру стенки корпуса сверхзвукового летательного аппарата кратковременного действия в условиях аэродинамического нагрева</td><td class="ir-num app-nowrap">4 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Подготовка к зачёту</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">8 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">12 ч</td></tr><tr><td>Решение специальных задач</td><td class="ir-num app-nowrap">20 ч</td></tr><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">12 ч</td></tr><tr><td>Решение специальных задач</td><td class="ir-num app-nowrap">44 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ПК-1 — Способность и готовность участвовать в разработке проектов авиационной техники различного целевого назначения
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать основные методы математического моделирования элементов инженерных систем и физических процессов с применением компьютера
+
+        </li><li>Уметь разрабатывать математические модели инженерных систем и физических процессов с применением компьютера
+
+        </li><li>Владеть основами разработки конечно-элементных моделей при решении инженерных задач
+
+        </li><li>Знать возможности методов математического моделирования систем и процессов в решении инженерных задач
+
+        </li><li>Уметь применять основные математические методы в решении инженерных
+
+        </li><li>Владеть применением метода конечных элементов в решении инженерных задач
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Пыхалов А. А. Математические модели в инженерных приложениях : учебное пособие для инженерных специальностей... / А. А. Пыхалов, А. А. Кудрявцев, 2008. - 183. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-1674.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-1674.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 14</span>
+</li><li>Кудрявцев А. А. Моделирование систем и процессов : учебное пособие / А. А. Кудрявцев, С. В. Молокова, 2022. - 96. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-31156.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-31156.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 14</span>
+</li><li>Краснощеков Евгений Александрович. Задачник по теплопередаче : для теплоэнерг. спец. вузов / Евгений Александрович Краснощеков, Александр Семенович Сукомел, 1980.
+
+        </li><li>287.
+
+        </li><li>Задачник по технической термодинамике и теории тепломассообмена : учеб. пособие для энергомашиностроит. спец. вузов / Под ред. В. М. Крутова, Г. Б. Петражицкого, 1986.
+
+        </li><li>383.
+
+        </li><li>Сборник задач по технической термодинамике и теплопередаче : для ин-тов водного транспорта / под ред. Л. В. Арнольда, 1960. - 292.
+
+        </li><li>Погорелов В. И. Строительная механика тонкостенных конструкций : учебное пособие для вузов по направлению подготовки 160800 "Ракетостроение и космонавтика" / В. И. Погорелов, 2007. - 518.
+
+        </li><li>Тимошенко С. П. Устойчивость упругих систем / С. П. Тимошенко ; пер. И. К. Снитко, 1946. - 531.
+
+        </li><li>Зенкевич О. Метод конечных элементов в технике : пер. с англ. / О. Зенкевич; ред. Б. Е. Победри, 1975. - 541. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-8221.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-8221.pdf</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 14</span>
+</li><li>Тимошенко С. П. Колебания в инженерном деле : переводное издание / С. П. Тимошенко, Д. Х. Янг, У. Уивер, 1985. - 472. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-8675.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-8675.pdf</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 15</span>
+</li><li>Рычков С. П. Моделирование конструкций в среде Femap with NX Nastran / С. П. Рычков, 2016. - 783.
+
+        </li><li>Тимошенко С.П. Механика материалов : [пер. с англ.] / С. П. Тимошенко, Дж. Гере, 2002. - 669.
+
+        </li><li>Тимошенко С. П. Пластинки и оболочки / С. П. Тимошенко, С. Войновский-Кригер, 1966. - 635.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 15</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 15</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 15</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 15</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">15</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%9C%D0%BE%D0%B4%D0%B5%D0%BB%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D1%81%D0%B8%D1%81%D1%82%D0%B5%D0%BC_%D0%B8_%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D1%81%D1%81%D0%BE%D0%B2_19627_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

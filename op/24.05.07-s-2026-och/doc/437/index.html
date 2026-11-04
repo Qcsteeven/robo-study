@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Теория механизмов и машин — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Теория механизмов и машин</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>5</dd><dt>Трудоёмкость</dt><dd>4 з. е. · 144 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 32 ч, практические 16 ч, лабораторные 16 ч</dd><dt>Самостоятельная работа</dt><dd>44 ч</dd><dt>Промежуточная аттестация</dt><dd>Экзамен</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Строение механизмов</span>
+<span class="app-topics__text">Предмет и задачи курса. Основные понятия и определения. Структура и классификация механизмов. Кинематические пары и их классификация. Кинематическая цепь. Замена высших кинематических пар низшими. Избыточные связи и лишние степени свободы. Структурный анализ и синтез механизмов. Принцип образования механизмов. Группы Ассура и их классификация. Структурная классификация плоских рычажных механизмов. Порядок структурного анализа механизмов</span>
+</li>
+<li><span class="app-topics__title">Кинематический анализ и синтез механизмов</span>
+<span class="app-topics__text">Основные понятия кинематики механизмов. Задачи и методы кинематического анализ. Планы положений механизмов. Графический метод кинематического анализа. Графическое дифференцирование и интегрирование. Кинематическое исследование механизмов методом планов. Планы скоростей плоских механизмов. Планы ускорений плоских механизмов. Аналитический метод кинематического анализ. Функции положения, аналоги скоростей и ускорений. Метод замкнутого векторного контура</span>
+</li>
+<li><span class="app-topics__title">Динамика механизмов</span>
+<span class="app-topics__text">Задачи и методы силового анализа. Кинетостатический (силовой) расчет механизмов. Характеристика сил, действующих на звенья механизмов и машин. Условия статической определимости кинематической цепи. Порядок кинетостатического анализа механизмов. Силовой расчет групп Ассура первого, второго и третьего видов. Силовой расчет начального звена. Определение уравновешивающей силы с помощью рычага Жуковского. Трение в кинематических парах механизмов. Механический коэффициент полезного действия механизмов. Основные задачи и методы динамики машин. Выбор динамической модели машинного агрегата. Приведение сил и моментов сил. Приведение масс и моментов инерции. Режимы движения машинных агрегатов и их энергетические характеристики. Графо-аналитический метод динамического синтеза. Определение закона движения начального звена</span>
+</li>
+<li><span class="app-topics__title">Колебания в механизмах</span>
+<span class="app-topics__text">Уравнения движения механизмов в энергетической и дифференциальной формах. Условия статической и динамической уравновешенности ротора. Уравновешивание вращающихся масс. Статическая и динамическая балансировка ротора. Уравновешивание механизмов. Линейные и нелинейные уравнения движения в механизмах. Коэффициент неравномерности хода машины. Регулирование колебаний угловой скорости с помощью маховика. Вибрация, виброактивность машин. Пассивные и активные виброзащитные системы. Демпферы. Гашение колебаний, виброгасители. Динамические гасители колебаний. Вибрационные транспортеры</span>
+</li>
+<li><span class="app-topics__title">Синтез механизмов с высшими кинематическими парами</span>
+<span class="app-topics__text">Основные понятия и методы синтеза. Синтез механизмов по методу приближения функций. Методы оптимизации в синтезе механизмов с применением ЭВМ. Синтез плоских механизмов с высшими кинематическими парами. Общая характеристика зубчатых механизмов. Основная теорема зацепления. Основные геометрические параметры зубчатого колеса. Эвольвента и её свойства. Эвольвентное зацепление и его свойства. Синтез планетарных механизмов. Подбор чисел зубьев планетарных механизмов. Дифференциальные планетарные механизмы. Синтез кулачковых механизмов. Определение основных параметров кулачковых механизмов. Выбор закона движения ведомого звена. Определение основных размеров кулачкового механизма из условия ограничения угла давления. Синтез плоских механизмов с низшими кинематическими парами. Синтез механизмов по заданному ходу ведомого звена и по положениям промежуточного звена. Синтез направляющих механизмов</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Структурный анализ рычажного механизма</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Структурный синтез рычажного механизма</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Кинематический анализ кулачковых механизмов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Кинематический анализ зубчатых механизмов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Графо-аналитический метод динамического анализа</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение основных размеров кулачковых механизмов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение геометрических параметров зубчатого колеса</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Построение эвольвентного профиля колеса методом обкатки инструментальной рейкой</td><td class="ir-num app-nowrap">2 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Практические занятия</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Структурный анализ плоских рычажных механизмов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Исследование рычажных механизмов графическим методом</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Построение планов скоростей и ускорений рычажных механизмов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение уравновешивающей силы методом Жуковского</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Построение диаграммы Виттенбауэра</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Построение картины эвольвентного зацепления</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение основных показателей зацепления</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Построение профиля кулачка</td><td class="ir-num app-nowrap">2 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Оформление отчетов по лабораторным и практическим работам</td><td class="ir-num app-nowrap">18 ч</td></tr><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">16 ч</td></tr><tr><td>Подготовка к экзамену</td><td class="ir-num app-nowrap">10 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ОПК-1 — Способен применять естественнонаучные и общеинженерные знания, методы математического анализа и моделирования, теоретического и экспериментального исследования для решения инженерных задач профессиональной деятельности
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать общие методы структурного, кинематического и динамического анализа и синтеза типовых механизмов и машин
+
+        </li><li>Уметь применять общие методы структурного, кинематического и динамического анализа и синтеза механизмов и машин при решении практических задач выбора типовых расчетных моделей элементов авиационных конструкций
+
+        </li><li>Владеть навыками применения общих методов структурного, кинематического и динамического анализа и синтеза механизмов и машин при решении практических задач выбора типовых расчетных моделей элементов авиационных конструкций
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Артоболевский И. И. Теория механизмов и машин : учебник для втузов / И. И. Артоболевский, 2011. - 640 с. [Сайт] – URL: <a href="https://isopromat.ru/tmm/literatura/artobolevskij-i-i-teoria-mehanizmov-i-mashin" rel="noopener">https://isopromat.ru/tmm/literatura/artobolevskij-i-i-teoria-mehanizmov-i-mashin</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 13</span>
+</li><li>Тимофеев Г. А. Теория механизмов и машин : учебное пособие для вузов по техническим специальностям / Г. А. Тимофеев, 2012. - 351 с [Сайт] – URL: <a href="http://shador.ru/Timofeev.pdf" rel="noopener">http://shador.ru/Timofeev.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 13</span>
+</li><li>Чмиль В. П. Теория механизмов и машин : учебное пособие / В. П. Чмиль, 2017. - 280 с. [Сайт] – URL: <a href="https://e.lanbook.com/book/91896" rel="noopener">https://e.lanbook.com/book/91896</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 13</span>
+</li><li>Кузнецов Н. К. Теория механизмов и машин : учебное пособие для бакалавров заочной формы обучения / Н. К. Кузнецов, 2014. - 103 с. [Сайт] – URL: <a href="https://www.iprbookshop.ru/23076.html" rel="noopener">https://www.iprbookshop.ru/23076.html</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 13</span>
+</li><li>Шматкова А. В. Теория механизмов и машин : учебное пособие / А. В. Шматкова, 2014.
+
+        </li><li>168 с. [Сайт] – URL: <a href="http://www.biblio-online.ru/book/DE89640A-582C-4A07-B96E-517CF7CB4188?" rel="noopener">http://www.biblio-online.ru/book/DE89640A-582C-4A07-B96E-517CF7CB4188?</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 13; Из раздела «8 Дополнительная учебная литература и справочная», стр. 14</span>
+</li><li>Теория механизмов и машин: руководство по курсовому проектированию : учебное пособие для механических специальностей / А. С. Кореняко [и др.]; под ред. А. С. Кореняко, 2012. - 139 с [Сайт] – URL: <a href="https://www.ozon.ru/product/kursovoe-proektirovanie-po-teorii-mehanizmov-i-mashin-a-s-korenyako-uchebnik-pyatoe-izdanie-1737161015/?__rr=1=1=www.google.com" rel="noopener">https://www.ozon.ru/product/kursovoe-proektirovanie-po-teorii-mehanizmov-i-mashin-a-s-korenyako-uchebnik-pyatoe-izdanie-1737161015/?__rr=1=1=www.google.com</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 14</span>
+</li><li>Тимофеев Г. А. Теория механизмов и машин [Электронный ресурс] : учебник и практикум для академического бакалавриата / Г. А. Тимофеев, 2018. - 429 с. [Сайт] – URL: <a href="http://www.biblio-online.ru/book/DE89640A-582C-4A07-B96E-517CF7CB4188?" rel="noopener">http://www.biblio-online.ru/book/DE89640A-582C-4A07-B96E-517CF7CB4188?</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 13; Из раздела «8 Дополнительная учебная литература и справочная», стр. 14</span>
+</li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 14</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 14</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 14</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 14</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">15</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%A2%D0%B5%D0%BE%D1%80%D0%B8%D1%8F_%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%B7%D0%BC%D0%BE%D0%B2_%D0%B8_%D0%BC%D0%B0%D1%88%D0%B8%D0%BD_14270_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

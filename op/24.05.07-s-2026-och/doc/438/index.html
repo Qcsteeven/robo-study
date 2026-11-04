@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Детали механизмов и машин — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Детали механизмов и машин</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>6</dd><dt>Трудоёмкость</dt><dd>5 з. е. · 180 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 32 ч, практические 32 ч, лабораторные 16 ч</dd><dt>Самостоятельная работа</dt><dd>64 ч</dd><dt>Промежуточная аттестация</dt><dd>Экзамен, Курсовой проект</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Основы расчета и проектирования деталей и узлов машин</span>
+<span class="app-topics__text">Классификация механизмов, узлов и деталей. Основы проектирования механизмов, стадии разработки. Требования к деталям. Критерии работоспособности, влияющие на них факторы</span>
+</li>
+<li><span class="app-topics__title">Механические передачи и детали передач</span>
+<span class="app-topics__text">Классификация, характеристики механических передачах. Цилиндрические зубчатые передачи. Конические зубчатые передачи. Планетарные передачи. Волновые передачи. Передачи винт -гайка. Передачи червячные. Фрикционные передачи и вариаторы. Ременные и цепные передачи. Расчеты передач на прочность</span>
+</li>
+<li><span class="app-topics__title">Валы, муфты и упругие элементы</span>
+<span class="app-topics__text">Конструкции валов и осей. Расчеты на прочность и жесткость, конструирование валов. Назначение, классификация муфт. Муфты глухие, компенсирующие, самоуправляемые, сцепные. Классификация, материалы, характеристики упругих элементов. Проектирование витых пружин</span>
+</li>
+<li><span class="app-topics__title">Подшипники, уплотнения и корпусные детали</span>
+<span class="app-topics__text">Конструкции, расчеты подшипников скольжения. Конструкции, классификация, обозначение подшипников качения. Разрушения и методы расчёта подшипников качения. Конструирование подшипниковых узлов. Уплотнение подвижных и неподвижных соединений. Уплотнения и системы смазки подшипниковых узлов. Корпусные детали. Конструирование литых корпусов</span>
+</li>
+<li><span class="app-topics__title">Соединения и детали соединений</span>
+<span class="app-topics__text">Резьбовые соединения. Cварные соединения. Шпоночные и шлицевые соединения. Заклепочные соединения. Соединения с натягом. Клеммовые соединения. Паяные и клеевые соединения. Профильные и штифтовые соединения</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Изучение конструкции и определение параметров зубчатого цилиндрического редуктора</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Изучение конструкции и определение параметров червячного редуктора</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Изучение конструкции авиационного редуктора</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Исследование влияния режимов работы привода на КПД конического редуктора</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Исследование влияния частоты вращения входного вала на КПД планетарного редуктора</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение критических частот вращения вала при различной инерционной нагрузке</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение момента сил трения подшипника скольжения в зависимости от скорости вращения вала</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Экспериментальное определение зависимости силы, растягивающей болт в затянутом резьбовом соединении, от величины внешней отрывающей силы</td><td class="ir-num app-nowrap">2 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Практические занятия</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Кинематический и энергетический расчет авиационных редукторов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Дифференциальные редукторы с двумя соосными воздушными винтами</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Определение допускаемых напряжений при расчёте зубчатых передач</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Расчет на прочность цилиндрической зубчатой передачи</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Расчет на прочность конической зубчатой передачи</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Расчет на прочность планетарной зубчатой передачи</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Проектирование механизма винт-гайка</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Компоновка авиционных механических передач</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Конструирование авиационных зубчатых колес</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Проектирование валов и осей</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Проверочный расчёт валов на выносливость</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Конструирование подшипниковых узлов</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Подбор подшипников качения и проверка их долговечности</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Конструирование корпусных деталей авиационных механических передач</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Разработка смазочной и уплотнительной систем авиационного привода</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Расчет и конструирование фланцевых соединений авиационных конструкций</td><td class="ir-num app-nowrap">2 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Выполнение тренировочных и обучающих тестов в дистанционном режиме</td><td class="ir-num app-nowrap">10 ч</td></tr><tr><td>Написание курсового проекта (работы)</td><td class="ir-num app-nowrap">46 ч</td></tr><tr><td>Оформление отчетов по лабораторным и практическим работам</td><td class="ir-num app-nowrap">8 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ОПК-1 — Способен применять естественнонаучные и общеинженерные знания, методы математического анализа и моделирования, теоретического и экспериментального исследования для решения инженерных задач профессиональной деятельности
+
+        </li><li>ПК-2 — Способность и готовность участвовать в разработке конструктивно-силовых схем узлов и агрегатов авиационной техники
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Уметь самостоятельно находить техническое решение в виде кинематической схемы устройства и основных её исполнительных модулей
+
+        </li><li>Владеть терминологией дисциплины, культурой мышления, способностью к обобщению, анализу, восприятию информации, постановке цели и выбору путей её достижения
+
+        </li><li>Знать основы автоматизации расчетов и конструирования авиационных механических
+
+        </li><li>Уметь оценивать качество конструкторских решений по разработке конструкций механических передач, их типовых узлов и деталей
+
+        </li><li>Владеть оформлением результатов исследований; основными методами разработки конструкции механических передач, их типовых узлов и деталей
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Иванов М. Н. Детали машин : учебник для высших технических учебных заведений / М. Н. Иванов, В. А. Финогенов, 2008. - 407.
+
+        </li><li>Дунаев П. Ф. Конструирование узлов и деталей машин : учебное пособие для вузов по машиностроительным направлениям подготовки и специальностям / П. Ф. Дунаев, О. П. Леликов, 2009. - 495.
+
+        </li><li>Еремеев В. К. Основы конструирования и детали механических машин [Электронный ресурс] : учебник / В. К. Еремеев, 2011. - 807. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-4629.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-4629.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 10</span>
+</li><li>Основы расчета и конструирования деталей и механизмов летательных аппаратов : учеб. пособие для втузов / Под ред. В. Н. Кестельмана, Г. И. Рощина, 1989. - 454. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-22156.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-22156.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 10</span>
+</li><li>Тюняев А. В. Детали машин : учебник / А. В. Тюняев, В. П. Звездаков, В. А. Вагнер, 2013. - 731. [Сайт] – URL: <a href="https://e.lanbook.com/book/5109#book" rel="noopener">https://e.lanbook.com/book/5109#book</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 10</span>
+</li><li>Детали машин и прикладная механика : лабораторный практикум / В. К. Еремеев [и др.], 2014. - 101. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-15689.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-15689.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 10</span>
+</li><li>Королев П. В. Детали машин и основы конструирования : лабораторный практикум / П. В. Королев, М. В. Форенталь, 2016. - 114.
+
+        </li><li>Осипов А. Г. Детали машин и основы конструирования. Курсовое проектирование [Электронный ресурс] : учебное пособие / А. Г. Осипов, Ю. Н. Горнов, В. К. Еремеев, 2019. - 178. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-21743.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-21743.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 10</span>
+</li><li>Детали машин и основы конструирования : учеб. для вузов по направлениям подгот. и специальностям высш. проф. образования в области техники и технологии / Г. И. Рощин [и др.]; под ред. Г. И. Рощина и Е. А. Самойлова, 2006. - 415.
+
+        </li><li>Тюняев А. В. Основы конструирования деталей машин. Литые детали : учебное пособие / А. В. Тюняев, 2013. - 192. [Сайт] – URL: <a href="https://e.lanbook.com/book/30429#book" rel="noopener">https://e.lanbook.com/book/30429#book</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 10</span>
+</li><li>Тюняев А. В. Основы конструирования деталей машин. Детали передач с гибкой связью : учебное пособие / А. В. Тюняев, 2020. - 148 с [Сайт] – URL: <a href="https://e.lanbook.com/book/133900" rel="noopener">https://e.lanbook.com/book/133900</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 11</span>
+</li><li>Тюняев А. В. Основы конструирования деталей машин. Валы и оси : учебно- методическое пособие / А. В. Тюняев, 2023. - 316. [Сайт] – URL: <a href="https://e.lanbook.com/book/282710" rel="noopener">https://e.lanbook.com/book/282710</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 11</span>
+</li><li>Решетов Д. Н. Детали машин : учеб. для машиностроит. специальностей вузов / Д. Н. Решетов, 1975. - 654, [ 1].
+
+        </li><li>Орлов Павел Иванович. Основы конструирования: Справ.-метод. пособие : в 2 кн. Кн. 1. / Павел Иванович Орлов; Под ред. П. Н. Учаева, 1988. - 559. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-21922.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-21922.pdf</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 11</span>
+</li><li>Орлов Павел Иванович. Основы конструирования : справ.-метод. пособие: в 2 кн. Кн.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://repo.ssau.ru/handle/Uchebnye-izdaniya/Raschet-i-konstruirovanie-detaleiaviacionnyh-mehanicheskih-peredach-Elektronnyi-resurs-uchebsprav-posobie-dlya-vuzov-pospecialnosti-Samoleto-i-vertolet-74930">проектированию/работе: Осипов А. Г. Детали машин и основы конструирования. Курсовое проектирование [Электронный ресурс] : учебное пособие / А. Г. Осипов, Ю. Н. Горнов, В. К. Еремеев, 2019. - 178. Силаев Б.М. Расчет и конструирование деталей авиационных механических передач: учеб. - справочное пособие / Б.М. Силаев. - Самара: Изд-во Самар, гос. аэрокосм, ун-та, 2008. 150 с</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по курсовому», стр. 6</span>
+</li>
+<li><a class="ir-link" href="https://el.istu.edu/mod/book/view.php?id=66415">Методические указания приведены в электронном курсе</a>
+<span class="app-resource-origin">Из раздела «5.1.2 Методические указания для обучающихся по практическим занятиям», стр. 6; Из раздела «5.1.4 Методические указания для обучающихся по самостоятельной работе», стр. 7</span>
+</li>
+<li><a class="ir-link" href="http://elib.istu.edu/viewer/view.php?file=/files3/er-21923.pdf">/ Павел Иванович Орлов, 1988. - 542. [Сайт] – URL</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 11</span>
+</li>
+<li><a class="ir-link" href="http://elib.istu.edu/viewer/view.php?file=/files3/er-9130.pdf">Анурьев. Справочник конструктора-машиностроителя : в 3 т. Т. 1, 2001. - 920. [Сайт] – URL</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 11</span>
+</li>
+<li><a class="ir-link" href="http://elib.istu.edu/viewer/view.php?file=/files3/er-9131.pdf">Анурьев. Справочник конструктора-машиностроителя : в 3 т. Т. 2, 2001. - 900. [Сайт] – URL</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 11</span>
+</li>
+<li><a class="ir-link" href="http://elib.istu.edu/viewer/view.php?file=/files3/er-9132.pdf">Анурьев. Справочник конструктора-машиностроителя : в 3 т. Т. 3, 2001. - 858. [Сайт] – URL</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 11</span>
+</li>
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 12</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 12</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 12</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 12</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">13</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%94%D0%B5%D1%82%D0%B0%D0%BB%D0%B8_%D0%BC%D0%B5%D1%85%D0%B0%D0%BD%D0%B8%D0%B7%D0%BC%D0%BE%D0%B2_%D0%B8_%D0%BC%D0%B0%D1%88%D0%B8%D0%BD_14266_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

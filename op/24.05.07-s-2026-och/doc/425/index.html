@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Гидропривод — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Гидропривод</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>7</dd><dt>Трудоёмкость</dt><dd>3 з. е. · 108 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 16 ч, лабораторные 32 ч</dd><dt>Самостоятельная работа</dt><dd>60 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Основные свойства капельной жидкости. Требования к рабочим жидкостям гидросистем</span>
+<span class="app-topics__text">Плотность жидкости. Сжимаемость Температурное расширение Сопротивление растяжению Силы поверхностного натяжения Вязкость Испаряемость ...Требования к рабочим жидкостям гидросистем</span>
+</li>
+<li><span class="app-topics__title">Объёмные гидроприводы</span>
+<span class="app-topics__text">Агрегаты Гидроцилиндры Гидроаккумуляторы поршневые. Гидроаккумуляторы диафрагменные. Гидроаккумуляторы сильфонные. Гидродвигатели</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Универсальный гидравлический стенд</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Промывка гидроагрегатов и гидравлических систем</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Испытания на прочность, герметичность и давление срабатывания агрегатов гидросистемы летательных аппаратов</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Циклические испытания силовых цилиндров</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Стендовая отработка гидроусилителя БУ-190А</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Проектирование гидравлических схем с помощью компьютерных систем</td><td class="ir-num app-nowrap">4 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Подготовка к зачёту</td><td class="ir-num app-nowrap">20 ч</td></tr><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">20 ч</td></tr><tr><td>Подготовка к сдаче и защите отчетов</td><td class="ir-num app-nowrap">20 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ОПК-1 — Способен применять естественнонаучные и общеинженерные знания, методы математического анализа и моделирования, теоретического и экспериментального исследования для решения инженерных задач профессиональной деятельности
+
+        </li><li>ПК-2 — Способность и готовность участвовать в разработке конструктивно-силовых схем узлов и агрегатов авиационной техники
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать методы математического анализа при решении задач проектирования гидравлических систем
+
+        </li><li>Уметь Применять естественнонаучные и общеинженерные знания, методы математического анализа при решении задач проектирования гидравлических систем
+
+        </li><li>Владеть навыками компьютерного применения методов математического анализа при решении задач проектирования гидравлических систем
+
+        </li><li>Знать состав, назначение и принципы работы гидравлических систем самолетов различного целевого назначения
+
+        </li><li>Уметь составить гидравлическую систему для конкретного стенда самолета и определить ее основные параметры
+
+        </li><li>Владеть представлением о новых, технологических и конструктивных решениях в конструкциях существующих гидросистем ла
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Гидравлика, гидромашины и гидроприводы : учебник для втузов / Т. М. Башта [и др.], 2010. - 422.
+
+        </li><li>Гидравлика, гидромашины и гидроприводы : учебник для втузов / Т. М. Башта [и др.], 2011. - 422.
+
+        </li><li>Гидравлика, гидромашины и гидроприводы : учебник для втузов / Т. М. Башта, С. С. Руднев, Б. Б. Некрасов [и др.], 2013. - 422.
+
+        </li><li>Киселева И. И. Основы гидравлики и гидропривода : учебное пособие / И. И. Киселева, Т. Г. Войткова, Д. В. Кокоуров, 2011. - 132.
+
+        </li><li>Ивановский Ю. К. Основы теории гидропривода : учебное пособие / Ю. К. Ивановский, К. П. Моргунов, 2018. - 200. [Сайт] – URL: <a href="https://e.lanbook.com/book/102590" rel="noopener">https://e.lanbook.com/book/102590</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 6</span>
+</li><li>Карев. Гидропривод летательных аппаратов : конспект лекций. Ч. 1 : Гидромеханические следящие приводы в системах управления современных самолетов, 1976. - 72.
+
+        </li><li>Башта Т. М. Расчеты и конструкции самолетных гидравлических устройств / Т. М. Башта, 1961. - 475.
+
+        </li><li>Задачник по гидравлике, гидромашинам и гидроприводу : учебное пособие для машиностроительных специальностей вузов / Б. Б. Некрасов [и др.], 2007. - 191.
+
+        </li><li>Системы оборудования летательных аппаратов : учеб. для вузов по направлению "Авиа- и ракетостроение" ... / М. Г. Акопов [и др.]; под ред. А. М. Матвеенко, В. И. Бекасов, 2005.
+
+        </li><li>557.
+
+        </li><li>Панов В. М. Использование типовых программ для расчета гидроприводов на ЭВМ : учебное пособие / В. М. Панов, 1983. - 104.
+
+        </li><li>Башта Т. М. Машиностроительная гидравлика : справочное пособие / Т. М. Башта, 1963.
+
+        </li><li>696.
+
+        </li><li>Башта Т. М. Гидравлические следящие приводы / Т. М. Башта, 1960. - 279.
+
+        </li><li>Башта Т. М. Гидравлические приводы летательных аппаратов / Т. М. Башта, 1967. - 495.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 7</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 7</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 7</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 7</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">8</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%93%D0%B8%D0%B4%D1%80%D0%BE%D0%BF%D1%80%D0%B8%D0%B2%D0%BE%D0%B4_19620_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

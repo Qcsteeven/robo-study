@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Технологическая оснастка — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Технологическая оснастка</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестры</dt><dd>9, 10</dd><dt>Трудоёмкость</dt><dd>7 з. е. · 252 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 64 ч, лабораторные 48 ч</dd><dt>Самостоятельная работа</dt><dd>140 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет с оценкой, Зачет, Курсовая работа</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Лекция 1.1</span>
+<span class="app-topics__text">Место ЗШП в производственной цепочке самолето- и вертолетостроения. Классификация оснастки: штампы, приспособления, калибры, пресс-формы. Требования к оснастке для листовых деталей летательных аппаратов. Влияние качества оснастки на точность, массу и ресурс конструкции. Обзор цифрового проектирования оснастки (CAD/CAE). Упоминание конечно-элементного анализа (МКЭ) как инструмента виртуальной отработки оснастки</span>
+</li>
+<li><span class="app-topics__title">Лекция 1.2</span>
+<span class="app-topics__text">Напряженно-деформированное состояние (НДС) при листовой штамповке. Зоны растяжения, сжатия, сдвига. Упругие и пластические деформации. Предел текучести, предел прочности, модуль упругости. Особенности деформирования алюминиевых и титановых сплавов, применяемых в авиации. Связь свойств материала с выбором схемы формообразования и конструкции оснастки. Упоминание лабораторных работ по моделированию развертки и формообразования</span>
+</li>
+<li><span class="app-topics__title">Лекция 1.3</span>
+<span class="app-topics__text">Обзор основных операций: гибка, гибка с растяжением, вытяжка, обтяжка, раздача, обжим, формовка. Особенности каждой операции с точки зрения требований к оснастке. Выбор технологической схемы в зависимости от геометрии детали и материала. Эластоформование (штамповка эластичной средой) как способ снижения жесткости требований к оснастке. Упоминание лабораторных работ по эластоформованию и вытяжке в жестких штампах</span>
+</li>
+<li><span class="app-topics__title">Лекция 1.4</span>
+<span class="app-topics__text">Типовые конструкции штампов для листовой штамповки. Пуансон, матрица, прижим, съемник, направляющие элементы. Материалы оснастки: стали, чугуны, полимеры. Требования к жесткости, износостойкости, точности изготовления. Влияние конструкции оснастки на распределение деформаций в заготовке. Способы крепления и базирования оснастки на прессовом оборудовании</span>
+</li>
+<li><span class="app-topics__title">Лекция 1.5</span>
+<span class="app-topics__text">Метод конечных элементов как основа современного инженерного анализа. Постановка задачи: геометрия, материал, граничные условия, нагрузка. Выбор типа конечных элементов (оболочечные, объемные). Понятие сходимости решения, влияние размера сетки. Обзор программных комплексов для моделирования штамповки (PAM-STAMP 2G, AutoForm, DynaForm). Место МКЭ в жизненном цикле оснастки — от эскиза до эксплуатации. Упоминание лабораторных работ в PAM-STAMP 2G</span>
+</li>
+<li><span class="app-topics__title">Лекция 1.6</span>
+<span class="app-topics__text">Задача определения исходной заготовки (развертки) для детали сложной формы. Методы развертки: геометрические, на основе МКЭ (Inverse approach). Учет анизотропии материала и технологических ограничений. Влияние точности развертки на качество детали и нагрузку на оснастку. Автоматизация построения развертки в CAD/CAE-системах. Упоминание лабораторных работ №1 и №2 по моделированию развертки Inverse в PAM-STAMP 2G</span>
+</li>
+<li><span class="app-topics__title">Лекция 1.7</span>
+<span class="app-topics__text">Специфика моделирования вытяжки в жестких штампах: контактное взаимодействие, трение, прижимное усилие, риск разрыва и гофрообразования. Моделирование эластоформования: деформируемая среда (резина, полиуретан) как инструмент. Преимущества и ограничения каждого метода. Анализ результатов моделирования: карты толщин, карты деформаций, зоны риска. Упоминание лабораторных работ №3 и №4</span>
+</li>
+<li><span class="app-topics__title">Лекция 1.8</span>
+<span class="app-topics__text">Сравнение результатов МКЭ-моделирования с натурными экспериментами. Источники погрешностей: свойства материала, условия трения, упрощенная геометрия. Методы повышения достоверности: калибровка моделей, уточнение граничных условий. Роль верификации при проектировании ответственной оснастки для авиационных деталей. Стандарты и требования к сертификации оснастки в авиастроении</span>
+</li>
+<li><span class="app-topics__title">Лекция 2.1</span>
+<span class="app-topics__text">Природа пружинения (springback) при листовой штамповке. Факторы, влияющие на величину пружинения: свойства материала, радиус гиба, схема деформирования. Методы учета пружинения при проектировании оснастки: компенсация геометрии инструмента, дополнительные операции (калибровка). Прогнозирование пружинения с помощью МКЭ. Упоминание лабораторной работы по моделированию упругого отклика</span>
+</li>
+<li><span class="app-topics__title">Лекция 2.2</span>
+<span class="app-topics__text">Стратегии компенсации пружинения: изменение геометрии рабочих поверхностей пуансона и матрицы, регулировка прижимного усилия, термическая обработка. Итерационный подход: моделирование → анализ → корректировка оснастки → повторное моделирование. Передача скорректированной геометрии в CAD-систему для изготовления оснастки. Автоматизация процесса компенсации в PAM-STAMP 2G. Упоминание лабораторной работы по оптимизации с учетом пружинения</span>
+</li>
+<li><span class="app-topics__title">Лекция 2.3</span>
+<span class="app-topics__text">Скоростные эффекты в листовой штамповке: инерционные нагрузки, динамическое деформирование, влияние скорости деформации на свойства материала. Особенности моделирования динамических процессов в МКЭ: явные и неявные схемы интегрирования. Нагрузки на оснастку при динамическом нагружении: силы, моменты, распределение контактных давлений. Упоминание лабораторной работы по расчету оснастки на прочность при динамическом процессе</span>
+</li>
+<li><span class="app-topics__title">Лекция 2.4</span>
+<span class="app-topics__text">Критерии работоспособности оснастки: прочность, жесткость, износостойкость, усталостная прочность. Расчет напряжений и деформаций в элементах оснастки под действием технологических нагрузок. Методы МКЭ для прочностного анализа: статический и динамический расчеты. Анализ концентраторов напряжений. Выбор запасов прочности для авиационной оснастки. Упоминание лабораторной работы по расчету оснастки при динамическом формообразовании</span>
+</li>
+<li><span class="app-topics__title">Лекция 2.5</span>
+<span class="app-topics__text">Постановка задачи оптимизации: целевая функция (масса, стоимость, напряженность), ограничения (прочность, жесткость, технологичность). Методы оптимизации: параметрическая, топологическая, формы. Применение оптимизации к оснастке: уменьшение металлоемкости при сохранении несущей способности. Интеграция оптимизации с МКЭ-моделированием. Упоминание лабораторной работы по оптимизации формы оснастки по массе</span>
+</li>
+<li><span class="app-topics__title">Лекция 2.6</span>
+<span class="app-topics__text">Цифровой двойник оснастки. Бесшовный обмен данными между CAD-системой (геометрия) и CAE-системой (сетка, граничные условия, результаты). Передача результатов оптимизации и компенсации пружинения обратно в CAD. PDM/PLM-системы для управления данными об оснастке. Автоматизация рутинных операций при проектировании. Упоминание лабораторной работы по переносу информации в CAD</span>
+</li>
+<li><span class="app-topics__title">Лекция 2.7</span>
+<span class="app-topics__text">Аддитивные технологии для изготовления оснастки (3D-печать полимерных и металлических форм). Применение композитных материалов для оснастки. Интеллектуальная оснастка с датчиками контроля процесса. Бездоводочные технологии изготовления листовых деталей. Цифровое производство и Индустрия 4.0 в ЗШП. Перспективы развития МКЭ-моделирования</span>
+</li>
+<li><span class="app-topics__title">Лекция 2.8</span>
+<span class="app-topics__text">Системный подход к проектированию оснастки: учет всех этапов — от развертки до эксплуатационной прочности. Взаимосвязь технологических параметров, конструкции оснастки и качества детали. Многокритериальная оптимизация. Примеры из практики авиастроения: крупногабаритные панели, детали двойной кривизны. Подготовка к выполнению курсовой работы: обзор типовых задач и методов их решения</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Моделирование развертки листовой детали (Inverse approach) – часть 1</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Моделирование развертки листовой детали (Inverse approach) – часть 2</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Моделирование эластоформования</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Моделирование вытяжки в жёстких штампах</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Моделирование формообразования с учётом упругого отклика материала</td><td class="ir-num app-nowrap">8 ч</td></tr><tr><td>Оптимизация оснастки с учётом пружинения и передача данных в CAD</td><td class="ir-num app-nowrap">8 ч</td></tr><tr><td>Расчёт на прочность оснастки при динамическом формообразовании</td><td class="ir-num app-nowrap">8 ч</td></tr><tr><td>Оптимизация формы оснастки по массе и повторный прочностной расчёт</td><td class="ir-num app-nowrap">8 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Написание курсового проекта (работы)</td><td class="ir-num app-nowrap">20 ч</td></tr><tr><td>Тестирование по разделам дисциплин</td><td class="ir-num app-nowrap">40 ч</td></tr><tr><td>Написание курсового проекта (работы)</td><td class="ir-num app-nowrap">40 ч</td></tr><tr><td>Тестирование по разделам дисциплин</td><td class="ir-num app-nowrap">40 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ПК-6 — Способность и готовность к разработке средств технологического оснащения производства и мест их размещения
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Владеть Методами структурно-функционального анализа производственных цепей, навыками
+
+        </li><li>Владеть Навыками работы с программным комплексом PAM-STAMP 2G (построение конечно-элементных моделей, задание материалов и граничных условий, постобработка результатов), методами компенсации пружинения и
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Чеславская. Технология заготовительно-штамповочных работ [Электронный ресурс] : конспект лекций. Ч. 1 : Теория обработки металлов давлением, 2007. - 69. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-3955.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-3955.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 20</span>
+</li><li>Технология заготовительно-штамповочных работ : методические указания по выполнению курсового проекта / Иркут. гос. техн. ун-т, 2002. - 11. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-13859.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-13859.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 20</span>
+</li><li>Горбунов Михаил Николаевич. Технология заготовительно-штамповочных работ в производстве самолетов : учеб. для втузов по спец. "Самолетостроение" / Михаил Николаевич Горбунов, 1981. - 224. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-22032.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-22032.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 20</span>
+</li><li>Катков В. Ф. Оборудование и средства автоматизации и механизации заготовительно- штамповочных цехов : учеб. пособие для авиац. специальностей вузов / В. Ф. Катков, 1985. - 384.
+
+        </li><li>Сусин П. П. Нормирование работ в машиностроении (работы станочные, механосборочные, вспомогательные, заготовительного производства) / П. П. Сусин, 1974.
+
+        </li><li>229.
+
+        </li><li>Григорьев А. К. Термомеханическое упрочнение стали в заготовительном производстве / А. К. Григорьев, Г. Е. Коджаспиров, 1985. - 143.
+
+        </li><li>Андрашников Б. И. Механизация и автоматизация заготовительно-сборочных операций / Б. И. Андрашников, 1976. - 176.
+
+        </li><li>Богомолова. Конспект лекций по курсу "Организация и проектирование основных цехов авиапредприятий". Ч. 1 : Организация и проектирование заготовительно- штамповочных цехов, 1970. - 87.
+
+        </li><li>Исаченко А. С. Оптимизация технологии производства деталей заготовительно- штамповочной оснастки : диссертация ... кандидата технических наук: 05.02.08 / Исаченко Алексей Сергеевич, 2018. - 146 л. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/ker-21611.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/ker-21611.pdf</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 21</span>
+</li><li>Исаченко А. С. Оптимизация технологии производства деталей заготовительно- штамповочной оснастки : автореферат диссертации ... кандидата технических наук:
+
+        </li><li>02.08 / Исаченко Алексей Сергеевич, 2019. - 19 с., включ. обл. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-21593.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-21593.pdf</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 21</span>
+</li><li>Прейскурант порайонных расценок на строительные и санитарно-технические работы в ценах, введенных с 1 июля 1950 г. на строительство предприятий лесозаготовительной промышленности. Ч. 1 : Порайонные расценки, Кн. 5, 1951, 1951. - 179.
+
+        </li><li>Технология, организация и механизация заготовительного и кузнечно-прессового производства : сборник, 1975. - 36.
+
+        </li><li>Технология, организация и механизация заготовительного и кузнечно-прессового производства : сборник, 1975. - 27.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 21</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 21</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 21</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 21</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">22</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%A2%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F_%D0%BE%D1%81%D0%BD%D0%B0%D1%81%D1%82%D0%BA%D0%B0_19649_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Проектирование сборочных приспособлений — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/24.05.07-s-2026-och/">24.05.07</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Проектирование сборочных приспособлений</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>24.05.07 Самолетостроение</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестры</dt><dd>9, 10</dd><dt>Трудоёмкость</dt><dd>7 з. е. · 252 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 64 ч, лабораторные 48 ч</dd><dt>Самостоятельная работа</dt><dd>140 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет с оценкой, Зачет, Курсовая работа</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Конструкция сборочного приспособления</span>
+<span class="app-topics__text">Требования к сборочным приспособлениям. Основные схемы конструкций и конструктивные элементы сборочных приспособлений. Состав конструктивных элементов. Назначение и конструктивные особенности основных элементов сборочных приспособлений. Классификация сборочных приспособлений. Типовая последовательность этапов проектирования сборочных приспособлений. Конструктивно-технологический анализ сборочной единицы</span>
+</li>
+<li><span class="app-topics__title">Методы монтажа сборочных приспособлений</span>
+<span class="app-topics__text">Основные задачи монтажа сборочных приспособлений. Классификация способов монтажа СП. Монтаж приспособлений по жёстким носителям форм и размеров. Монтаж сборочных приспособлений по координатным стендам. Монтаж СП с применением оптико-механических приборов и лазеров. Безэталонный монтаж сборочной оснастки</span>
+</li>
+<li><span class="app-topics__title">Вспомогательные элементы сборочных приспособлений</span>
+<span class="app-topics__text">Назначение вспомогательных элементов. Состав и функции вспомогательных элементов сборочного приспособления. Элементы механизации сборочной оснастки. Классификация средств механизации. Типовые компоновочные решения по механизации и автоматизации сборочной оснастки</span>
+</li>
+<li><span class="app-topics__title">Специальные виды сборочной оснастки</span>
+<span class="app-topics__text">Разделочные и стыковочные стенды. Типовые компоновки разделочного стенда. Типовые компоновки стыковочного стенда. Контроль положения агрегатов при стыковке. Технологические особенности сборки крупногабаритных агрегатов. Сборочно-сварочные приспособления. Обеспечение технологичности конструкции сборочного приспособления</span>
+</li>
+<li><span class="app-topics__title">Технологические основы механизации и автоматизации сборочных процессов</span>
+<span class="app-topics__text">Состав объектов технологической системы в современном сборочном производстве. Типы производств с точки зрения управления оборудованием. Основные принципы организации гибкого автоматизированного производства. Особенности применения механизированного и автоматизированного оборудования для сборочных процессов. Приводы перемещения в технологическом оборудовании. Классификация систем программного управления. Компоновочные схемы технологического оборудования</span>
+</li>
+<li><span class="app-topics__title">Ручное и стационарное механизированное оборудование для обработки отверстий</span>
+<span class="app-topics__text">Оценка уровня механизации и автоматизации производственного подразделения. Состав технологических операций процесса соединения. Ручное механизированное оборудование для обработки отверстий. Переносное механизированное оборудование для обработки отверстий. Сверлильные машины с автоматической подачей. Устройства для протяжки отверстий. Сверлильные и сверлильно-зенковальные агрегаты. Конструкции выравнивающих устройств в механизированном оборудовании. Сверлильно-зенковальные установки</span>
+</li>
+<li><span class="app-topics__title">Ручное и стационарное механизированное оборудование для выполнения заклепочных соединений</span>
+<span class="app-topics__text">Технологические процессы клепки. Пневматические клепальные молотки. Прессовая клепка при образовании заклепочного соединения. Пневморычажные схемы клепальных прессов. Переносные клепальные прессы. Стационарные клепальные прессы для одиночной клепки. Стационарный клепальный пресс КП-204М. Стационарный клепальный пресс КПК-406М. Стационарные клепальные прессы для групповой клепки. Пресс для групповой клепки КП-403. Выравнивающе-поддерживающее устройство типа ВУП. Стационарный клепальный пресс КП-504П. Стационарный клепальный пресс КП-602М</span>
+</li>
+<li><span class="app-topics__title">Технологическое оборудование для постановки специальных заклепок</span>
+<span class="app-topics__text">Конструкция болт-заклепок. Выполнение отверстий под болт-заклепки. Технологический процесс постановки болт-заклепок. Технологическое оборудование для постановки болт-заклепок. Работа пневмогидравлического пресса при постановке болт-заклепок. Контроль качества выполнения соединения</span>
+</li>
+<li><span class="app-topics__title">Автоматизированное оборудование для выполнения заклепочных соединений</span>
+<span class="app-topics__text">Системы управления автоматизированным оборудованием. Системы управления по упорам и концевым выключателям. Кулачковые системы управления. Копировальные системы управления. Системы числового программного управления. Сверлильно-клепальные автоматы. Общая характеристика сверлильно-клепальных автоматов. Технологический процесс автоматизированной постановки заклепок. Технологическое назначение, компоновка и органы управления сверлильно-клепальных автоматов. Сверлильно-клепальные автоматы в современном сборочном производстве. Сверлильно-клепальные автоматы для узловой сборки. Сверлильно-клепальные автоматы для клепки панелей. Рабочие головки сверлильно-клепальных автоматов</span>
+</li>
+<li><span class="app-topics__title">Организация сборочных процессов в автоматизированном производстве</span>
+<span class="app-topics__text">Основные особенности современного сборочного производства. Автоматизированные сборочные станции. Функциональные особенности сборочных станций. Конструктивные особенности компоновки сборочных станций. Методы автоматизированного координатного позиционирования. Объекты координатного позиционирования. Компоновка координатного пространства сборочной станции. Постановка задачи координатного позиционирования. Метод прямого координатного позиционирования. Метод обратного координатного позиционирования</span>
+</li>
+<li><span class="app-topics__title">Координатное позиционирование в сборочных станциях агрегатной сборки и стыковки</span>
+<span class="app-topics__text">Типовая компоновка сборочного пространства в сборочной станции. Технологический процесс позиционирования панелей в станции агрегатной сборки. Конструктивно-компоновочная структура станции стыковки отсеков фюзеляжа. Последовательность сборочно-стыковочных работ. Координатное позиционирование в станциях окончательной сборки</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Определение компоновочной схемы сборочного приспособления</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Монтаж сборочных приспособлений с использованием жёстких носителей форм и размеров</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Монтаж сборочных приспособлений с помощью координатных стендов</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Безэталонный монтаж сборочного приспособления</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Расчет параметров поточной сборочной линии</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Координатные измерения в автоматизированной сборке</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Программирование промышленного робота</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Автоматизированный монтаж сборочной оснастки</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Координатная стыковка изделий</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Обратное координатное позиционирование изделия</td><td class="ir-num app-nowrap">6 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Оформление отчетов по лабораторным и практическим работам</td><td class="ir-num app-nowrap">28 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">32 ч</td></tr><tr><td>Оформление отчетов по лабораторным и практическим работам</td><td class="ir-num app-nowrap">22 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">58 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>ПК-6 — Способность и готовность к разработке средств технологического оснащения производства и мест их размещения
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Уметь производить обоснованный выбор состава технологического оборудования для оснащения сборочного производства; выполнять комплектацию технических средств координатного
+
+        </li><li>Владеть навыками работы с научно-технической и справочной литературой для поиска и выбора состава технологического оборудования, навыками расчета требуемых технических характеристик технологического оборудования и систем управления; навыками построения дискретной модели заданной конструкции сборочной оснастки
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Ахатов Р. Х. Проектирование сборочных приспособлений : учебное пособие / Р. Х. Ахатов, 2020. - 208. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-23139.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-23139.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 17</span>
+</li><li>Ахатов Р. Х. Автоматизация сборочного оснащения в авиастроении : учебное пособие / Р. Х. Ахатов, 2022. - 258. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-31127.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-31127.pdf</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 17</span>
+</li><li>Никольский А. А. Основы монтажа сборочных приспособлений : учеб. пособие по курсу "Проектирование сборочных приспособлений": Для спец. 0535 "Самолетостроение" / А. А. Никольский; Моск. авиац. технол. ин-т им. К. Е. Циолковского, 1975. - 80. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files3/er-22661.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files3/er-22661.pdf</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 17</span>
+</li><li>Ахатов Р. Х. Проектирование сборочных приспособлений, 10 семестр : электронный курс / Р. Х. Ахатов, 2022 [Сайт] – URL: <a href="https://el.istu.edu/course/view.php?id=6319" rel="noopener">https://el.istu.edu/course/view.php?id=6319</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 17</span>
+</li><li>Современные методы и средства монтажа сборочной оснастки : учебно-методическое пособие для студентов специальности "Самолето- и вертолетостроение" / Нац. исслед. Иркут. гос. техн. ун-т, 2011. - 77. [Сайт] – URL: <a href="http://elib.istu.edu/viewer/view.php?file=/files/er-4618.pdf" rel="noopener">http://elib.istu.edu/viewer/view.php?file=/files/er-4618.pdf</a>
+<span class="app-resource-origin">Из раздела «8 Дополнительная учебная литература и справочная», стр. 17</span>
+</li><li>Вагнер Е. Т. Лазеры в самолетостроении / Е. Т. Вагнер, 1982. - 184.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="https://el.istu.edu/course/view.php?id=4684">Ахатов, Рашид Хадиатович. Проектирование сборочных приспособлений: электронный курс / Р. Х. Ахатов. – Иркутск : ИРНИТУ, 2020</a>
+<span class="app-resource-origin">Из раздела «5.1.3 Методические указания для обучающихся по самостоятельной работе», стр. 10</span>
+</li>
+<li><a class="ir-link" href="http://elib.istu.edu/viewer/view.php?file=/files3/er-19950.pdf">Автоматизированное координатное позиционирование [Электронный ресурс] : методические указания к лабораторным работам по дисциплине "Проектирование сборочных приспособлений" по специальности "Самолето- и вертолетостроение" всех форм обучения / Иркут. нац. исслед. техн. ун-т, Ин-т авиамашиностроения и трансп., Каф. самолетостроения и эксплуатации авиационной техники, 2018. - 40. [Сайт] – URL</a>
+<span class="app-resource-origin">Из раздела «7 Основная учебная литература», стр. 17</span>
+</li>
+<li><a class="ir-link" href="http://library.istu.edu/">library.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 17</span>
+</li>
+<li><a class="ir-link" href="https://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 17</span>
+</li>
+<li><a class="ir-link" href="http://new.fips.ru/">new.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 17</span>
+</li>
+<li><a class="ir-link" href="http://www1.fips.ru/">www1.fips.ru</a>
+<span class="app-resource-origin">Из раздела «10 Профессиональные базы данных», стр. 17</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">18</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A1%D0%9C_2026_%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D1%81%D0%B1%D0%BE%D1%80%D0%BE%D1%87%D0%BD%D1%8B%D1%85_%D0%BF%D1%80%D0%B8%D1%81%D0%BF%D0%BE%D1%81%D0%BE%D0%B1%D0%BB%D0%B5%D0%BD%D0%B8%D0%B9_19636_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/24.05.07-s-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

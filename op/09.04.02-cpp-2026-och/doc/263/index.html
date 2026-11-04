@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Проектный менеджмент — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/09.04.02-cpp-2026-och/">09.04.02</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Проектный менеджмент</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>09.04.02 Цифровизация промышленных предприятий</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестры</dt><dd>1, 2</dd><dt>Трудоёмкость</dt><dd>5 з. е. · 180 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 28 ч, практические 28 ч</dd><dt>Самостоятельная работа</dt><dd>88 ч</dd><dt>Промежуточная аттестация</dt><dd>Экзамен, Зачет</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Теоретические основы проектной деятельности</span>
+<span class="app-topics__text">Проектный подход к управлению реальными инвестициями. Понятие и виды проектов. Сущность управления проектами</span>
+</li>
+<li><span class="app-topics__title">Планирование проекта</span>
+<span class="app-topics__text">Сущность планирования проекта. Структура разбиения работ и назначение ответственных. Определение основных этапов проекта и сетевое планирование</span>
+</li>
+<li><span class="app-topics__title">Управление стоимостью проекта</span>
+<span class="app-topics__text">Сущность управления стоимостью проекта. Оценка стоимости проекта. Методы контроля стоимости проекта. Прогнозирование затрат проекта. Бюджетирование проекта</span>
+</li>
+<li><span class="app-topics__title">Управление работами по проекту</span>
+<span class="app-topics__text">Взаимосвязь объёма, продолжительности и стоимости работ. Методы управления содержанием работ. Структура и объёмы работ. Формы контроля производительности труда</span>
+</li>
+<li><span class="app-topics__title">Управление ресурсами проекта</span>
+<span class="app-topics__text">Ресурсы проекта и управление ими. Управление закупками. Управление поставками. Виды запасов и оптимизация их размеров</span>
+</li>
+<li><span class="app-topics__title">Оценка эффективности проекта</span>
+<span class="app-topics__text">Основные принципы оценки эффективности инвестиционного проекта. Исходные данные для оценки эффективности проекта. Основные показатели эффективности проекта. Расчёт границ безубыточности проекта</span>
+</li>
+<li><span class="app-topics__title">Проектные отклонения</span>
+<span class="app-topics__text">Сценарии управления отклонениями. Управление рисками. Управление проблемами. Управление изменениями</span>
+</li>
+<li><span class="app-topics__title">Управление коммуникациями проекта. Выбор системы управления проектами</span>
+<span class="app-topics__text">Теоретические основы управления коммуникациями проекта. Модель коммуникации Шеннона-Уивера и ее приложение к проектам. Дополнительные барьеры коммуникации в проектах. Виды коммуникаций в организации. Процессы управления коммуникациями (PMBOK). Выбор системы управления проектами (PMS). Выбор системы управления проектами в России. Внедрение системы управления проектами. Синтез: как коммуникации влияют на выбор PMS и наоборот</span>
+</li>
+<li><span class="app-topics__title">Методологии управления проектами</span>
+<span class="app-topics__text">Классические (традиционные) методологии. Гибридные и управленческие методы. Гибкие методы (AGILE-СЕМЕЙСТВО)</span>
+</li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Практические занятия</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Этапы жизненного цикла проекта</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Устав проекта</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Кейс «Создание и выпуск новой продукции»</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Сетевые графики</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Оценка эффективности бюджета проекта</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Распределение работ. Графики и диаграммы</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Расчет потребности в ресурсе</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Расчет показателей эффективности проекта</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Расчет отклонений проекта</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Матрицы коммуникаций</td><td class="ir-num app-nowrap">3 ч</td></tr><tr><td>Выбор методологии управления проектами</td><td class="ir-num app-nowrap">4 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Итоговый тест</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Подготовка к зачёту</td><td class="ir-num app-nowrap">8 ч</td></tr><tr><td>Подготовка к практическим занятиям</td><td class="ir-num app-nowrap">14 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">20 ч</td></tr><tr><td>Итоговый тест</td><td class="ir-num app-nowrap">2 ч</td></tr><tr><td>Подготовка к зачёту</td><td class="ir-num app-nowrap">8 ч</td></tr><tr><td>Подготовка к практическим занятиям</td><td class="ir-num app-nowrap">14 ч</td></tr><tr><td>Проработка разделов теоретического материала</td><td class="ir-num app-nowrap">20 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list">
+<li>УК-2 — Способен управлять проектом на всех этапах его жизненного цикла
+
+        </li><li>УК-3 — Способен организовывать и руководить работой команды, вырабатывая командную стратегию для достижения поставленной цели
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list">
+<li>Знать основные этапы подготовки, разработки, согласования, практического претворения в жизнь проектов, направленных на развитие предприятия; методологии управления проектами; методы оценки рисков проекта и способы их минимизации
+
+        </li><li>Уметь своевременно реагировать на проблемы и принимать эффективные решения, внося изменения в проект на любом этапе жизненного цикла проекта
+
+        </li><li>Владеть навыками анализа данных для принятия обоснованных решений, учитывая соблюдения соответствия результатов проекта требованиям заказчика и установленным срокам
+
+        </li><li>Знать модели ролей в команде проекта; модели жизненного цикла команды проекта; коммуникационные технологии
+
+        </li><li>Уметь формировать команду проекта, планировать ее работу и контролировать выполнение задач
+
+        </li><li>Владеть навыками коммуникации внутри команды проекта и с заинтересованными сторонами проекта; навыками презентации результатов работы команды
+
+        </li>
+</ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list">
+<li>Управление проектами : пер. с англ. / Дж. К. Пинто [и др.], 2004. - 463.
+
+        </li><li>Романова М. В. Управление проектами : учебное пособие по дисциплине специализации специальности "Менеджмент организации" / М. В. Романова, 2014. - 253.
+
+        </li><li>Кук Хелен С. Управление проектами : учебник : пер. с англ. / Хелен С. Кук, Карен Тейт; пер. с англ. М. С. Павловой, 2007. - 427.
+
+        </li><li>Троцкий М. Управление проектами : пер. с пол. / М. Троцкий, Б. Груча, К. Огонек, 2006. - 301.
+
+        </li><li>Мартин П. Управление проектами / П. Мартин, К. Тейт, 2006. - 223.
+
+        </li><li>Грекул В. И. Проектное управление в сфере информационных технологий : монография / В. И. Грекул, Н. Л. Коровкина, Ю. В. Куприянов, 2013. - 336.
+
+        </li><li>Проектное управление : учебник / Г. Д. Антонов, О. П. Иванова, В. М. Тумин [и др.], 2023. - 294.
+
+        </li>
+</ul>
+<h3 class="item-title">Электронные ресурсы из документа</h3>
+<ul class="app-list app-resources">
+<li><a class="ir-link" href="https://el.istu.edu/course/view.php?id=5686">Проектный менеджмент. Электронный курс в LMS Moodle.URL</a>
+<span class="app-resource-origin">Из раздела «5.1.1 Методические указания для обучающихся по практическим занятиям», стр. 6; Из раздела «5.1.2 Методические указания для обучающихся по самостоятельной работе», стр. 6</span>
+</li>
+<li><a class="ir-link" href="http://elib.istu.edu/">elib.istu.edu</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 10</span>
+</li>
+<li><a class="ir-link" href="https://нэб.рф/">нэб.рф</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 10</span>
+</li>
+<li><a class="ir-link" href="http://e.lanbook.com">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 10</span>
+</li>
+<li><a class="ir-link" href="http://e.lanbook.com/">e.lanbook.com</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 10</span>
+</li>
+<li><a class="ir-link" href="https://elibrary.ru/">elibrary.ru</a>
+<span class="app-resource-origin">Из раздела «9 Ресурсы сети Интернет», стр. 10</span>
+</li>
+</ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">10</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%A6%D0%9F%D0%9F%D0%BC_2026_%D0%9F%D1%80%D0%BE%D0%B5%D0%BA%D1%82%D0%BD%D1%8B%D0%B9_%D0%BC%D0%B5%D0%BD%D0%B5%D0%B4%D0%B6%D0%BC%D0%B5%D0%BD%D1%82_19064_accepted_G8c9Vu4.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/09.04.02-cpp-2026-och/">Страница ОП</a>
+</aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

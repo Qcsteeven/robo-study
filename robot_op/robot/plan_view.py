@@ -60,6 +60,11 @@ _CHOICE = re.compile(r"\.ДВ\.\d\d$")
 _CHOICE_ITEM = re.compile(r"\.ДВ\.\d\d\.\d\d$")
 
 
+def is_choice(index: str) -> bool:
+    """Блок дисциплин по выбору; в УП он может быть помечен как модуль."""
+    return bool(_CHOICE.search(index))
+
+
 def _items(rows: list[dict]) -> list[dict]:
     """Строки УП → дисциплины. Модули пропускаются; блок дисциплин по выбору становится одной позицией
     «A или B» (или «… — N вариантов на выбор»), его варианты отдельно не показываются."""
@@ -69,7 +74,7 @@ def _items(rows: list[dict]) -> list[dict]:
         idx = r.get("index", "")
         if _CHOICE_ITEM.search(idx):
             continue
-        if _CHOICE.search(idx):
+        if is_choice(idx):
             options = [x for x in rows if x.get("index", "").startswith(idx + ".")]
             names = [o["name"] for o in options]
             if len(names) > 3:

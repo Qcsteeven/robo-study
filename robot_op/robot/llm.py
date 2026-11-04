@@ -18,6 +18,7 @@ import certifi
 import httpx
 
 from ..config import ROOT, LlmSettings
+from . import program_summary
 
 PROVIDERS = ("ollama", "openai", "gigachat")
 GIGACHAT_URL = "https://gigachat.devices.sberbank.ru/api/v1"
@@ -35,7 +36,8 @@ SYSTEM = (
 
 TASKS = {
     "oop": "Составь общую характеристику образовательной программы (3–5 предложений): кого и для какой деятельности "
-           "готовит программа, что составляет основу обучения, где проходит практическая подготовка.",
+           "готовит программа и что составляет основу обучения. Не включай реквизиты приказов, ФГОС, состав "
+           "документов и служебные сведения; место практики указывай только при наличии явных данных.",
     "rpd": "Опиши дисциплину в 2–3 предложениях: чему она учит и основное содержание (ключевые темы, "
            "лабораторные и практические занятия).",
     "practice": "Опиши практику в 2–3 предложениях: вид и тип практики, что студент делает на ней по этапам, чем она завершается.",
@@ -73,6 +75,18 @@ def too_long(doc_type: str, text: str) -> bool:
 
 def compact(primary: dict, limit: int, doc_type: str = "") -> str:
     """Первичный JSON без служебных полей, обрезанный под окно модели."""
+    if doc_type == "oop":
+        data = {}
+        if isinstance(primary.get("program"), dict):
+            data["program"] = {k: v for k, v in primary["program"].items()
+                               if k in ("profile", "code", "direction", "level", "form", "year")}
+        data.update(program_summary.facts(primary))
+        # Убирать целые поля, а не обрезать JSON посередине строки. Название ОП имеет приоритет.
+        text = json.dumps(data, ensure_ascii=False)
+        while len(text) > limit and data:
+            data.pop(next(reversed(data)))
+            text = json.dumps(data, ensure_ascii=False)
+        return text
     data = {k: v for k, v in primary.items() if k not in ("template", "source", "robot")}
     keys = STRUCTURED.get(doc_type)
     if keys and any(primary.get(k) for k in keys):
@@ -167,6 +181,8 @@ class LlmClient:
         if PARAGRAPHS.get(doc_type, 1) == 1:
             text = " ".join((text or "").split())
         text = limit_text(doc_type, text)
+        if doc_type == "oop" and not program_summary.clean_summary(text):
+            raise LlmError("Краткая характеристика ОП не прошла проверку качества")
         if not text:
             raise LlmError("Модуль LLM вернул пустой ответ")
         return text

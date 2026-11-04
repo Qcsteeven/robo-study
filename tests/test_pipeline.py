@@ -109,11 +109,14 @@ def test_interrupted_run_resumes_without_redownload(robot):
 
 def test_llm_summaries_and_llm_failure(tmp_path):
     prompts = []
+    oop_summary = ("Программа готовит магистров для исследовательской и проектной работы. "
+                   "Обучение длится два года. Выпускники разрабатывают интеллектуальные информационные системы.")
 
     def ollama(request):
         body = json.loads(request.content)
         prompts.append(body)
-        return httpx.Response(200, json={"message": {"content": "Краткое описание документа."}})
+        reply = oop_summary if "Составь общую характеристику" in body["messages"][1]["content"] else "Краткое описание документа."
+        return httpx.Response(200, json={"message": {"content": reply}})
     settings = demo_settings(tmp_path, ROBOT_LLM_PROVIDER="ollama", ROBOT_LLM_BASE_URL="http://llm.local:11434")
     db = Database(settings.app.database_url)
     db.create_all()
@@ -121,7 +124,7 @@ def test_llm_summaries_and_llm_failure(tmp_path):
     robot.execute(robot.create_run("master", 2026, ["*"]))
     with db.Session() as ses:
         page = ses.scalars(select(Program)).first().page
-        assert page["op"]["summary"] == "Краткое описание документа."
+        assert page["op"]["summary"] == oop_summary
         assert all(d["summary"] for d in page["disciplines"])
     # в LLM уходят только сведения первичного JSON
     assert prompts and all("Сведения документа" in p["messages"][1]["content"] for p in prompts)

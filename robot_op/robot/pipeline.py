@@ -25,12 +25,12 @@ from ..extract import curriculum, schedule, sections
 from ..extract import pdf as pdfmod
 from ..extract.ocr import OcrConfig, OcrUnavailable, ocr_page_text
 from ..models import Database, Document, JsonVersion, LogEntry, Program, Run, RunItem, now
-from . import page as pagebuilder
+from . import page as pagebuilder, program_summary
 from .http import AuthRequired, SiteClient, SiteError
 from .llm import LlmClient, LlmError, too_long
 from .site import LevelYears, ProgramBlock, parse_education, parse_op_list
 
-PARSER_VERSION = "1.2"   # 1.1 — КУГ по дням; 1.2 — таблицы РПД, практик и ГИА
+PARSER_VERSION = "1.3"   # 1.3 — оглавление сканов ООП и структурированные сведения для характеристики
 log = logging.getLogger("robot_op")
 
 
@@ -441,7 +441,8 @@ class Robot:
             return
         with self.db.Session() as ses:
             final = pagebuilder.latest_final(ses, doc_id)
-        if not final or not final.get("data") or (final.get("summary") and not too_long(doc_type, final["summary"])):
+        if not final or not final.get("data") or (final.get("summary") and not too_long(doc_type, final["summary"])
+                and (doc_type != "oop" or program_summary.clean_summary(final["summary"]))):
             return
         try:
             summary = self.llm.summarize(doc_type, {"program": final.get("program"), "document": final.get("document"), **final["data"]})
@@ -480,9 +481,9 @@ class Robot:
                 return "processed", f"{'Скан, OCR' if scanned else 'Текстовый слой'}; курсов: {len(extracted['courses'])}", method, extracted, pages
             # текстовые документы; отсканированные распознаются OCR постранично
             if scanned:
-                full = "\n".join(ocr_page_text(pdfmod.render_page(data, i, dpi), self.ocr) for i in range(pages))
+                full = "\f\n".join(ocr_page_text(pdfmod.render_page(data, i, dpi), self.ocr) for i in range(pages))
             else:
-                full = "\n".join(pdfmod.page_texts(data))
+                full = "\f\n".join(pdfmod.page_texts(data))
             ok, why = sections.type_check(doc.doc_type, full[:4000])
             if not ok:
                 self.journal(run_id, "WARNING", f"Содержимое не соответствует типу ({why}) — документ помечен и не обрабатывается",

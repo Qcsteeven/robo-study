@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import re
 from datetime import date, timedelta
+from urllib.parse import urlencode
 
 from sqlalchemy import select
 
@@ -11,7 +12,7 @@ from ..extract import curriculum
 from ..extract.schedule import LEGEND
 from ..extract.tables import vkr_topics
 from ..models import Document, JsonVersion, Program
-from . import plan_view
+from . import plan_view, program_summary
 
 QUALIFICATION = {"bachelor": "Бакалавр", "specialist": "Специалист", "master": "Магистр",
                  "spo": "Специалист среднего звена", "postgraduate": "Исследователь. Преподаватель-исследователь"}
@@ -24,7 +25,27 @@ def latest_final(ses, doc_id: int) -> dict | None:
 
 
 def _key(name: str) -> str:
-    return re.sub(r"[^а-яёa-z0-9]", "", (name or "").lower().replace("ё", "е"))
+    # Tesseract читает латинское Web в скане как «М/еБ».
+    name = (name or "").lower().replace("ё", "е").replace("м/еб-программирование", "web-программирование")
+    return re.sub(r"[^а-яёa-z0-9]", "", name)
+
+
+def discipline_links(program_id: str, rows: list[dict], docs: list[Document], finals: dict) -> dict[str, str]:
+    """РПД по названию; для остальных позиций — карточка по индексу учебного плана."""
+    links = {}
+    for doc in docs:
+        if doc.doc_type not in ("rpd", "practice"):
+            continue
+        url = f"/op/{program_id}/doc/{doc.id}"
+        links.setdefault(_key(doc.title), url)
+        discipline = ((finals.get(doc.id) or {}).get("data") or {}).get("discipline")
+        if discipline:
+            links.setdefault(_key(discipline), url)
+    for row in rows:
+        if row.get("index") and (not row.get("is_module") or plan_view.is_choice(row["index"])):
+            url = f"/op/{program_id}/discipline?" + urlencode({"index": row["index"]})
+            links.setdefault(_key(row["name"]), url)
+    return links
 
 
 def _years(n_semesters: int) -> str:
@@ -131,8 +152,8 @@ def build(ses, prog: Program) -> dict:
         "duration": oop_data.get("duration") or _years(len(up_data.get("semesters", []))),
         "qualification": (oop_data.get("qualification") or QUALIFICATION.get(prog.level, "")).capitalize(),
         "source_url": prog.source_url,
-        "summary": (oop or {}).get("summary"),
-        "characteristic": oop_data.get("characteristic", ""),
+        "summary": program_summary.clean_summary((oop or {}).get("summary")),
+        "characteristic": program_summary.fallback(oop_data, {"profile": prog.profile or prog.block_title}),
         "areas": oop_data.get("areas", []),
         "task_types": oop_data.get("task_types", []),
     }
@@ -203,12 +224,7 @@ def build(ses, prog: Program) -> dict:
             documents.append({"type": DOC_TYPES[t], "title": DOC_TYPE_TITLES[t] if t not in ("rpd", "practice") else d.title,
                               "url": d.url, "doc_id": d.id})
     # карусель по семестрам и полки категорий; дисциплины ведут на страницы своих РПД и программ практик
-    links = {}
-    for d in by_type.get("rpd", []) + by_type.get("practice", []):
-        links.setdefault(_key(d.title), f"/op/{prog.id}/doc/{d.id}")
-        discipline = ((finals.get(d.id) or {}).get("data") or {}).get("discipline")
-        if discipline:
-            links.setdefault(_key(discipline), f"/op/{prog.id}/doc/{d.id}")
+    links = discipline_links(prog.id, up_data.get("rows", []), docs, finals)
     plan = plan_view.build(up_data, links, key=_key)
 
     return {"op": op, "plan": plan, "schedule": schedule, "disciplines": disciplines, "practices": practices,

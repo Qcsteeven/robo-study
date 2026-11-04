@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="app-page">
+  <div class="app-content">
+    <section class="app-section">
+      {% if options %}
+      <h2 class="section-title">Дисциплины на выбор</h2>
+      <ul class="app-list app-discipline-options">{% for option in options %}
+        <li><a class="ir-link" href="{{ option.url }}">{{ option.name }}</a></li>
+      {% endfor %}</ul>
+      {% else %}
+      <p class="app-prose">Рабочая программа для этой позиции пока не загружена. Ниже — сведения из учебного плана.</p>
+      {% endif %}
+      <h2 class="section-title">Сведения</h2>
+      <dl class="app-kv">{% for label, value in facts %}<dt>{{ label }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>
+    </section>
+    {% if load %}
+    <section class="app-section">
+      <h2 class="section-title">Нагрузка по семестрам</h2>
+      <p class="app-lead">Количество пар за семестр. Пара — два академических часа.</p>
+      <div class="ir-table-wrap"><table class="ir-table">
+        <thead><tr><th>Семестр</th><th>Лекции</th><th>Практические</th><th>Лабораторные</th><th>Всего пар</th><th>Контроль</th></tr></thead>
+        <tbody>{% for sem in load %}<tr><th scope="row">{{ sem.number }}</th>
+          <td>{{ ui.num(sem.lec) }}</td><td>{{ ui.num(sem.pr) }}</td><td>{{ ui.num(sem.lab) }}</td>
+          <td>{{ ui.num(sem.pairs) }}</td><td>{{ sem.control or '—' }}</td>
+        </tr>{% endfor %}</tbody>
+      </table></div>
+    </section>
+    {% endif %}
+  </div>
+  <aside class="app-aside">
+    {{ ui.info_block([{'label': 'Программа', 'value': program.profile}, {'label': 'Год набора', 'value': program.year}], title='Учебный план', variant='navy') }}
+    <a class="ir-btn ir-btn--outline app-aside__btn" href="{{ source.url }}">Исходный учебный план</a>
+    <a class="ir-btn ir-btn--outline app-aside__btn" href="/op/{{ program.id }}#up">Страница ОП</a>
+  </aside>
+</div>
+{% endblock %}

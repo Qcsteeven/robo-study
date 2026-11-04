@@ -97,11 +97,17 @@ def type_check(doc_type: str, first_pages: str) -> tuple[bool, str]:
 
 
 # строка оглавления: «2.2. Требования к выпускной квалификационной работе ........ 4»
-TOC_LINE = re.compile(r"(\.\s?){4,}\s*\d{1,3}\s*$|…{2,}\s*\d{1,3}\s*$")
+TOC_LINE = re.compile(r"(?:\.\s*){4,}|…{2,}")
 
 
 def split_sections(text: str, specs: list[Spec]) -> dict[str, dict]:
-    lines = [ln.strip() for ln in text.splitlines()]
+    # OCR оглавления может потерять номера, точки-лидеры и границы строк.
+    # Сохраняем границы страниц: страница содержания не является разделом ООП.
+    pages = text.split("\f")
+    if len(pages) > 1 and any(spec.key == "activity" for spec in specs):
+        pages = [p for p in pages if not (re.search(r"(?im)^\s*(?:содержание|оглавление)\s*$", p)
+                 and not re.search(r"(?m)^\s*\d{1,2}\.\d{1,2}\s+", p))]
+    lines = [ln.strip() for ln in "\n".join(pages).splitlines()]
     found: list[tuple[int, Spec, str]] = []
     used = set()
     for i, line in enumerate(lines):
@@ -275,11 +281,12 @@ def extract(doc_type: str, text: str, tables: list | None = None) -> dict:
         act = body("activity")
         data.update({
             "characteristic": body("general")[:2500],
-            "qualification": _after(text, r"квалификаци\w+,?\s+(присваиваем\w+\s+)?(выпускник\w+)?\s*[:—–-]\s*"),
-            "duration": _after(text, r"срок\s+(получения\s+образования|обучения|освоения)\w*\s*[:—–-]?\s*"),
-            "ze_total": first(ZE_RE, body("general") or text),
-            "areas": _list_after(act, r"област\w+\s+профессиональной\s+деятельности\s*[:—–-]\s*"),
-            "task_types": _list_after(act, r"тип\w*\s+задач\s+профессиональной\s+деятельности\s*[:—–-]\s*"),
+            "qualification": _after(text, r"квалификаци\w+,?\s*(?:присваиваем\w+\s+)?(?:выпускник\w+)?\s*[:—–-]\s*"),
+            "duration": _oop_duration(text),
+            "ze_total": first(ZE_RE, re.sub(r"_+", " ", body("general") or text)),
+            "areas": _oop_areas(act),
+            "task_types": _oop_tasks(act),
+            "gia_forms": _oop_gia(body("general")),
             "competencies": competencies(body("results")),
             "conditions": body("conditions")[:1000],
         })
@@ -309,6 +316,40 @@ def extract(doc_type: str, text: str, tables: list | None = None) -> dict:
         "score": round((required_total - len(missing_required)) / required_total, 2) if required_total else 1.0,
     }
     return data
+
+
+def _oop_duration(text: str) -> str:
+    m = re.search(r"срок\s+(?:получения\s+образования|обучения|освоения)[^\n]{0,40}?"
+                  r"(\d+(?:[.,]\d+)?\s+(?:года?|лет|месяц\w*))", text, re.I)
+    return m.group(1) if m else ""
+
+
+def _oop_areas(text: str) -> list[str]:
+    # Строки 06/16/40 — коды областей; код вида 06.017 относится уже к профстандарту.
+    block = re.split(r"(?m)^\s*2\.2\b", text)[0]
+    found = re.findall(r"(?:^|\n)\s*[—–\-•]?\s*(\d{2}\.?\s+[^\n]+(?:\n(?!\s*(?:[—–\-•]|\d{2}\.?\s|Выпускники))[^\n]+)*)", block)
+    if not found:
+        return _list_after(text, r"област\w+\s+профессиональной\s+деятельности\s*[:—–-]\s*")
+    return [re.sub(r"\s+", " ", a).strip(" .;") for a in found
+            if not re.match(r"\d{2}\.?\s+област", a, re.I)][:5]
+
+
+def _oop_tasks(text: str) -> list[str]:
+    m = re.search(r"задач\s+профессиональной\s+деятельности[^:\n]*:\s*([^\f]+)", text, re.I)
+    if not m:
+        return []
+    block = re.split(r"(?m)^\s*\d{1,2}\.\d{1,2}\s", m.group(1))[0]
+    values = [v.strip(" .;—–-•\"|") for v in re.split(r"[;\n]", block)]
+    return [v for v in values if re.fullmatch(r"[а-яёА-ЯЁ-]{5,80}", v)][:5]
+
+
+def _oop_gia(text: str) -> list[str]:
+    m = re.search(r"форма\s+государственной\s+итоговой\s+аттестации\s*:\s*([^\n]+(?:\n(?!\s*(?:[А-ЯЁ][а-яё]+\s*[:,]|\d+\.))[^\n]+)?)", text, re.I)
+    if not m:
+        return []
+    value = re.sub(r"_+", " ", m.group(1))
+    value = re.sub(r"\s+", " ", value).strip(" .")
+    return [value] if len(value) < 250 else []
 
 
 def _goal(text: str) -> str:

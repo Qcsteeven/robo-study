@@ -17,7 +17,8 @@ from ..catalog import DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE, LEVELS, REVIEW_STA
 from ..config import Settings, get_settings
 from ..models import Database, Document, JsonVersion, Program, Run, RunItem
 from ..robot.http import SiteError
-from ..robot import doc_view
+from ..robot import doc_view, plan_view, page as pagebuilder
+from ..extract import curriculum
 from ..robot.page import latest_final
 from ..robot.pipeline import Robot
 from ..robot.worker import Worker
@@ -215,6 +216,42 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                       meta=[DOC_TYPE_TITLES[doc.doc_type], f"{prog.code} {prog.profile}"],
                       active_nav="programs", doc=doc, program=prog, final=final, view=view,
                       type_title=DOC_TYPE_TITLES[doc.doc_type])
+
+    @app.get("/op/{program_id}/discipline", response_class=HTMLResponse, include_in_schema=False)
+    def discipline_page(request: Request, program_id: str, index: str):
+        with db.Session() as ses:
+            prog = ses.get(Program, program_id)
+            if prog is None:
+                return not_found(request, "Образовательная программа не найдена.")
+            docs = ses.scalars(select(Document).where(Document.program_id == program_id)).all()
+            finals = {doc.id: latest_final(ses, doc.id) for doc in docs}
+            source = next((doc for doc in docs if doc.doc_type == "up"
+                           and ((finals.get(doc.id) or {}).get("data") or {}).get("rows")), None)
+            rows = (finals[source.id]["data"]["rows"] if source else [])
+            row = next((r for r in rows if r.get("index") == index
+                        and (not r.get("is_module") or plan_view.is_choice(index))), None)
+            if row is None:
+                return not_found(request, "Дисциплина не найдена в учебном плане.")
+            links = pagebuilder.discipline_links(program_id, rows, docs, finals)
+            options = [{"name": r["name"], "url": links[pagebuilder._key(r["name"])]}
+                       for r in rows if r.get("index", "").startswith(index + ".")]
+            target = links.get(pagebuilder._key(row["name"]))
+            if not options and target and target.startswith(f"/op/{program_id}/doc/"):
+                return RedirectResponse(target, status_code=302)
+            sems = sorted(set(int(s) for s in row.get("semesters", {})) |
+                          {s for values in row.get("control", {}).values() for s in values})
+            load = []
+            for sem in sems:
+                hours = row.get("semesters", {}).get(str(sem), {})
+                pairs = {k: round((hours.get(k) or 0) / 2, 1) for k in ("lec", "pr", "lab")}
+                load.append({"number": sem, **pairs, "pairs": round(sum(pairs.values()), 1),
+                             "control": curriculum.control_label(row.get("control", {}), sem)})
+            hours = {"total": row.get("hours", {}).get("plan"), "sr": row.get("hours", {}).get("sr")}
+            view = doc_view.build("rpd", {"ze": row.get("ze"), "hours": hours, "semesters": sems})
+        return render(request, "discipline.html", page_title=row["name"],
+                      crumbs=crumbs(("Программы", "/programs"), (prog.code, f"/op/{prog.id}"), (row["name"], None)),
+                      meta=[prog.profile, "Из учебного плана"], active_nav="programs",
+                      program=prog, source=source, facts=view["facts"], load=load, options=options)
 
     @app.get("/documents/{doc_id}/pdf", include_in_schema=False)
     def doc_pdf(doc_id: int):

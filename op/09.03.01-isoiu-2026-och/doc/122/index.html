@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Организация ЭВМ и периферийные устройства — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/09.03.01-isoiu-2026-och/">09.03.01</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Организация ЭВМ и периферийные устройства</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>09.03.01 Интеллектуальные системы обработки информации и управления</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>3</dd><dt>Трудоёмкость</dt><dd>4 з. е. · 144 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 32 ч, лабораторные 32 ч</dd><dt>Самостоятельная работа</dt><dd>44 ч</dd><dt>Промежуточная аттестация</dt><dd>Экзамен</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Введение в дисциплину "Организация ЭВМ и периферийные устройства."</span><span class="app-topics__text">Цели и задачи курса. История и развитие компьютерных систем. Обзор перечня комплектующих ЭВМ</span></li>
+<li><span class="app-topics__title">Корпус, система охлаждения и блок питания персонального компьютера</span><span class="app-topics__text">Виды корпусов и систем охлаждения. Понятие форм-фактора и совместимости компонентов. Устройство и характеристики блоков питания</span></li>
+<li><span class="app-topics__title">Устройство системной платы ПК</span><span class="app-topics__text">Обзор форм-факторов системных плат персонального компьютера, архитектура, основные характеристики, устройство</span></li>
+<li><span class="app-topics__title">Центральный процессор и арифметико-логическое устройство</span><span class="app-topics__text">Архитектура центрального процессора и его компоненты. Функции АЛУ и выполнение арифметических и логических операций</span></li>
+<li><span class="app-topics__title">Память и устройства хранения данных</span><span class="app-topics__text">Виды памяти, такие как оперативная память (RAM) и постоянная память (ROM). Устройства хранения данных, такие как жесткие диски, SSD и оптические носители</span></li>
+<li><span class="app-topics__title">Карты расширения персонального компьютера</span><span class="app-topics__text">Виды карт расширения, устройство, характеристики, интерфейсы подключения к компьютеру</span></li>
+<li><span class="app-topics__title">Манипуляторы и клавиатуры</span><span class="app-topics__text">Виды клавиатур и манипуляторов. Устройство, обзор основных характеристик</span></li>
+<li><span class="app-topics__title">Сканеры</span><span class="app-topics__text">Виды, назначение, особенности. Устройство сканеров, основные характеристики, виды</span></li>
+<li><span class="app-topics__title">Устройство принтеров и плоттеров</span><span class="app-topics__text">Разновидности и устройство 2D и 3D принтеров, плоттеров, каттеров, графопостроителей</span></li>
+<li><span class="app-topics__title">Типы мониторов и их назначение</span><span class="app-topics__text">Устройство матриц плоскопанельных мониторов, разновидности, характеристики</span></li>
+<li><span class="app-topics__title">Виды звукового оборудования</span><span class="app-topics__text">Акустические системы и устройства для ввода и вывода звука</span></li>
+<li><span class="app-topics__title">Тренды и новые технологии</span><span class="app-topics__text">Искусственный интеллект и машинное обучение. Квантовые вычисления и квантовые компьютеры</span></li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Система Bios</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Устройство и диагностика HDD и SSD</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Устройство и диагностика монитора</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Системные ошибки Windows</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Диагностика системной платы</td><td class="ir-num app-nowrap">8 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Подготовка к практическим занятиям</td><td class="ir-num app-nowrap">44 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list"><li>ОПК ОС-11 — Способность применять знания аппаратной части ЭВМ и систем, сетевого оборудования при решении задач профессиональной деятельности</li><li>ОПК ОС-3 — Способность решать стандартные задачи профессиональной деятельности на основе информационной и библиографической культуры с применением информационно-коммуникационных технологий и с учетом основных требований информационной безопасности</li><li>ОПК ОС-4 — Способность участвовать в разработке стандартов, норм и правил, а также технической документации, связанной с профессиональной деятельностью</li><li>ОПК ОС-5 — Способность инсталлировать программное и аппаратное обеспечение для информационных и автоматизированных систем</li><li>ОПК ОС-6 — Способность разрабатывать бизнес-планы и технические задания на оснащение отделов, лабораторий, офисов компьютерным и сетевым оборудованием</li><li>ОПК ОС-9 — Способность осваивать методики использования программных средств для решения практических задач</li></ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list"><li>Знать Основные архитектурные принципы построения ЭВМ (фон Неймана, Гарвардская) Функциональное назначение и характеристики компонентов ЭВМ: Принципы работы и взаимодействия аппаратных компонентов</li><li>Уметь Анализировать аппаратную конфигурацию ЭВМ Подбирать оптимальные аппаратные решения под профессиональные задачи</li><li>Владеть Методами сборки и конфигурирования компьютерных систем Технологиями аппаратного мониторинга и диагностики Навыками работы с технической документацией на оборудование</li><li>Уметь Анализировать структурные схемы ЭВМ Определять назначение компонентов по технической документации</li><li>Владеть Навыками анализа архитектуры ЭВМ Методами диагностики взаимодействия модулей Технологиями работы с осциллографом и логическим анализатором</li><li>Знать Основы стандартизации и сертификации в IT и электронике (ISO, IEEE, ГОСТ, RFC) Архитектурные принципы аппаратно-программных комплексов (АПК) Требования к аппаратному и программному обеспечению в регулируемых отраслях (телеком, медицина, авионика)</li><li>Уметь Анализировать существующие стандарты и адаптировать их под конкретные АПК Разрабатывать технические требования к аппаратуре и ПО Оформлять техническую документацию (ТЗ, спецификации)</li><li>Владеть Методами разработки стандартов Инструментами документооборота</li><li>Знать Принципы работы периферийных устройств (принтеры, сканеры, камеры, внешние накопители и др.) Протоколы подключения и взаимодействия (USB, Bluetooth, Wi-Fi, PnP) Драйверы устройств: установка, обновление, устранение конфликтов Поддержка ОС: особенности работы с Windows, Linux, macOS Программные средства диагностики</li><li>Уметь Устанавливать и настраивать ПО для периферийных устройств Находить и устранять неисправности (отсутствие драйверов, конфликты устройств) Работать с диспетчером устройств и системными журналами Использовать специализированные утилиты Оптимизировать производительность системы (настройка BIOS/UEFI, управление электропитанием)</li><li>Владеть Навыками автоматизированной установки драйверов Методами диагностики аппаратных проблем (анализ дампов памяти, температурных режимов) Работой с инструментами мониторинга Опытом настройки сетевых периферийных устройств (принт-серверы, NAS)</li><li>Знать Принципы проектирования ИТ-инфраструктуры (сетевые решения, электропитание, охлаждение) Нормативные требования к компьютерным помещениям Характеристики оборудования (серверы, СХД, активное сетевое оборудование, ИБП)</li><li>Уметь Анализировать технические требования заказчика Подбирать оборудование под задачи (производительность, масштабируемость, отказоустойчивость) Составлять спецификации с техническими параметрами</li><li>Владеть Методами разработки ТЗ (структура, формулировки, приложения) Инструментами проектирования (Visio, AutoCAD,</li><li>Знать Классификацию ПО общего назначения (офисные пакеты, графические редакторы, СУБД, браузеры) Основные функции и интерфейс популярных программ (MS Office, LibreOffice, Photoshop, GIMP) Принципы работы с файлами (форматы, сохранение, экспорт/импорт данных) Базовые понятия информационной безопасности при работе с ПО Методы поиска и освоения нового ПО (документация, обучающие материалы)</li><li>Уметь Устанавливать и настраивать ПО под конкретные задачи Создавать и редактировать документы (тексты, таблицы, презентации) Решать типовые задачи с помощью специализированных программ (например, построение диаграмм) Осваивать новые программы по инструкциям и руководствам</li><li>Владеть Навыками автоматизации задач (макросы, шаблоны) Методами эффективной работы (горячие клавиши, настройка интерфейса) Приемами совместной работы (облачные сервисы, общие документы) Критериями выбора ПО для конкретных задач</li></ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list"><li>Организация ЭВМ и систем [Электронный ресурс] : программа, конспект лекций, контрольные вопросы и методические указания к практическим заданиям для специальности 071900 : в 2 частях / Иркут. гос. техн. ун-т; сост. Мироманов А. В. Ч. 1, 1999. - 10. [Сайт] – URL: http://elib.istu.edu/viewer/view.php?file=/files/er-7209.pdf</li><li>Организация ЭВМ и систем [Электронный ресурс] : программа, конспект лекций, контрольные вопросы и методические указания к практическим заданиям для специальности 071900 : в 2 частях / Иркут. гос. техн. ун-т; сост. Мироманов А. В. Ч. 2, 1999. - 80. [Сайт] – URL: http://elib.istu.edu/viewer/view.php?file=/files/er-7223.pdf</li><li>Ланина Э. П. Организация ЭВМ и систем : учебное пособие для специальности 002201 "Вычислительные машины, комплексы, системы и сети" / Э. П. Ланина, 2008. - 476. [Сайт] – URL: http://elib.istu.edu/viewer/view.php?file=/files/er-2567.pdf</li><li>Ланина Э. П. Организация ЭВМ, систем и сетей [Электронный ресурс] : методические указания к курсовому проектированию / Э. П. Ланина, 2011. - 27. [Сайт] – URL: http://elib.istu.edu/viewer/view.php?file=/files/er-4661.pdf</li><li>Орлов С. А. Организация ЭВМ и систем : учебник по направлению подготовки дипломированных специалистов "Информатика и вычислительная техника" / С. А. Орлов, Б. Я. Цилькер, 2011. - 686. 8 Дополнительная учебная литература и справочная</li><li>Заставной М. И. Организация ЭВМ и систем. Устройства мультимедиа : учебное пособие / М. И. Заставной, 2011. - 83.</li><li>Орлов С. А. Организация ЭВМ и систем : фундаментальный курс по архитектуре и структуре современных компьютерных средств: учебник для вузов по направлению "Информатика и вычислительная техника": для бакалавров и магистров / С. А. Орлов, Б. Я. Цилькер, 2015. - 685.</li></ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">14</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%98%D0%A1%D0%98%D0%B1_2026_%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F_%D0%AD%D0%92%D0%9C_%D0%B8_%D0%BF%D0%B5%D1%80%D0%B8%D1%84%D0%B5%D1%80%D0%B8%D0%B9%D0%BD%D1%8B%D0%B5_%D1%83%D1%81%D1%82%D1%80%D0%BE%D0%B9%D1%81%D1%82%D0%B2%D0%B0_13645_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/09.03.01-isoiu-2026-och/">Страница ОП</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-122-5a9957dc35c6.json">Первичный JSON</a><a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-122-6c88044d2652.json">Итоговый JSON</a></aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+          
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

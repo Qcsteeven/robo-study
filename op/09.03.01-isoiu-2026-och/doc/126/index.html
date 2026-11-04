@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Методы оптимизации — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/09.03.01-isoiu-2026-och/">09.03.01</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Методы оптимизации</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>09.03.01 Интеллектуальные системы обработки информации и управления</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>6</dd><dt>Трудоёмкость</dt><dd>5 з. е. · 180 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 32 ч, лабораторные 32 ч</dd><dt>Самостоятельная работа</dt><dd>80 ч</dd><dt>Промежуточная аттестация</dt><dd>Экзамен</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Введение в дисциплину. Основные понятия</span><span class="app-topics__text">Понятия об управлении и системах управления, об оптимальном управлении. Безусловная одномерная оптимизация</span></li>
+<li><span class="app-topics__title">Методы нулевого порядка для решения задач безусловной многомерной оптимизации</span><span class="app-topics__text">Безусловная многомерная оптимизация. Методы прямого поиска. Симплексные методы. Область их применения, достоинства и недостатки, сходимость</span></li>
+<li><span class="app-topics__title">Методы первого порядка для решения задач безусловной многомерной оптимизации</span><span class="app-topics__text">Методы теории чувствительности. Общая схема градиентных методов, Метод наискорейшего спуска, Метод релаксации, Метод сопряженных градиентов. Применение функции чувствительности САР для реализации градиентного метода. Сложность алгоритмов оптимизации и их тестирование</span></li>
+<li><span class="app-topics__title">Методы второго порядка для решения задач безусловной многомерной оптимизации</span><span class="app-topics__text">Метод Ньютона и его модификации. Методы переменной метрики. Их достоинства и недостатки, область применения</span></li>
+<li><span class="app-topics__title">Математические методы, применяемые в теории оптимального управления. Принцип максимума</span><span class="app-topics__text">Метод фазового пространства. Описание систем автоматического управления в фазовом пространстве. Постановка задачи оптимальных управлений и их свойства. Принцип максимума и его применение</span></li>
+<li><span class="app-topics__title">Метод вариационного исчисления</span><span class="app-topics__text">Основные понятия вариационного исчисления, условия Эйлера, Лежандра, Якоби, Вейерштрасса. Алгоритм решения задачи вариационного исчисления</span></li>
+<li><span class="app-topics__title">Методы условной оптимизации</span><span class="app-topics__text">Метод штрафных функций.Метод барьерных функций. Метод Лагранжа, Коруша-Куна-Таккера</span></li>
+<li><span class="app-topics__title">Геометрическое программирование</span><span class="app-topics__text">Постановка задачи геометрического программирования. Минимизация регулярный позиномов. Минимизация произвольных позиномов</span></li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Расчет на ЭВМ оптимальных параметров ПИД-регулятора градиентными методами</td><td class="ir-num app-nowrap">16 ч</td></tr><tr><td>Синтез оптимальных систем с использование принципа максимума</td><td class="ir-num app-nowrap">10 ч</td></tr><tr><td>Методы условной оптимизации</td><td class="ir-num app-nowrap">6 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Подготовка к практическим занятиям (лабораторным работам)</td><td class="ir-num app-nowrap">80 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list"><li>ПКС-4 — Способность разрабатывать требование к программному обеспечению</li></ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list"><li>Уметь формировать критерии оптимизации; ориентироваться в классификации методов оптимизации; правильно выбирать методы для решения поставленной задачи оптимизации; использовать полученные знания в практической деятельности; грамотно тестировать работоспособность разработанного программного продукта</li><li>Владеть навыками разработки по в современных программных средах для решения оптимизационных задач различных систем; терминологией в области теории оптимального управления; современными методами решения оптимизационных задач; методиками тестирования и проверки работоспособности</li></ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list"><li>Банди Брайан. Методы оптимизации : вводный курс / Брайан Банди, 1988. - 127. [Сайт] – URL: http://elib.istu.edu/viewer/view.php?file=/files3/er-8718.pdf</li><li>Струченков В. И. Методы оптимизации. Основы теории, задачи, обучающие компьютерные программы : учебное пособие / В. И. Струченков, 2007. - 254.</li><li>Аттетков Александр Владимирович. Методы оптимизации : учебник для втузов / А. В. Аттетков, С. В. Галкин, В. С. Зарубин; под ред. В. С. Зарубина и А. П. Крищенко, 2003. - 439.</li><li>Струченков В. И. Методы оптимизации. Основы теории, задачи, обучающие компьютерные программы : учебное пособие / В. И. Струченков, 2005. - 254. 8 Дополнительная учебная литература и справочная</li><li>Аттетков А. В. Методы оптимизации : учебное пособие для вузов / А. В. Аттетков, В. С. Зарубин, А. Н. Канатников, 2013. - 269.</li><li>Штойер Ральф. Многокритериальная оптимизация. Теория, вычисления и приложения / Ральф Штойер; пер. с англ. Е. М. Столяровой, 1992. - 504.</li><li>Колбин В. В. Специальные методы оптимизации : учебное пособие / В. В. Колбин, 2014.</li><li>378.</li><li>Фролькис Виктор Абрамович. Введение в теорию и методы оптимизации для экономистов : учеб. пособие / В. А. Фролькис, 2002. - 314. 10</li><li>Костюк В. И. Автоматическая параметрическая оптимизация систем регулирования : монография / В. И. Костюк, Л. А. Широков, 1981. - 94.</li><li>Соболь Б. В. Методы оптимизации : практикум / Б. В. Соболь, Б. Ч. Месхи, Г. И. Каныгин, 2009. - 380.</li></ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">11</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%98%D0%A1%D0%98%D0%B1_2026_%D0%9C%D0%B5%D1%82%D0%BE%D0%B4%D1%8B_%D0%BE%D0%BF%D1%82%D0%B8%D0%BC%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D0%B8_13640_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/09.03.01-isoiu-2026-och/">Страница ОП</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-126-5a9957dc35c6.json">Первичный JSON</a><a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-126-6c88044d2652.json">Итоговый JSON</a></aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+          
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="ru">
+<head><script>(function(){
+function apply(theme){document.documentElement.dataset.theme=theme;
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){
+a.textContent=theme==='dark'?'Светлая тема':'Тёмная тема';});}
+var theme='light';try{theme=localStorage.getItem('robot-op-theme')||'light';}catch(e){}
+apply(theme==='dark'?'dark':'light');
+document.addEventListener('DOMContentLoaded',function(){apply(document.documentElement.dataset.theme);
+document.querySelectorAll('[data-theme-toggle]').forEach(function(a){a.addEventListener('click',function(e){
+e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light':'dark';apply(t);
+try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Нейронные сети и их приложения — Робот ОП</title>
+<link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
+<link href="/robo-study/static/css/app.css" rel="stylesheet"/>
+</head>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<div class="app-rail">
+<div class="ir-rail" id="rail">
+<div class="ir-rail__buttons">
+<button aria-controls="rail-panel" aria-expanded="false" aria-label="Развернуть меню" class="ir-rail__btn ir-burger" data-rail-toggle="" type="button">
+<span></span><span></span><span></span><span></span>
+</button>
+<a aria-label="Образовательные программы" class="ir-rail__btn" href="/robo-study/programs/" title="Образовательные программы">
+<img alt="" src="/robo-study/static/img/search-white.svg" width="24"/>
+</a>
+</div>
+<div class="ir-rail__panel" hidden="" id="rail-panel">
+<div class="ir-rail__header">Робот ОП</div>
+<nav aria-label="Разделы" class="ir-rail__menu">
+<ul>
+<li class="is-active">
+<a aria-current="page" href="/robo-study/programs/">Образовательные программы</a>
+<ul>
+<li><a href="/robo-study/programs/query-a8d6c21c9f5b/">Бакалавриат</a></li>
+<li><a href="/robo-study/programs/query-84d73e792062/">Специалитет</a></li>
+<li><a href="/robo-study/programs/query-9bdb187cb491/">Магистратура</a></li>
+<li><a href="/robo-study/programs/query-7a020556c2ec/">СПО</a></li>
+<li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
+</ul>
+</li>
+<li>
+<a href="/robo-study/run/">Обновить данные</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="app">
+<header class="ir-pagehead">
+<div class="ir-pagehead__inner">
+<div class="ir-pagehead__top">
+<img alt="Иркутский политех" class="ir-pagehead__logo" src="/robo-study/static/img/irnitu-logo-white.svg"/>
+<nav aria-label="Хлебные крошки">
+<ol class="ir-crumbs">
+<li><a href="/robo-study/">Робот ОП</a></li>
+<li><a href="/robo-study/programs/">Программы</a></li>
+<li><a href="/robo-study/op/09.03.01-isoiu-2026-och/">09.03.01</a></li>
+<li><span aria-current="page">РПД</span></li>
+</ol>
+</nav>
+</div>
+<h1 class="ir-pagehead__title">Нейронные сети и их приложения</h1>
+<div class="ir-pagehead__meta"><span>Рабочая программа дисциплины</span><span>09.03.01 Интеллектуальные системы обработки информации и управления</span></div>
+</div>
+</header>
+<main class="app-main" id="main">
+<div class="app-page">
+<div class="app-content">
+<section aria-labelledby="h-facts" class="app-section">
+<h2 class="section-title" id="h-facts">Сведения</h2>
+<dl class="app-kv"><dt>Семестр</dt><dd>6</dd><dt>Трудоёмкость</dt><dd>3 з. е. · 108 ч</dd><dt>Аудиторные занятия</dt><dd>лекции 16 ч, лабораторные 32 ч</dd><dt>Самостоятельная работа</dt><dd>60 ч</dd><dt>Промежуточная аттестация</dt><dd>Зачет</dd></dl>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Темы и содержание</h2>
+<ol class="app-topics">
+<li><span class="app-topics__title">Введение в нейронные сети</span><span class="app-topics__text">Области применения искусственных нейронных сетей. Биологический нейрон. Структура и свойства искусственного нейрона. Разновидности искусственных нейронов. Классификация искусственных нейронных сетей и их свойства. Теорема Колмогорова– Арнольда. Работа Хехт-Нильсена. Следствия из теоремы Колмогорова-Арнольда–Хехт- Нильсена</span></li>
+<li><span class="app-topics__title">Обучение нейронных сетей</span><span class="app-topics__text">Постановка и возможные пути решения задачи обучения искусственных нейронных сетей: обучение с учителем, алгоритмобратного распространения ошибки; обучение без учителя. Настройка числа нейронов в скрытых слоях многослойных нейронных сетей в процессе обучения. Алгоритмы сокращения. Конструктивные алгоритмы</span></li>
+<li><span class="app-topics__title">Основные концепции искусственных нейронных сетей</span><span class="app-topics__text">Персептрон. Многослойный персептрон. Нейронные сети радиальных базисных функций. Вероятностная нейронная сеть. Обобщенно-регрессионная нейронная сеть</span></li>
+<li><span class="app-topics__title">Основные концепции искусственных нейронных сетей</span><span class="app-topics__text">Нейронные сети Кохонена. Нейронные сети встречного распространения. Нейронные сети Хопфилда</span></li>
+<li><span class="app-topics__title">Основные концепции искусственных нейронных сетей</span><span class="app-topics__text">Нейронные сети Хэмминга. Двунаправленная ассоциативная память. Каскадные искусственные нейронные сети</span></li>
+<li><span class="app-topics__title">Искусственные нейронные сети, имитирующие свойства естественных нейронных сетей</span><span class="app-topics__text">Сети адаптивной резонансной теории (назначение, описание, структура, обучение, применение)</span></li>
+<li><span class="app-topics__title">Искусственные нейронные сети, имитирующие свойства естественных нейронных сетей</span><span class="app-topics__text">Когнитрон и неокогнитрон (назначение, описание, структура, обучение,применение)</span></li>
+<li><span class="app-topics__title">Применение искусственных нейронных сетей. Программные средства и системы моделирования искусственных нейронных сетей</span><span class="app-topics__text">Представление задачи в нейросетевом логическом базисе. Применение ИНС для моделирования: статических объектов, классификации, аппроксимации функций, кластеризации, временных рядов, линейных динамических объектов</span></li>
+</ol>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Лабораторные работы</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Персептроны и однослойные персептронные нейронные сети</td><td class="ir-num app-nowrap">4 ч</td></tr><tr><td>Простая нейросеть на языке Python</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Многослойная нейросеть на Python (keras) для распознавания изображений</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Применение нейросети для предсказания значений</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Применение нейросети для предсказания</td><td class="ir-num app-nowrap">6 ч</td></tr><tr><td>Процедура настройки и адаптации параметров нейронной сети</td><td class="ir-num app-nowrap">4 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Самостоятельная работа</h2>
+<div class="ir-table-wrap">
+<table class="ir-table app-table-text">
+<tbody><tr><td>Тест (СРС)</td><td class="ir-num app-nowrap">60 ч</td></tr></tbody>
+</table>
+</div>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Формируемые компетенции</h2>
+<ul class="app-list"><li>ДК-1 — Способность осуществлять деятельность, находящуюся за пределами основной профессиональной сферы</li></ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Результаты обучения</h2>
+<ul class="app-list"><li>Знать основные типы нейронных сетей и принципы их работы</li><li>Уметь применять нейронные сети для решения задач профессиональной области</li><li>Владеть владеет инструментами разработки нейронных сетей</li></ul>
+</section>
+<section class="app-section">
+<h2 class="card-title" style="margin:0 0 var(--space-12)">Литература</h2>
+<ul class="app-list"><li>Букунов С. В. Разработка приложений с графическим пользовательским интерфейсом на языке Python : учебное пособие / С. В. Букунов, О. В. Букунова, 2023. - 88. [Сайт] – URL: https://e.lanbook.com/book/292856 8 Дополнительная учебная литература и справочная</li><li>Нейронные сети и аппроксимация функций : учеб. пособие / Н. П. Абовский [и др.], 2002. - 133.</li><li>Головко В. А. Нейронные сети: обучение, организация и применение : учеб. пособие по направлению подгот. бакалавров и магистров "Прикладные математика и физика" / В. А. Головко, 2001. - 256.</li></ul>
+</section>
+</div>
+<aside class="app-aside">
+<section class="ir-info ir-info--navy"><h3 class="ir-info__title">Документ</h3>
+<div class="ir-info__item"><span class="ir-info__label">Тип</span><span class="ir-info__value">Рабочая программа дисциплины</span></div>
+<div class="ir-info__item"><span class="ir-info__label">Страниц</span><span class="ir-info__value">8</span></div>
+</section>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="https://app.istu.edu/oop/uploads/rpd_generator/%D0%98%D0%A1%D0%98%D0%B1_2026_%D0%9D%D0%B5%D0%B9%D1%80%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5_%D1%81%D0%B5%D1%82%D0%B8_%D0%B8_%D0%B8%D1%85_%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F_13643_accepted.pdf">PDF на сайте ИРНИТУ</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" href="/robo-study/op/09.03.01-isoiu-2026-och/">Страница ОП</a>
+<a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-104-5a9957dc35c6.json">Первичный JSON</a><a class="ir-btn ir-btn--outline app-aside__btn" download="" href="/robo-study/downloads/doc-104-6c88044d2652.json">Итоговый JSON</a></aside>
+</div>
+</main>
+<footer class="app-footer">
+<div class="app-footer__inner">
+<div class="app-footer__name">Робот ОП — сбор и преобразование документов образовательных программ ИРНИТУ</div>
+<div class="app-footer__note">
+          Данные: <a href="https://www.istu.edu/sveden/education/">www.istu.edu, «Сведения об образовательной организации. Образование»</a>.
+          
+        </div>
+<div class="app-footer__note">
+<a class="app-theme" data-theme-toggle="" href="#theme">Тёмная тема</a>
+</div>
+</div>
+</footer>
+</div>
+<script>
+    (function () {
+      var rail = document.getElementById('rail');
+      var btn = rail.querySelector('[data-rail-toggle]');
+      var panel = document.getElementById('rail-panel');
+      function setOpen(open) {
+        rail.classList.toggle('is-open', open);
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.setAttribute('aria-label', open ? 'Свернуть меню' : 'Развернуть меню');
+        document.body.classList.toggle('app-scroll-lock', open);
+      }
+      btn.addEventListener('click', function () { setOpen(!rail.classList.contains('is-open')); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>

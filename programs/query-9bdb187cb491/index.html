@@ -13,12 +13,12 @@ e.preventDefault();var t=document.documentElement.dataset.theme==='dark'?'light'
 try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Образовательные программы: Магистратура — Робот ОП</title>
+<title>Образовательные программы — Робот ОП</title>
 <link href="/robo-study/static/css/tokens.css" rel="stylesheet"/>
 <link href="/robo-study/static/css/irnitu.css" rel="stylesheet"/>
 <link href="/robo-study/static/css/app.css" rel="stylesheet"/>
 </head>
-<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении</div>
+<body><div class="app-footer__note" data-static-snapshot="" style="padding:12px 24px;text-align:center">Демонстрационная версия · сохранённые результаты обработки</div>
 <div class="app-rail">
 <div class="ir-rail" id="rail">
 <div class="ir-rail__buttons">
@@ -43,9 +43,6 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 <li><a href="/robo-study/programs/query-dea3d16f9f2d/">Аспирантура</a></li>
 </ul>
 </li>
-<li>
-<a href="/robo-study/run/">Обновить данные</a>
-</li>
 </ul>
 </nav>
 </div>
@@ -64,29 +61,42 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
 </ol>
 </nav>
 </div>
-<h1 class="ir-pagehead__title">Образовательные программы: Магистратура</h1>
+<h1 class="ir-pagehead__title">Образовательные программы</h1>
 </div>
 </header>
 <main class="app-main" id="main">
 <div class="app-page app-page--wide">
 <div class="app-content">
-<section aria-labelledby="g-1" class="app-cards-group">
+<div data-catalog-filters="" hidden="">
+<fieldset class="app-catalog-filter">
+<legend>Год набора</legend>
+<div class="app-catalog-choices" data-year-choices=""></div>
+</fieldset>
+<fieldset class="app-catalog-filter">
+<legend>Уровень образования</legend>
+<div class="app-catalog-choices" data-level-choices=""></div>
+</fieldset>
+<div class="app-catalog-search" role="search">
+<label for="program-search">Поиск по программам</label>
+<input class="ir-input" id="program-search" placeholder="Название, профиль или код" type="search"/>
+</div>
+</div>
+<p class="app-small" data-catalog-no-results="" hidden="" role="status">Подходящие программы не найдены.</p>
+
+<div data-catalog-url="/programs/catalog" data-selected-level="master" data-selected-level-title="Магистратура">
+
+<section aria-labelledby="g-1" class="app-cards-group" data-catalog-level="master" data-catalog-level-title="Магистратура" data-catalog-year="2026">
 <h2 class="card-title" id="g-1">Магистратура, набор 2026</h2>
 <div class="ir-cards">
-<article class="ir-card">
-<div class="ir-card__tags"><span class="ir-tag ir-tag--cyan" title="Магистратура">Магистратура</span><span class="ir-tag ir-tag--outline" title="Очная">Очная</span></div>
-<div class="ir-card__code">09.04.01 </div>
-<a class="ir-card__title" href="/robo-study/op/09.04.01-ii-2026-och/">Искусственный интеллект</a>
-<div class="ir-card__foot"><span>Обновлено 04.11.2026</span></div>
-</article>
-<article class="ir-card">
+<article class="ir-card" data-program-search="Цифровизация промышленных предприятий 09.04.02  Магистратура">
 <div class="ir-card__tags"><span class="ir-tag ir-tag--cyan" title="Магистратура">Магистратура</span><span class="ir-tag ir-tag--outline" title="Очная">Очная</span></div>
 <div class="ir-card__code">09.04.02 </div>
 <a class="ir-card__title" href="/robo-study/op/09.04.02-cpp-2026-och/">Цифровизация промышленных предприятий</a>
-<div class="ir-card__foot"><span>Обновлено 04.11.2026</span></div>
+<div class="ir-card__foot"><span>Обновлено 15.11.2026</span></div>
 </article>
 </div>
 </section>
+</div>
 </div>
 </div>
 </main>
@@ -121,5 +131,110 @@ try{localStorage.setItem('robot-op-theme',t);}catch(e){} });});});})();</script>
       });
     })();
   </script>
+<script>
+(function () {
+  const filters = document.querySelector('[data-catalog-filters]');
+  const input = document.getElementById('program-search');
+  const catalog = document.querySelector('[data-catalog-url]');
+  const noResults = document.querySelector('[data-catalog-no-results]');
+  const yearChoices = filters.querySelector('[data-year-choices]');
+  const levelChoices = filters.querySelector('[data-level-choices]');
+  const normalize = text => text.normalize('NFC').toLocaleLowerCase('ru').replace(/ё/g, 'е');
+  let groups = [];
+  let availability = {};
+  let year = '';
+  let level = catalog.dataset.selectedLevel;
+
+  function markSelection(container, selected) {
+    for (const button of container.querySelectorAll('button')) {
+      button.setAttribute('aria-pressed', String(button.dataset.value === selected));
+    }
+  }
+
+  function renderChoices(container, options, selected) {
+    container.replaceChildren(...Array.from(options, ([value, label]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'ir-btn ir-btn--outline ir-btn--pill';
+      button.dataset.value = value;
+      button.textContent = label;
+      return button;
+    }));
+    markSelection(container, selected);
+  }
+
+  function renderLevels() {
+    const options = new Map([['', 'Все уровни']]);
+    for (const [key, title] of Object.entries(availability[year] || {})) {
+      options.set(key, title);
+    }
+    if (!options.has(level)) {
+      if (year) level = '';
+      else options.set(level, catalog.dataset.selectedLevelTitle);
+    }
+    renderChoices(levelChoices, options, level);
+  }
+
+  function filterPrograms() {
+    const terms = normalize(input.value).trim().split(/\s+/).filter(Boolean);
+    const filtering = Boolean(level || terms.length);
+    let anyMatch = false;
+    for (const group of groups) {
+      const selected = (!year || group.dataset.catalogYear === year) &&
+                       (!level || group.dataset.catalogLevel === level);
+      let groupMatch = false;
+      for (const card of group.querySelectorAll('[data-program-search]')) {
+        const name = normalize(card.dataset.programSearch);
+        card.hidden = !selected || !terms.every(term => name.includes(term));
+        groupMatch ||= !card.hidden;
+      }
+      group.hidden = !groupMatch;
+      anyMatch ||= groupMatch;
+    }
+    const emptyCatalog = catalog.querySelector('[data-catalog-empty]');
+    if (emptyCatalog) emptyCatalog.hidden = filtering;
+    noResults.hidden = anyMatch || catalog.hasAttribute('aria-busy') || (!filtering && Boolean(emptyCatalog));
+  }
+
+  function refreshFilters() {
+    groups = Array.from(catalog.querySelectorAll('.app-cards-group'));
+    const metadata = catalog.querySelector('[data-catalog-years]');
+    availability = metadata ? JSON.parse(metadata.textContent) : {};
+    for (const group of groups) {
+      const {catalogYear, catalogLevel, catalogLevelTitle} = group.dataset;
+      (availability[catalogYear] ??= {})[catalogLevel] = catalogLevelTitle;
+    }
+    const years = Object.keys(availability).sort((a, b) => Number(b) - Number(a));
+    if (!years.includes(year)) {
+      year = years.find(value => !level || availability[value][level]) || years[0] || '';
+    }
+    renderChoices(yearChoices, years.map(value => [value, value]), year);
+    renderLevels();
+    filterPrograms();
+  }
+
+  yearChoices.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    year = button.dataset.value;
+    markSelection(yearChoices, year);
+    renderLevels();
+    catalog.dispatchEvent(new CustomEvent('catalog:year', {detail: year}));
+    filterPrograms();
+  });
+  levelChoices.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    level = button.dataset.value;
+    markSelection(levelChoices, level);
+    filterPrograms();
+  });
+  input.addEventListener('input', filterPrograms);
+  catalog.addEventListener('catalog:loaded', refreshFilters);
+  filters.hidden = false;
+  refreshFilters();
+})();
+</script>
+
 </body>
 </html>

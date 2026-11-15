@@ -58,7 +58,7 @@
       <h2 class="section-title" id="h-up">Учебный план</h2>
       {%- if plan %}
       <h3 class="card-title app-subhead app-subhead--first">По семестрам</h3>
-      <p class="app-lead">Нагрузка каждого семестра: сколько пар лекций, практических и лабораторных занятий за семестр. Одна пара — 1 час 30 минут. В скобках указано обычное время занятий. Название дисциплины открывает её рабочую программу или сведения из учебного плана.</p>
+      <p class="app-lead">В таблице показано среднее число пар за учебную неделю с округлением до 0,5 пары. В шапке указаны общая нагрузка и время занятий из расчёта 90 минут на пару. Название дисциплины открывает её рабочую программу или сведения из учебного плана.</p>
       {{ ui.plan_carousel(plan) }}
       <h3 class="card-title app-subhead">Из чего состоит программа</h3>
       <p class="app-lead">Доля категорий в объёме программы ({{ plan.total_ze }} {{ plan.unit or "з. е." }} без факультативов).</p>
@@ -104,20 +104,11 @@
 
     <section class="app-section" id="gia" aria-labelledby="h-gia">
       <h2 class="section-title" id="h-gia">Государственная итоговая аттестация</h2>
-      {%- if gia['items'] or gia.summary %}
-      {{ ui.info_block(gia['items']) }}
-      {%- if gia.summary %}
-      {%- for p in (gia.summary if gia.summary is not string else [gia.summary]) %}<p class="app-prose">{{ p }}</p>{% endfor %}
-      <p class="app-llm-note">Краткое описание сформировано автоматически по программе ГИА.</p>
-      {%- endif %}
-      {%- if gia.vkr_topics %}
-      <h3 class="card-title app-subhead">Примерная тематика ВКР</h3>
-      <ul class="app-list">{% for t in gia.vkr_topics %}<li>{{ t }}</li>{% endfor %}</ul>
-      {%- endif %}
-      <p class="app-llm-note">{% if gia.gia_url %}<a class="ir-link" href="{{ gia.gia_url }}">Программа ГИА</a>{% endif %}{% if gia.gia_url and gia.fos_url %} · {% endif %}{% if gia.fos_url %}<a class="ir-link" href="{{ gia.fos_url }}">ФОС ГИА</a>{% endif %}</p>
+      {%- for p in gia.summary %}
+      <p class="app-prose">{{ p }}</p>
       {%- else %}
-      {{ ui.empty('Программа ГИА пока не опубликована.') }}
-      {%- endif %}
+      <p class="app-prose">—</p>
+      {%- endfor %}
     </section>
 
     <section class="app-section" id="docs" aria-labelledby="h-docs">

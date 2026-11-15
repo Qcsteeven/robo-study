@@ -67,7 +67,7 @@ def export_site(client, output: Path, base_path: str, program_ids=(), documents=
         if path.startswith("static/"):
             rel = Path(path)
             return rel, base_path + rel.as_posix()
-        if not (u.path in ("/", "/programs", "/run") or u.path.startswith("/op/")):
+        if not (u.path in ("/", "/programs") or u.path.startswith("/op/")):
             raise ValueError(f"Unsupported internal route: {key}")
         rel = Path(path)
         if u.query:
@@ -95,10 +95,7 @@ def export_site(client, output: Path, base_path: str, program_ids=(), documents=
             continue
         seen.add(key)
         rel, _ = destination(key)
-        if key == "/run":
-            response = client.get("/programs")
-        else:
-            response = client.get(key)
+        response = client.get(key)
         if response.status_code != 200:
             raise ValueError(f"Export request failed: {key}: {response.status_code}")
         target = output / rel
@@ -106,26 +103,15 @@ def export_site(client, output: Path, base_path: str, program_ids=(), documents=
         soup = BeautifulSoup(response.text, "html.parser")
         if not soup.body or not soup.head:
             raise ValueError(f"Expected HTML page: {key}")
-        if key == "/run":
-            soup.title.string = "Обновление данных — Робот ОП"
-            if soup.h1:
-                soup.h1.string = "Обновление данных"
-            main = soup.find("main")
-            main.clear()
-            section = soup.new_tag("section", attrs={"class": "app-section app-content"})
-            section.append(BeautifulSoup('<h2>Просмотр сохранённых результатов</h2><p>На GitHub Pages размещена копия '
-                'результатов обработки. Здесь можно изучать программы, дисциплины и учебные планы.</p>'
-                '<p>Запуск робота, распознавание PDF и обновление данных доступны в локальном приложении. '
-                'Для обновления опубликованной версии нужно заново выполнить экспорт.</p>'
-                '<p><a href="/programs">Открыть образовательные программы</a></p>', "html.parser"))
-            main.append(section)
+        for action in soup.select("[data-live-catalog]"):
+            action.decompose()
         # JSON remains an internal storage/API format, not a visitor-facing download.
         for a in soup.select("a[href]"):
             url, _ = canonical(a["href"], key)
             if url and re.fullmatch(r"/api/documents/\d+/json(?:\?.*)?", url):
                 a.decompose()
         note = soup.new_tag("div", attrs={"data-static-snapshot": "", "class": "app-footer__note", "style": "padding:12px 24px;text-align:center"})
-        note.string = "Демонстрационная версия · сохранённые результаты обработки · обновление данных выполняется в локальном приложении"
+        note.string = "Демонстрационная версия · сохранённые результаты обработки"
         soup.body.insert(0, note)
         script = soup.new_tag("script")
         script.string = THEME_SCRIPT
@@ -227,7 +213,8 @@ def main():
         app = create_app(settings, start_worker=False)
         with app.state.db.Session() as ses:
             programs = set(ses.scalars(select(Program.id).where(Program.page.is_not(None))))
-            documents = list(ses.execute(select(Document.program_id, Document.id).where(Document.program_id.in_(programs))).all())
+            documents = list(ses.execute(select(Document.program_id, Document.id).where(
+                Document.program_id.in_(programs), Document.doc_type.not_in(("gia", "fos_gia")))).all())
             if not programs:
                 parser.error("No saved program pages to publish")
         # Do not enter lifespan: no worker or interrupted-run updates are needed.

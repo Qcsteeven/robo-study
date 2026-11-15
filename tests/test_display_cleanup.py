@@ -67,14 +67,19 @@ def test_program_display_removes_area_codes_but_keeps_meaningful_numbers(tmp_pat
                        source_url="https://www.istu.edu/test")
         ses.add(prog)
         ses.add_all([Document(id=1,program_id=prog.id,doc_type="oop",title="ООП",url="https://www.istu.edu/oop.pdf"),
-                     Document(id=2,program_id=prog.id,doc_type="up",title="УП",url="https://www.istu.edu/up.pdf")])
+                     Document(id=2,program_id=prog.id,doc_type="up",title="УП",url="https://www.istu.edu/up.pdf"),
+                     Document(id=3, program_id=prog.id, doc_type="gia", title="ГИА", url="https://www.istu.edu/gia.pdf")])
         ses.flush()
         areas=["16 Строительство (объек- тов, техниче- ской эксплуатации и ма- териалов)",
                "40. Сквозные виды профессиональной деятельности", "06 Связь и технологии 5G"]
         ses.add_all([JsonVersion(document_id=1,kind="final",version=1,data={"data":{"areas":areas}}),
                      JsonVersion(document_id=2,kind="final",version=1,data={"data":{
-                         "semesters":[{"number":1,"weeks":14}],"rows":[{"index":"Б1.О.01","name":"М/еБ-программирование",
-                         "semesters":{"1":{"lec":296}},"control":{},"ze":4}]}})])
+                         "semesters": [{"number": 1, "weeks": 14}, {"number": 2, "weeks": 0}],
+                         "rows": [{"index":"Б1.О.01", "name":"М/еБ-программирование",
+                                   "semesters":{"1":{"lec":296}, "2":{"lec":32}}, "control":{}, "ze":4}]}}),
+                     JsonVersion(document_id=3, kind="final", version=1, data={
+                         "summary": "Аттестация проходит в форме защиты выпускной работы.",
+                         "data": {"forms": ["Защита ВКР"], "ze": 6}})])
         ses.flush()
         prog.page=build(ses,prog)
         assert prog.page["op"]["areas"] == ["Строительство (объектов, технической эксплуатации и материалов)",
@@ -83,10 +88,33 @@ def test_program_display_removes_area_codes_but_keeps_meaningful_numbers(tmp_pat
     with TestClient(app) as client:
         soup=BeautifulSoup(client.get("/op/clean-op").text,"html.parser")
         load=soup.select_one(".app-load").get_text(" ",strip=True)
-        assert "222 ч" in load and "15 ч 51 мин" in load and "10,6" in load
+        assert "Пар за семестр" in load and "222 ч" in load
+        assert "Пар за учебный год" in load and "246 ч" in load
+        table = soup.select_one(".app-semtable")
+        assert table.thead and table.tfoot.th.get_text(strip=True) == "Итого в неделю"
+        assert table.select_one("tbody .app-semtable__sum").get_text(strip=True) == "10,5"
+        assert table.select_one("tfoot .app-semtable__sum").get_text(strip=True) == "10,5"
+        assert soup.select("tbody .app-semtable__sum")[1].get_text(strip=True) == "—"
+        assert soup.select("tfoot .app-semtable__sum")[1].get_text(strip=True) == "—"
+        gia = soup.select_one("#gia")
+        assert gia.select_one(".app-prose").get_text(strip=True) == "Аттестация проходит в форме защиты выпускной работы."
+        assert not gia.select("a, .ir-info")
         assert "Web-программирование" in soup.get_text() and "М/еБ" not in soup.get_text()
         card=BeautifulSoup(client.get('/op/clean-op/discipline?index=Б1.О.01').text,'html.parser')
         assert card.h1.get_text(strip=True)=="Web-программирование"
+        assert "Пар в неделю" in card.select_one("thead").get_text()
+        assert card.select_one("tbody tr td").get_text(strip=True) == "10,5"
+    with app.state.db.Session() as ses:
+        prog = ses.get(Program, "clean-op")
+        prog.page = dict(prog.page, gia={"summary": [
+            "Генеративные языковые модели не обладают собственным мнением — их ответы являются обобщением информации.",
+            "Чтобы избежать ошибок и неправильного толкования, разговоры на чувствительные темы могут быть ограничены .",
+        ]})
+        ses.commit()
+    with TestClient(app) as client:
+        gia = BeautifulSoup(client.get("/op/clean-op").text, "html.parser").select_one("#gia")
+        assert gia.select_one(".app-prose").get_text(strip=True) == "—"
+        assert len(gia.select(".app-prose")) == 1
 
 
 def test_text_cleanup_preserves_real_compounds_and_coordination():

@@ -86,7 +86,7 @@
 {%- endmacro %}
 
 {#- Учебный план по семестрам: слайд на семестр — сводка нагрузки и дисциплины с числом пар лекций, практик
-    и лабораторных за семестр. Без скриптов — горизонтальная прокрутка с прилипанием к слайду; скрипт
+    и лабораторных в среднем за учебную неделю. Без скриптов — горизонтальная прокрутка с прилипанием к слайду; скрипт
     страницы добавляет переключатель семестров, стрелки и фильтр категорий -#}
 {% macro plan_carousel(plan) -%}
 <div class="app-catfilter" data-catfilter hidden>
@@ -113,10 +113,12 @@
         <span class="app-course__meta">{{ s.course }} курс{% if s.weeks %} · {{ s.weeks }} учебных недел{{ s.weeks | plural('я', 'и', 'ь') }}{% endif %} · {{ s.count }} дисциплин{{ s.count | plural('а', 'ы', '') }} · {{ s.exams }} экзамен{{ s.exams | plural('', 'а', 'ов') }}</span>
       </div>
       <dl class="app-load">
-        <div class="app-load__total"><dt>Пар за семестр</dt><dd>{{ num(s.pairs) }} <span class="app-load__hours">({{ s.hours | clock_hours }})</span></dd>{% if s.per_week %}<span class="app-load__note">≈ {{ num(s.per_week) }} {{ 'пары' if s.per_week != s.per_week | int else s.per_week | plural('пара', 'пары', 'пар') }} ({{ s.hours_per_week | clock_hours }}) в неделю</span>{% endif %}</div>
+        <div class="app-load__total"><dt>Пар за семестр</dt><dd>{{ num(s.pairs) }} <span class="app-load__hours">({{ s.hours | clock_hours }})</span></dd></div>
         <div class="app-load--lec"><dt><span class="app-load__mark" aria-hidden="true"></span>Лекции</dt><dd>{{ num(s.lec) }} <span class="app-load__hours">({{ (s.lec * 1.5) | clock_hours }})</span></dd></div>
         <div class="app-load--pr"><dt><span class="app-load__mark" aria-hidden="true"></span>Практики</dt><dd>{{ num(s.pr) }} <span class="app-load__hours">({{ (s.pr * 1.5) | clock_hours }})</span></dd></div>
         <div class="app-load--lab"><dt><span class="app-load__mark" aria-hidden="true"></span>Лабораторные</dt><dd>{{ num(s.lab) }} <span class="app-load__hours">({{ (s.lab * 1.5) | clock_hours }})</span></dd></div>
+        {% set year_pairs = plan.semesters | selectattr('course', 'equalto', s.course) | sum(attribute='pairs') %}
+        <div><dt>Пар за учебный год</dt><dd>{{ num(year_pairs) }} <span class="app-load__hours">({{ (year_pairs * 1.5) | clock_hours }})</span></dd></div>
       </dl>
       {%- if s.pairs %}
       <div class="app-load__bar" aria-hidden="true">
@@ -125,13 +127,13 @@
       {%- endif %}
       <div class="ir-table-wrap app-scroll">
         <table class="ir-table app-semtable">
-          <caption class="sr-only">{{ s.number }} семестр: дисциплины и число пар</caption>
+          <caption class="sr-only">{{ s.number }} семестр: дисциплины и число пар в неделю</caption>
           <thead><tr>
             <th scope="col">Дисциплина</th>
-            <th scope="col" class="ir-num" title="Лекции, пар за семестр">Лек</th>
-            <th scope="col" class="ir-num" title="Практические занятия, пар за семестр">Пр</th>
-            <th scope="col" class="ir-num" title="Лабораторные работы, пар за семестр">Лаб</th>
-            <th scope="col" class="ir-num">Пар</th>
+            <th scope="col" class="ir-num" title="Лекции, пар в неделю">Лек</th>
+            <th scope="col" class="ir-num" title="Практические занятия, пар в неделю">Пр</th>
+            <th scope="col" class="ir-num" title="Лабораторные работы, пар в неделю">Лаб</th>
+            <th scope="col" class="ir-num">Пар в неделю</th>
             <th scope="col">Контроль</th>
           </tr></thead>
           <tbody>
@@ -143,17 +145,20 @@
               {%- if d.practice and not d.pairs %}
               <td colspan="4" class="app-semtable__practice">{{ 'практика' if d.category == 'prac' else 'без аудиторных занятий' }}{% if d.ze %} · {{ d.ze }} з. е.{% endif %}</td>
               {%- else %}
-              <td class="ir-num">{{ num(d.lec, '—') }}</td><td class="ir-num">{{ num(d.pr, '—') }}</td><td class="ir-num">{{ num(d.lab, '—') }}</td>
-              <td class="ir-num app-semtable__sum">{{ num(d.pairs, '—') }}</td>
+              <td class="ir-num">{{ weekly_pairs(d.lec, s.weeks, '—') }}</td><td class="ir-num">{{ weekly_pairs(d.pr, s.weeks, '—') }}</td><td class="ir-num">{{ weekly_pairs(d.lab, s.weeks, '—') }}</td>
+              <td class="ir-num app-semtable__sum">{{ weekly_pairs(d.pairs, s.weeks, '—') }}</td>
               {%- endif %}
               <td class="app-nowrap">{{ d.control or '—' }}</td>
             </tr>
             {%- endfor %}
           </tbody>
           <tfoot><tr>
-            <th scope="row">Итого{% if s['items'] | selectattr('optional') | list %} <span class="app-chip__tag">без факультативов</span>{% endif %}</th>
-            <td class="ir-num">{{ num(s.lec, '—') }}</td><td class="ir-num">{{ num(s.pr, '—') }}</td><td class="ir-num">{{ num(s.lab, '—') }}</td>
-            <td class="ir-num app-semtable__sum">{{ num(s.pairs, '—') }}</td><td></td>
+            <th scope="row">Итого в неделю{% if s['items'] | selectattr('optional') | list %} <span class="app-chip__tag">без факультативов</span>{% endif %}</th>
+            <td class="ir-num">{{ weekly_pairs(s.lec, s.weeks, '—') }}</td>
+            <td class="ir-num">{{ weekly_pairs(s.pr, s.weeks, '—') }}</td>
+            <td class="ir-num">{{ weekly_pairs(s.lab, s.weeks, '—') }}</td>
+            <td class="ir-num app-semtable__sum">{{ weekly_pairs(s.pairs, s.weeks) }}</td>
+            <td></td>
           </tr></tfoot>
         </table>
       </div>
@@ -166,6 +171,11 @@
 {#- Число: 32 → «32», 4.5 → «4,5»; ноль — заглушка -#}
 {% macro num(v, zero='0') -%}
   {%- if v -%}{{ '%g' | format(v) | replace('.', ',') }}{%- else -%}{{ zero }}{%- endif -%}
+{%- endmacro %}
+
+{#- В сохранённых планах нагрузка хранится в парах за семестр. -#}
+{% macro weekly_pairs(pairs, weeks, zero='0') -%}
+  {%- if weeks -%}{{ num(((pairs / weeks * 2 + 0.5) | int) / 2, zero) }}{%- else -%}—{%- endif -%}
 {%- endmacro %}
 
 {#- Из чего состоит программа: доля категорий в з. е. — полоса и подписи с процентами -#}

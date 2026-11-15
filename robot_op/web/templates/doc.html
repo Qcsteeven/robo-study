@@ -51,9 +51,25 @@
         {%- endfor %}
       </ol>
       {%- elif b.kind == 'hours' %}
+      {%- set numbered = b.title in ('Практические занятия', 'Самостоятельная работа') %}
       <div class="ir-table-wrap">
         <table class="ir-table app-table-text">
-          <tbody>{% for t in b['items'] %}<tr><td>{{ t.title }}</td><td class="ir-num app-nowrap">{{ t.hours or '—' }}</td></tr>{% endfor %}</tbody>
+          {%- if numbered %}
+          <thead><tr>
+            <th scope="col" class="ir-num">№</th>
+            <th scope="col">Тема</th>
+            <th scope="col" class="ir-num">Часы</th>
+          </tr></thead>
+          {%- endif %}
+          <tbody>
+            {%- for t in b['items'] %}
+            <tr>
+              {%- if numbered %}<th scope="row" class="ir-num">{{ loop.index }}</th>{% endif %}
+              <td>{{ t.title }}</td>
+              <td class="ir-num app-nowrap">{{ t.hours or '—' }}</td>
+            </tr>
+            {%- endfor %}
+          </tbody>
         </table>
       </div>
       {%- else %}

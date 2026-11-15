@@ -17,12 +17,12 @@
     {% if load %}
     <section class="app-section">
       <h2 class="section-title">Нагрузка по семестрам</h2>
-      <p class="app-lead">Количество пар за семестр. Пара — два академических часа.</p>
+      <p class="app-lead">Среднее число пар за учебную неделю семестра.</p>
       <div class="ir-table-wrap"><table class="ir-table">
-        <thead><tr><th>Семестр</th><th>Лекции</th><th>Практические</th><th>Лабораторные</th><th>Всего пар</th><th>Контроль</th></tr></thead>
+        <thead><tr><th>Семестр</th><th>Лекции</th><th>Практические</th><th>Лабораторные</th><th>Пар в неделю</th><th>Контроль</th></tr></thead>
         <tbody>{% for sem in load %}<tr><th scope="row">{{ sem.number }}</th>
-          <td>{{ ui.num(sem.lec) }}</td><td>{{ ui.num(sem.pr) }}</td><td>{{ ui.num(sem.lab) }}</td>
-          <td>{{ ui.num(sem.pairs) }}</td><td>{{ sem.control or '—' }}</td>
+          <td>{{ ui.weekly_pairs(sem.lec, sem.weeks) }}</td><td>{{ ui.weekly_pairs(sem.pr, sem.weeks) }}</td><td>{{ ui.weekly_pairs(sem.lab, sem.weeks) }}</td>
+          <td>{{ ui.weekly_pairs(sem.pairs, sem.weeks) }}</td><td>{{ sem.control or '—' }}</td>
         </tr>{% endfor %}</tbody>
       </table></div>
     </section>

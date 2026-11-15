@@ -2,27 +2,170 @@
 {% block content %}
 <div class="app-page app-page--wide">
   <div class="app-content">
-    {%- if groups %}
-    {%- for g in groups %}
-    <section class="app-cards-group" aria-labelledby="g-{{ loop.index }}">
-      <h2 class="card-title" id="g-{{ loop.index }}">{{ g.title }}</h2>
-      <div class="ir-cards">
-        {%- for p in g.programs %}
-        <article class="ir-card">
-          <div class="ir-card__tags">{{ ui.tag(p.level_title, tones.get(p.level)) }}{{ ui.tag(p.form, 'outline') }}</div>
-          <div class="ir-card__code">{{ p.code }} {{ p.direction }}</div>
-          <a class="ir-card__title" href="/op/{{ p.id }}">{{ p.profile or p.block_title }}</a>
-          {%- if p.page_updated_at %}
-          <div class="ir-card__foot"><span>Обновлено {{ p.page_updated_at.strftime('%d.%m.%Y') }}</span></div>
-          {%- endif %}
-        </article>
-        {%- endfor %}
+    {% if message %}{% call ui.alert('info') %}<p>{{ message }}</p>{% endcall %}{% endif %}
+    <div data-catalog-filters hidden>
+      <fieldset class="app-catalog-filter">
+        <legend>Год набора</legend>
+        <div class="app-catalog-choices" data-year-choices></div>
+      </fieldset>
+      <fieldset class="app-catalog-filter">
+        <legend>Уровень образования</legend>
+        <div class="app-catalog-choices" data-level-choices></div>
+      </fieldset>
+      <div class="app-catalog-search" role="search">
+        <label for="program-search">Поиск по программам</label>
+        <input class="ir-input" id="program-search" type="search" placeholder="Название, профиль или код">
       </div>
-    </section>
-    {%- endfor %}
-    {%- else %}
-    {{ ui.empty('Образовательных программ' ~ (' этого уровня' if level else '') ~ ' пока нет: сведения появятся после обновления данных с сайта ИРНИТУ.') }}
-    {%- endif %}
+    </div>
+    <p class="app-small" data-catalog-no-results role="status" hidden>Подходящие программы не найдены.</p>
+    <p class="app-small" data-live-catalog data-catalog-status role="status" hidden></p>
+    <div data-catalog-url="/programs/catalog" data-selected-level="{{ level if level_title else '' }}"
+         data-selected-level-title="{{ level_title }}">
+      {% include "program_cards.html" %}
+    </div>
   </div>
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  const filters = document.querySelector('[data-catalog-filters]');
+  const input = document.getElementById('program-search');
+  const catalog = document.querySelector('[data-catalog-url]');
+  const noResults = document.querySelector('[data-catalog-no-results]');
+  const yearChoices = filters.querySelector('[data-year-choices]');
+  const levelChoices = filters.querySelector('[data-level-choices]');
+  const normalize = text => text.normalize('NFC').toLocaleLowerCase('ru').replace(/ё/g, 'е');
+  let groups = [];
+  let availability = {};
+  let year = '';
+  let level = catalog.dataset.selectedLevel;
+
+  function markSelection(container, selected) {
+    for (const button of container.querySelectorAll('button')) {
+      button.setAttribute('aria-pressed', String(button.dataset.value === selected));
+    }
+  }
+
+  function renderChoices(container, options, selected) {
+    container.replaceChildren(...Array.from(options, ([value, label]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'ir-btn ir-btn--outline ir-btn--pill';
+      button.dataset.value = value;
+      button.textContent = label;
+      return button;
+    }));
+    markSelection(container, selected);
+  }
+
+  function renderLevels() {
+    const options = new Map([['', 'Все уровни']]);
+    for (const [key, title] of Object.entries(availability[year] || {})) {
+      options.set(key, title);
+    }
+    if (!options.has(level)) {
+      if (year) level = '';
+      else options.set(level, catalog.dataset.selectedLevelTitle);
+    }
+    renderChoices(levelChoices, options, level);
+  }
+
+  function filterPrograms() {
+    const terms = normalize(input.value).trim().split(/\s+/).filter(Boolean);
+    const filtering = Boolean(level || terms.length);
+    let anyMatch = false;
+    for (const group of groups) {
+      const selected = (!year || group.dataset.catalogYear === year) &&
+                       (!level || group.dataset.catalogLevel === level);
+      let groupMatch = false;
+      for (const card of group.querySelectorAll('[data-program-search]')) {
+        const name = normalize(card.dataset.programSearch);
+        card.hidden = !selected || !terms.every(term => name.includes(term));
+        groupMatch ||= !card.hidden;
+      }
+      group.hidden = !groupMatch;
+      anyMatch ||= groupMatch;
+    }
+    const emptyCatalog = catalog.querySelector('[data-catalog-empty]');
+    if (emptyCatalog) emptyCatalog.hidden = filtering;
+    noResults.hidden = anyMatch || catalog.hasAttribute('aria-busy') || (!filtering && Boolean(emptyCatalog));
+  }
+
+  function refreshFilters() {
+    groups = Array.from(catalog.querySelectorAll('.app-cards-group'));
+    const metadata = catalog.querySelector('[data-catalog-years]');
+    availability = metadata ? JSON.parse(metadata.textContent) : {};
+    for (const group of groups) {
+      const {catalogYear, catalogLevel, catalogLevelTitle} = group.dataset;
+      (availability[catalogYear] ??= {})[catalogLevel] = catalogLevelTitle;
+    }
+    const years = Object.keys(availability).sort((a, b) => Number(b) - Number(a));
+    if (!years.includes(year)) {
+      year = years.find(value => !level || availability[value][level]) || years[0] || '';
+    }
+    renderChoices(yearChoices, years.map(value => [value, value]), year);
+    renderLevels();
+    filterPrograms();
+  }
+
+  yearChoices.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    year = button.dataset.value;
+    markSelection(yearChoices, year);
+    renderLevels();
+    catalog.dispatchEvent(new CustomEvent('catalog:year', {detail: year}));
+    filterPrograms();
+  });
+  levelChoices.addEventListener('click', event => {
+    const button = event.target.closest('button');
+    if (!button) return;
+    level = button.dataset.value;
+    markSelection(levelChoices, level);
+    filterPrograms();
+  });
+  input.addEventListener('input', filterPrograms);
+  catalog.addEventListener('catalog:loaded', refreshFilters);
+  filters.hidden = false;
+  refreshFilters();
+})();
+</script>
+<script data-live-catalog>
+(function () {
+  const catalog = document.querySelector('[data-catalog-url]');
+  const status = document.querySelector('[data-catalog-status]');
+  let activeRequest;
+
+  async function loadCatalog(year) {
+    activeRequest?.abort();
+    const request = new AbortController();
+    activeRequest = request;
+    const url = new URL(catalog.dataset.catalogUrl, location.origin);
+    if (year) url.searchParams.set('year', year);
+    status.hidden = false;
+    status.textContent = year ? `Загружаем программы набора ${year}…` : 'Получаем список программ с сайта ИРНИТУ…';
+    catalog.setAttribute('aria-busy', 'true');
+    try {
+      const response = await fetch(url, {signal: request.signal});
+      if (!response.ok) throw new Error();
+      const html = await response.text();
+      if (request !== activeRequest) return;
+      catalog.innerHTML = html;
+      status.hidden = true;
+    } catch (error) {
+      if (request !== activeRequest) return;
+      status.textContent = 'Не удалось получить список с сайта ИРНИТУ.';
+    } finally {
+      if (request === activeRequest) {
+        catalog.removeAttribute('aria-busy');
+        catalog.dispatchEvent(new Event('catalog:loaded'));
+      }
+    }
+  }
+
+  catalog.addEventListener('catalog:year', event => loadCatalog(event.detail));
+  loadCatalog();
+})();
+</script>
 {% endblock %}

@@ -10,6 +10,7 @@ import hashlib
 import logging
 import threading
 import time
+from dataclasses import replace
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -94,19 +95,20 @@ class Robot:
     def education_url(self) -> str:
         return urljoin(self.s.site.base_url.rstrip("/") + "/", self.s.site.education_path.lstrip("/"))
 
-    def levels(self) -> list[LevelYears]:
+    def levels(self, client: SiteClient | None = None) -> list[LevelYears]:
         """Уровни образования и годы набора — из раздела «Образование» сайта (ТЗ, шаг 1)."""
         def load():
-            client = self.site()
+            c = client or self.site()
             try:
-                page = client.get(self.education_url())
+                page = c.get(self.education_url())
                 return parse_education(page.text, page.url)
             finally:
-                client.close()
+                if client is None:
+                    c.close()
         return self._cached("levels", 600, load)
 
     def latest_year(self, level: str) -> int:
-        """Робот обрабатывает только последний год набора уровня — документы прошлых лет на сайте закрыты авторизацией."""
+        """Год набора по умолчанию для запуска без явно выбранного года."""
         lv = next((x for x in self.levels() if x.level == level), None)
         if lv is None or not lv.years:
             raise SiteError(f"На странице «Образование» нет годов набора для уровня «{LEVELS.get(level, level)}»")
@@ -121,7 +123,8 @@ class Robot:
                 return lv.years[year]
         raise SiteError(f"На странице «Образование» нет ссылки для уровня «{LEVELS.get(level, level)}» и года {year}")
 
-    def programs(self, level: str, year: int, client: SiteClient | None = None) -> list[ProgramBlock]:
+    def programs(self, level: str, year: int, client: SiteClient | None = None,
+                 *, use_cache: bool = True) -> list[ProgramBlock]:
         def load():
             c = client or self.site()
             try:
@@ -130,32 +133,56 @@ class Robot:
             finally:
                 if client is None:
                     c.close()
-        if client is not None:
-            return load()
-        return self._cached(f"programs:{level}:{year}", 600, load)
+        return self._cached(f"programs:{level}:{year}", 600, load) if use_cache else load()
+
+    def catalog(self, cohort: int | None = None) -> tuple[list[tuple[str, int, ProgramBlock]], dict[str, list[int]], bool]:
+        """Доступные годы набора и перечни выбранного года либо последнего года каждого уровня."""
+        settings = replace(self.s.site, timeout=min(self.s.site.timeout, 8), retries=0)
+        client = SiteClient(settings, transport=self.transport, sleep=self.sleep)
+        entries = []
+        try:
+            levels = self.levels(client)
+            incomplete = not levels
+            for lv in levels:
+                if not lv.years:
+                    continue
+                year = cohort if cohort is not None else max(lv.years)
+                if year not in lv.years:
+                    continue
+                try:
+                    entries.extend((lv.level, year, block) for block in self.programs(lv.level, year, client))
+                except SiteError:
+                    incomplete = True
+        finally:
+            client.close()
+        return entries, {lv.level: sorted(lv.years) for lv in levels}, incomplete
 
     # ------------------------------------------------------------------ запуски
 
-    def create_run(self, level: str, year: int, programs: list[str], force: bool = False) -> int:
+    def create_run(self, level: str, year: int, programs: list[str], force: bool = False, *, only_new: bool = False) -> int:
         with self.db.Session() as ses:
             run = Run(status="queued", params={"level": level, "level_title": LEVELS.get(level, level), "year": year,
                                                "programs": programs, "force": force})
+            if only_new:
+                run.params = dict(run.params, only_new=True)
             ses.add(run)
             ses.commit()
             return run.id
 
-    def create_batch_run(self, selections: list[dict]) -> int:
+    def create_batch_run(self, selections: list[dict], *, only_new: bool = False) -> int:
         """Один возобновляемый запуск для нескольких уровней образования."""
         if not selections:
             raise ValueError("Не выбраны образовательные программы")
         if len(selections) == 1:
             x = selections[0]
-            return self.create_run(x["level"], x["year"], x["programs"])
+            return self.create_run(x["level"], x["year"], x["programs"], only_new=only_new)
         with self.db.Session() as ses:
             run = Run(status="queued", params={
                 "selections": selections, "force": False,
                 "level_title": ", ".join(LEVELS[x["level"]] for x in selections),
             })
+            if only_new:
+                run.params = dict(run.params, only_new=True)
             ses.add(run)
             ses.commit()
             return run.id
@@ -252,18 +279,18 @@ class Robot:
         for selection in params.get("selections") or [params]:
             if self._stop.is_set():
                 raise RunStopped()
-            self._plan_level(run_id, selection, client)
+            self._plan_level(run_id, selection, client, only_new=bool(params.get("only_new")))
         with self.db.Session() as ses:
             run = ses.get(Run, run_id)
             run.params = dict(run.params, planning_complete=True)
             ses.commit()
 
-    def _plan_level(self, run_id: int, params: dict, client: SiteClient) -> None:
+    def _plan_level(self, run_id: int, params: dict, client: SiteClient, *, only_new: bool = False) -> None:
         level, year = params["level"], int(params["year"])
         self._stage(run_id, "Открытие страницы перечня ОП")
         url = self.op_list_url(level, year)
         self.journal(run_id, "INFO", f"Открытие страницы перечня ОП: {url}")
-        blocks = self.programs(level, year, client=client)
+        blocks = self.programs(level, year, client=client, use_cache=False)
         self.journal(run_id, "INFO", f"На странице найдено ОП: {len(blocks)}")
         wanted = params.get("programs") or ["*"]
         selected = blocks if wanted == ["*"] else [b for b in blocks if b.key in wanted]
@@ -275,6 +302,8 @@ class Robot:
         with self.db.Session() as ses:
             for b in selected:
                 prog = ses.get(Program, b.key) or Program(id=b.key)
+                if only_new and prog.page:
+                    continue
                 prog.level, prog.level_title, prog.year = level, LEVELS.get(level, b.level_title), b.year or year
                 prog.code, prog.direction, prog.profile, prog.form = b.code, b.direction, b.profile, b.form
                 prog.block_title, prog.source_url = b.title, url
@@ -306,8 +335,15 @@ class Robot:
         force = bool(params.get("force"))
         with self.db.Session() as ses:
             items = ses.scalars(select(RunItem).where(RunItem.run_id == run_id).order_by(RunItem.id)).all()
-            todo = [(i.id, i.program_id) for i in items if not i.done]
             programs = list(dict.fromkeys(i.program_id for i in items))
+            if params.get("only_new"):
+                saved = {p.id for p in ses.scalars(select(Program).where(Program.id.in_(programs))) if p.page}
+                for item in items:
+                    if not item.done and item.program_id in saved:
+                        item.status, item.note, item.done = "skipped", "Программа уже загружена", True
+                programs = [key for key in programs if key not in saved]
+                ses.commit()
+            todo = [(i.id, i.program_id) for i in items if not i.done]
             total = len(items)
         done_before = total - len(todo)
         self._closed_hosts: dict[str, str] = {}   # хост → примечание, если его документы закрыты авторизацией

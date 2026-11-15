@@ -1,5 +1,6 @@
 import time
 
+from bs4 import BeautifulSoup
 from fastapi.testclient import TestClient
 
 from sqlalchemy import select
@@ -17,12 +18,12 @@ def test_web_flow(tmp_path):
     app = create_app(settings)
     with TestClient(app) as c:
         assert c.get("/run").status_code == 200
-        page = c.get("/run?level=master").text
-        # год набора не выбирается — берётся последний
+        page = c.get("/programs/catalog?level=master").text
         assert "Искусственный интеллект в информационных системах" in page and "набор 2026" in page
         assert 'name="year"' not in page
-        r = c.post("/run", data={"level": "master", "all": "1"}, follow_redirects=False)
-        assert r.status_code == 303 and r.headers["location"] == "/run?level=master"
+        r = c.post("/run", data={"level": "master", "program_id": "09.04.01-iiis-2026-och"},
+                   follow_redirects=False)
+        assert r.status_code == 303 and r.headers["location"].startswith("/run/")
         with app.state.db.Session() as ses:
             run = ses.scalar(select(Run).order_by(Run.id.desc()))
             run_id = run.id
@@ -37,22 +38,32 @@ def test_web_flow(tmp_path):
         # отчёты о запусках и журнал — не для посетителей сайта
         for url in ("/reports", f"/reports/{run_id}", "/log"):
             assert c.get(url).status_code == 404, url
-        assert c.get("/", follow_redirects=False).headers["location"] == "/programs"
+        assert c.get("/", follow_redirects=False).headers["location"] == "/run"
         op = c.get("/op/09.04.01-iiis-2026-och")
         assert op.status_code == 200
         assert "Учебный план" in op.text and "Глубокое обучение" in op.text and "app-kug" in op.text
         # карусель по семестрам с нагрузкой, без большой таблицы и служебных статусов
-        assert op.text.count('class="app-carousel__slide"') == 4 and "1 семестр" in op.text and "Пар за семестр" in op.text
+        assert op.text.count('class="app-carousel__slide"') == 4 and "1 семестр" in op.text and "Пар в неделю" in op.text
         assert "ir-matrix" not in op.text and "ir-status" not in op.text and "Отчёт о запуске" not in op.text
         # график по дням: шесть строк на курс и строка дат «вс» в шапке
         assert op.text.count('<th scope="row" class="app-kug__day">пн</th>') >= 2 and "app-kug--out" in op.text
         # доли категорий — полоса и проценты, без раскрывающихся списков; отдельного перечня дисциплин нет
         assert "app-shares-legend" in op.text and "app-shelf" not in op.text and "Из чего состоит программа" in op.text
         assert 'id="discipliny"' not in op.text
-        run_page = c.get("/run?level=master").text
-        assert "Запуск №" not in run_page and "ir-status" not in run_page and "на сайте, обновлено" in run_page
+        gia = BeautifulSoup(op.text, "html.parser").select_one("#gia")
+        assert gia.select_one(".app-prose").get_text(strip=True) == "—"
+        assert not gia.select("a, .ir-info, ul")
+        assert c.get(r.headers["location"], follow_redirects=False).headers["location"] == "/op/09.04.01-iiis-2026-och"
+        catalog = BeautifulSoup(c.get("/programs/catalog?level=master").text, "html.parser")
+        assert catalog.select_one('a[href="/op/09.04.01-iiis-2026-och"]')
+        assert not catalog.select('input[value="09.04.01-iiis-2026-och"]')
         docs = c.get("/api/programs/09.04.01-iiis-2026-och/documents").json()
-        assert all(c.get(f"/op/09.04.01-iiis-2026-och/doc/{d['id']}").status_code == 200 for d in docs)
+        for doc in docs:
+            response = c.get(f"/op/09.04.01-iiis-2026-och/doc/{doc['id']}", follow_redirects=False)
+            if doc["type"] in ("gia", "fos_gia"):
+                assert response.status_code == 302 and response.headers["location"].endswith("#gia")
+            else:
+                assert response.status_code == 200
         assert c.get(f"/api/documents/{docs[0]['id']}/json?kind=primary").json()["schema"] == "robot-op/primary/1"
         assert c.get("/op/unknown").status_code == 404
         assert c.get("/theme?mode=dark&next=/programs", follow_redirects=False).cookies.get("theme") == "dark"

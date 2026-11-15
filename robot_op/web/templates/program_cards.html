@@ -1,0 +1,29 @@
+{% import "ui.html" as ui with context %}
+<script type="application/json" data-catalog-years data-live-catalog>{{ catalog_years | tojson }}</script>
+{% for g in groups %}
+<section class="app-cards-group" aria-labelledby="g-{{ loop.index }}"
+         data-catalog-year="{{ g.year }}" data-catalog-level="{{ g.level }}" data-catalog-level-title="{{ g.level_title }}">
+  <h2 class="card-title" id="g-{{ loop.index }}">{{ g.title }}</h2>
+  <div class="ir-cards">
+    {% for p in g.programs %}
+    <article class="ir-card" data-program-search="{{ p.name }} {{ p.code }} {{ p.direction }} {{ p.level_title }}"{% if not p.ready %} data-live-catalog{% endif %}>
+      <div class="ir-card__tags">{{ ui.tag(p.level_title, tones.get(p.level)) }}{{ ui.tag(p.form, 'outline') }}</div>
+      <div class="ir-card__code">{{ p.code }} {{ p.direction }}</div>
+      {% if p.ready %}
+      <a class="ir-card__title" href="/op/{{ p.id }}">{{ p.name }}</a>
+      {% if p.updated_at %}<div class="ir-card__foot"><span>Обновлено {{ p.updated_at.strftime('%d.%m.%Y') }}</span></div>{% endif %}
+      {% else %}
+      <form action="/run" method="post">
+        <input type="hidden" name="program_id" value="{{ p.id }}">
+        <input type="hidden" name="level" value="{{ p.level }}">
+        <button class="ir-card__title app-catalog-start" type="submit" aria-describedby="load-{{ p.id }}">{{ p.name }}</button>
+      </form>
+      <div class="ir-card__foot" id="load-{{ p.id }}"><span>Загрузится при открытии</span></div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% else %}
+<div data-catalog-empty>{{ ui.empty(catalog_empty or 'Образовательных программ пока нет.') }}</div>
+{% endfor %}

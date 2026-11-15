@@ -18,7 +18,7 @@ def static_source(extra_link=""):
             '<a href="/programs?level=master">Магистратура</a>'
             '<a href="/op/test/discipline?index=Б1.О.01">Первая</a>'
             '<a href="/op/test/discipline?index=Б1.О.02">Вторая</a>'
-            '<a href="/run">Обновить данные</a><a class="app-theme" href="/theme?mode=dark">Тёмная тема</a>'
+            '<div data-live-catalog><a href="/run">Загрузить новую программу</a></div><a class="app-theme" href="/theme?mode=dark">Тёмная тема</a>'
             '<link rel="stylesheet" href="http://testserver/static/css/app.css?v=1">'
             '<a href="/api/documents/1/json?kind=final">JSON</a>' + extra_link + '</main></body></html>')
     @app.get("/")
@@ -69,9 +69,9 @@ def test_static_export_preserves_distinct_queries_and_assets(tmp_path):
     assert soup.find("a", string="JSON") is None
     assert report["json_files"] == 0
     assert (output / ".nojekyll").exists()
-    assert report["pages"] >= 5
-    update = local_file(output, soup.find("a", string="Обновить данные")["href"]).read_text()
-    assert "локальн" in update.lower() and "GitHub Pages" in update
+    assert report["pages"] >= 4
+    assert not soup.select("[data-live-catalog]")
+    assert not (output / "run").exists()
     assert soup.select_one("[data-static-snapshot]")
     assert soup.select_one("a[data-theme-toggle]")
 

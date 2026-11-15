@@ -2,16 +2,21 @@
 from __future__ import annotations
 
 import json
+import logging
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
-from urllib.parse import quote, urlparse, urlencode
+from threading import Lock, Thread
+from urllib.parse import urlencode, urlparse
 
 import httpx
-from fastapi import FastAPI, Form, HTTPException, Query, Request
+from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import select
+from sqlalchemy import JSON, select
+from sqlalchemy.orm import load_only
+from starlette.concurrency import run_in_threadpool
 
 from ..catalog import DOC_TYPE_TITLES, DOC_TYPES, LEVEL_TONE, LEVELS, REVIEW_STATUSES
 from ..config import Settings, get_settings
@@ -25,6 +30,7 @@ from ..robot.pipeline import Robot
 from ..robot.worker import Worker
 
 HERE = Path(__file__).parent
+log = logging.getLogger(__name__)
 
 
 def duration(seconds: float | None) -> str:
@@ -63,12 +69,67 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
     db.create_all()
     robot = Robot(settings, db, transport=transport, llm_transport=llm_transport)
     worker = Worker(robot)
+    submission_lock = Lock()
+
+    catalog_lock = Lock()
+    catalog_path = settings.data_path / "program-catalog.json"
+    catalog_state: tuple[list[dict], dict[str, list[int]]] = ([], {})
+    catalog_checks: dict[int | None, tuple[float, bool]] = {}
+
+    def refresh_catalog(cohort: int | None = None) -> tuple[list[dict], dict[str, list[int]], bool]:
+        nonlocal catalog_state
+        with catalog_lock:
+            previous, previous_years = catalog_state
+            checked_at, incomplete = catalog_checks.get(cohort, (float("-inf"), True))
+            if time.monotonic() - checked_at < (30 if incomplete else 600):
+                return previous, previous_years, incomplete
+            try:
+                remote, years, incomplete = robot.catalog(cohort)
+            except SiteError as exc:
+                log.warning("Каталог ИРНИТУ недоступен: %s", exc)
+                remote, years, incomplete = [], {}, True
+            cohorts = {(level, cohort if cohort is not None else max(available))
+                       for level, available in years.items() if available and (cohort is None or cohort in available)}
+            rows = {row["key"]: row for row in previous
+                    if incomplete or (row["level"], row["year"]) not in cohorts}
+            for level, year, block in remote:
+                rows[block.key] = dict(block.as_dict(), level=level, level_title=block.level_title, year=block.year or year)
+            updated = list(rows.values())
+            years = years or previous_years
+            if (updated, years) != catalog_state:
+                temporary = catalog_path.with_suffix(".tmp")
+                try:
+                    temporary.write_text(json.dumps({"rows": updated, "years": years}, ensure_ascii=False), encoding="utf-8")
+                    temporary.replace(catalog_path)
+                except OSError:
+                    log.warning("Не удалось сохранить каталог ИРНИТУ", exc_info=True)
+            catalog_state = (updated, years)
+            catalog_checks[cohort] = (time.monotonic(), incomplete)
+            return updated, years, incomplete
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
+        nonlocal catalog_state
         robot.mark_interrupted()      # запуски, оборванные остановкой приложения, можно продолжить
         if start_worker:
+            try:
+                saved = json.loads(catalog_path.read_text(encoding="utf-8"))
+                rows = saved.get("rows") if isinstance(saved, dict) else saved
+                years = saved.get("years", {}) if isinstance(saved, dict) else {}
+                required = {"key", "title", "level", "level_title", "year", "code", "direction", "form"}
+                if isinstance(rows, list) and all(isinstance(row, dict) and required <= row.keys() for row in rows):
+                    catalog_state = (rows, years if isinstance(years, dict) else {})
+            except FileNotFoundError:
+                pass
+            except (OSError, ValueError):
+                log.warning("Не удалось прочитать сохранённый каталог ИРНИТУ", exc_info=True)
+            Thread(target=refresh_catalog, name="robot-catalog", daemon=True).start()
             worker.start()
+            with db.Session() as ses:
+                queued = ses.scalars(select(Run.id).where(
+                    Run.status == "queued", Run.params["only_new"].as_boolean().is_(True)).order_by(Run.id))
+                for run_id in queued:
+                    worker.submit(run_id)
         yield
 
     app = FastAPI(title="Робот ОП ИРНИТУ", docs_url="/api/docs", redoc_url=None, openapi_url="/api/openapi.json",
@@ -104,11 +165,52 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
     def run_summary(ses, run: Run) -> dict:
         return {"run": run, "counts": Robot.counts(ses, run.id), "duration": duration(run.seconds)}
 
+    def requested_keys(params: dict) -> list[str]:
+        return [key for selection in (params.get("selections") or [params])
+                for key in selection.get("programs", []) if key != "*"]
+
+    def unavailable_programs() -> set[str]:
+        with db.Session() as ses:
+            active = ses.scalars(select(Run.params).where(Run.status.in_(("queued", "running"))))
+            pending = {key for params in active for key in requested_keys(params)}
+            saved = ses.scalars(select(Program.id).where(Program.page.is_not(None), Program.page != JSON.NULL))
+            return pending.union(saved)
+
+    def submit_new_programs(selections: list[dict]) -> int | None:
+        candidates = []
+        for selection in selections:
+            level, year = selection["level"], selection["year"]
+            requested = set(selection["programs"])
+            keys = [block.key for block in robot.programs(level, year) if "*" in requested or block.key in requested]
+            candidates.append(dict(selection, programs=keys))
+        return enqueue_new_programs(candidates)
+
+    def enqueue_new_programs(candidates: list[dict]) -> int | None:
+        with submission_lock:
+            unavailable = unavailable_programs()
+            fresh = []
+            for selection in candidates:
+                keys = [key for key in selection["programs"] if key not in unavailable]
+                if keys:
+                    fresh.append(dict(selection, programs=keys))
+                    unavailable.update(keys)
+            if not fresh:
+                return None
+            run_id = robot.create_batch_run(fresh, only_new=True)
+            worker.submit(run_id)
+            return run_id
+
+    def start_selection(requested: dict[str, list[str]]) -> int | None:
+        return submit_new_programs([
+            {"level": level, "year": robot.latest_year(level), "programs": keys}
+            for level, keys in requested.items()
+        ])
+
     # ---------------------------------------------------------------- страницы
 
     @app.get("/", include_in_schema=False)
     def index():
-        return RedirectResponse("/programs", status_code=302)
+        return RedirectResponse("/run", status_code=302)
 
     @app.get("/theme", include_in_schema=False)
     def set_theme(mode: str = "light", next: str = "/"):
@@ -117,99 +219,164 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
         r.set_cookie("theme", "dark" if mode == "dark" else "light", max_age=365 * 86400, samesite="lax")
         return r
 
-    @app.get("/run", response_class=HTMLResponse, include_in_schema=False)
-    def run_page(request: Request, level: list[str] = Query(default=[]), message: str = ""):
-        site_error = ""
-        levels, groups = [], []
-        try:
-            levels = robot.levels()
-        except SiteError as e:
-            site_error = str(e)
-        for lv in levels:
-            year = max(lv.years) if lv.years else None
-            programs = None
-            error = ""
-            if lv.level in level and year:
-                try:
-                    programs = [b.as_dict() for b in robot.programs(lv.level, year)]
-                except SiteError as e:
-                    error = str(e)
-            groups.append({"level": lv.level, "title": lv.title, "year": year,
-                           "selected": lv.level in level, "programs": programs, "error": error})
+    @app.get("/run/{run_id}", response_class=HTMLResponse, include_in_schema=False)
+    def run_details(request: Request, run_id: int):
         with db.Session() as ses:
-            last_run = ses.scalar(select(Run).order_by(Run.id.desc()).limit(1))
-            last = run_summary(ses, last_run) if last_run else None
-            on_site = {p.id: p.page_updated_at.strftime("%d.%m.%Y") for p in
-                       ses.scalars(select(Program).where(Program.page.is_not(None))) if p.page_updated_at}
-        return render(request, "run.html", page_title="Обновление данных", crumbs=crumbs(("Обновление данных", None)),
-                      active_nav="run", groups=groups, site_error=site_error, message=message, last=last, on_site=on_site)
+            run = ses.get(Run, run_id)
+            if run is None or not run.params.get("only_new"):
+                return not_found(request, "Загрузка не найдена.")
+            keys = requested_keys(run.params)
+            program = ses.get(Program, keys[0]) if len(keys) == 1 else None
+            if program and program.page:
+                return RedirectResponse(f"/op/{program.id}", status_code=302)
+            details = run_summary(ses, run)
+        return render(request, "run.html", page_title="Образовательные программы",
+                      crumbs=crumbs(("Программы", "/run"), ("Ход обработки", None)),
+                      active_nav="programs", details=details, program=program)
 
     @app.post("/run", include_in_schema=False)
     async def start_run(request: Request):
         form = await request.form()
+        if "program_id" in form:
+            level, program_id = form.get("level"), form.get("program_id")
+            if not isinstance(level, str) or not isinstance(program_id, str):
+                raise HTTPException(400, "Нужны уровень образования и программа")
+            return await run_in_threadpool(load_program, level, program_id)
         levels = list(dict.fromkeys(form.getlist("level")))
         if any(lv not in LEVELS for lv in levels):
             raise HTTPException(400, "Неизвестный уровень образования")
-        target = "/run" + ("?" + urlencode({"level": levels}, doseq=True) if levels else "")
-        selections = []
-        try:
-            for lv in levels:
-                chosen = list(dict.fromkeys(form.getlist("programs__" + lv)))
-                # Совместимость с прежней формой; принудительный разбор посетитель не выбирает.
-                if len(levels) == 1 and not chosen:
-                    chosen = ["*"] if form.get("all") else form.getlist("programs")
-                if chosen:
-                    selections.append({"level": lv, "year": robot.latest_year(lv), "programs": chosen})
-        except SiteError as e:
-            return RedirectResponse(target + ("&" if "?" in target else "?") + "message=" + quote(str(e)), status_code=303)
-        if not selections:
-            return RedirectResponse(target + ("&" if "?" in target else "?") + "message=Выберите+хотя+бы+одну+ОП", status_code=303)
-        run_id = robot.create_batch_run(selections)
-        worker.submit(run_id)
-        return RedirectResponse(target, status_code=303)
+        requested = {}
+        for lv in levels:
+            chosen = form.getlist("programs__" + lv)
+            if len(levels) == 1 and not chosen:
+                chosen = ["*"] if form.get("all") else form.getlist("programs")
+            if chosen:
+                requested[lv] = chosen
+        message = ""
+        if requested:
+            try:
+                run_id = await run_in_threadpool(start_selection, requested)
+                if run_id is not None:
+                    return RedirectResponse(f"/run/{run_id}", status_code=303)
+                message = "Нет выбранных программ, доступных для загрузки."
+            except SiteError as e:
+                message = str(e)
+        else:
+            message = "Выберите хотя бы одну программу."
+        return RedirectResponse("/run?" + urlencode({"message": message}), status_code=303)
 
     @app.post("/run/{run_id}/resume", include_in_schema=False)
     def resume(run_id: int):
-        with db.Session() as ses:
+        with submission_lock, db.Session() as ses:
             run = ses.get(Run, run_id)
-            if run is None:
+            if run is None or not run.params.get("only_new"):
                 raise HTTPException(404)
             if run.status in ("interrupted", "failed"):
                 run.status = "queued"
                 run.stage = "В очереди на продолжение"
                 ses.commit()
                 worker.submit(run_id)
-        return RedirectResponse("/run", status_code=303)
+        return RedirectResponse(f"/run/{run_id}", status_code=303)
 
     @app.post("/run/{run_id}/stop", include_in_schema=False)
     def stop(run_id: int):
         if worker.current == run_id:
             worker.stop_current()
-        return RedirectResponse("/run", status_code=303)
+        return RedirectResponse(f"/run/{run_id}", status_code=303)
 
-    @app.get("/programs", response_class=HTMLResponse, include_in_schema=False)
-    def programs_page(request: Request, level: str = ""):
-        """Программы последнего года набора каждого уровня, у которых есть веб-страница."""
+    def catalog_groups(level: str, remote: list[dict], cohort: int | None = None) -> list[dict]:
+        entries = {
+            row["key"]: {"id": row["key"], "name": row["title"], "level": row["level"],
+                         "level_title": row["level_title"], "year": row["year"], "code": row["code"],
+                         "direction": row["direction"], "form": row["form"], "ready": False}
+            for row in remote if (not level or row["level"] == level) and (cohort is None or row["year"] == cohort)
+        }
         with db.Session() as ses:
-            q = select(Program).where(Program.page.is_not(None))
+            query = select(Program).where(Program.page.is_not(None), Program.page != JSON.NULL).options(
+                load_only(Program.id, Program.profile, Program.block_title, Program.level, Program.level_title,
+                          Program.year, Program.code, Program.direction, Program.form, Program.page_updated_at))
             if level:
-                q = q.where(Program.level == level)
-            progs = ses.scalars(q).all()
-        latest = {}
-        for p in progs:
-            latest[p.level] = max(latest.get(p.level, 0), p.year)
-        groups: list[dict] = []
-        order = list(LEVELS)
-        for p in sorted((p for p in progs if p.year == latest[p.level]),
-                        key=lambda p: (order.index(p.level) if p.level in order else 9, p.code, p.profile or "")):
-            title = f"{p.level_title}, набор {p.year}"
-            if not groups or groups[-1]["title"] != title:
-                groups.append({"title": title, "programs": []})
-            groups[-1]["programs"].append(p)
-        title = "Образовательные программы" + (f": {LEVELS[level]}" if level in LEVELS else "")
-        return render(request, "programs.html", page_title=title,
-                      crumbs=crumbs(("Программы", "/programs" if level else None)) + ([{"label": LEVELS[level], "href": None}] if level in LEVELS else []),
-                      active_nav="programs", groups=groups, tones=LEVEL_TONE, level=level)
+                query = query.where(Program.level == level)
+            if cohort is not None:
+                query = query.where(Program.year == cohort)
+            for p in ses.scalars(query):
+                entries[p.id] = {"id": p.id, "name": p.profile or p.block_title, "level": p.level,
+                                 "level_title": p.level_title, "year": p.year, "code": p.code,
+                                 "direction": p.direction, "form": p.form, "ready": True,
+                                 "updated_at": p.page_updated_at}
+        order = {key: index for index, key in enumerate(LEVELS)}
+        groups = {}
+        for entry in sorted(entries.values(), key=lambda p: (order.get(p["level"], len(order)), -p["year"],
+                                                              p["code"], p["name"].casefold())):
+            key = entry["level"], entry["year"]
+            title = f'{entry["level_title"]}, набор {entry["year"]}'
+            group = groups.setdefault(key, {"title": title, "year": entry["year"], "level": entry["level"],
+                                            "level_title": entry["level_title"], "programs": []})
+            group["programs"].append(entry)
+        return list(groups.values())
+
+    def catalog_availability(remote: list[dict], years: dict[str, list[int]]) -> dict[int, dict[str, str]]:
+        by_year: dict[int, dict[str, str]] = {}
+        for level, title in LEVELS.items():
+            for year in years.get(level, []):
+                by_year.setdefault(year, {})[level] = title
+        for row in remote:
+            by_year.setdefault(row["year"], {})[row["level"]] = row["level_title"]
+        with db.Session() as ses:
+            saved = ses.execute(select(Program.year, Program.level, Program.level_title).where(
+                Program.page.is_not(None), Program.page != JSON.NULL).distinct())
+            for year, level, title in saved:
+                by_year.setdefault(year, {})[level] = title
+        return by_year
+
+    @app.get("/run", response_class=HTMLResponse, include_in_schema=False)
+    @app.get("/programs", response_class=HTMLResponse, include_in_schema=False)
+    def programs_page(request: Request, level: str = "", message: str = ""):
+        remote, years = catalog_state
+        return render(request, "programs.html", page_title="Образовательные программы",
+                      crumbs=crumbs(("Программы", "/programs" if level else None)) +
+                      ([{"label": LEVELS[level], "href": None}] if level in LEVELS else []),
+                      active_nav="programs", groups=catalog_groups(level, remote), tones=LEVEL_TONE,
+                      level=level, level_title=LEVELS.get(level, ""), message=message,
+                      catalog_years=catalog_availability(remote, years))
+
+    @app.get("/programs/catalog", response_class=HTMLResponse, include_in_schema=False)
+    def programs_catalog(request: Request, level: str = "", year: int | None = None):
+        remote, years, incomplete = refresh_catalog(year)
+        return render(request, "program_cards.html", groups=catalog_groups(level, remote, year), tones=LEVEL_TONE,
+                      catalog_years=catalog_availability(remote, years),
+                      catalog_empty="Список программ за этот год пока недоступен." if year is not None and incomplete else "")
+
+    def program_destination(program_id: str) -> str | None:
+        with db.Session() as ses:
+            runs = ses.scalars(select(Run).where(Run.status.in_(("queued", "running")),
+                                                  Run.params["only_new"].as_boolean().is_(True))).all()
+            program = ses.get(Program, program_id)
+            if program and program.page:
+                return f"/op/{program.id}"
+            return next((f"/run/{r.id}" for r in runs if program_id in requested_keys(r.params)), None)
+
+    @app.post("/programs/load", include_in_schema=False)
+    def load_program(level: str = Form(), program_id: str = Form()):
+        if level not in LEVELS:
+            raise HTTPException(400, "Неизвестный уровень образования")
+        if target := program_destination(program_id):
+            return RedirectResponse(target, status_code=303)
+        try:
+            entry = next((row for row in catalog_state[0] if row["key"] == program_id and row["level"] == level), None)
+            if entry is None:
+                run_id = start_selection({level: [program_id]})
+            else:
+                run_id = enqueue_new_programs([{"level": level, "year": entry["year"], "programs": [program_id]}])
+        except SiteError:
+            message = "Сайт ИРНИТУ не ответил. Попробуйте открыть программу позже."
+        else:
+            if run_id is not None:
+                return RedirectResponse(f"/run/{run_id}", status_code=303)
+            if target := program_destination(program_id):
+                return RedirectResponse(target, status_code=303)
+            message = "Программа недоступна для загрузки."
+        return RedirectResponse("/run?" + urlencode({"message": message}), status_code=303)
 
     @app.get("/op/{program_id}", response_class=HTMLResponse, include_in_schema=False)
     def op_page(request: Request, program_id: str):
@@ -219,6 +386,8 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                 return not_found(request, "Образовательная программа не найдена или её страница ещё не сформирована роботом.")
             ctx = dict(prog.page)
             ctx["op"] = dict(ctx["op"], updated_at=prog.page_updated_at.strftime("%d.%m.%Y") if prog.page_updated_at else "")
+            gia = ctx.get("gia") or {}
+            ctx["gia"] = dict(gia, summary=pagebuilder.gia_characteristic(gia.get("summary")))
         return render(request, "op_page.html", active_nav="programs", **ctx)
 
     @app.get("/op/{program_id}/doc/{doc_id}", response_class=HTMLResponse, include_in_schema=False)
@@ -227,6 +396,8 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             doc = ses.get(Document, doc_id)
             if doc is None or doc.program_id != program_id:
                 return not_found(request, "Документ не найден.")
+            if doc.doc_type in ("gia", "fos_gia"):
+                return RedirectResponse(f"/op/{program_id}#gia", status_code=302)
             prog = ses.get(Program, program_id)
             final = latest_final(ses, doc_id)
         view = doc_view.build(doc.doc_type, (final or {}).get("data") or {})
@@ -246,7 +417,9 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             finals = {doc.id: latest_final(ses, doc.id) for doc in docs}
             source = next((doc for doc in docs if doc.doc_type == "up"
                            and ((finals.get(doc.id) or {}).get("data") or {}).get("rows")), None)
-            rows = (finals[source.id]["data"]["rows"] if source else [])
+            up_data = finals[source.id]["data"] if source else {}
+            rows = up_data.get("rows", [])
+            weeks = {s["number"]: s["weeks"] for s in up_data.get("semesters", [])}
             row = next((r for r in rows if r.get("index") == index
                         and (not r.get("is_module") or plan_view.is_choice(index))), None)
             if row is None:
@@ -264,7 +437,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             for sem in sems:
                 hours = row.get("semesters", {}).get(str(sem), {})
                 pairs = {k: round((hours.get(k) or 0) / 2, 1) for k in ("lec", "pr", "lab")}
-                load.append({"number": sem, **pairs, "pairs": round(sum(pairs.values()), 1),
+                load.append({"number": sem, "weeks": weeks.get(sem), **pairs, "pairs": round(sum(pairs.values()), 1),
                              "control": curriculum.control_label(row.get("control", {}), sem)})
             hours = {"total": row.get("hours", {}).get("plan"), "sr": row.get("hours", {}).get("sr")}
             view = doc_view.build("rpd", {"ze": row.get("ze"), "hours": hours, "semesters": sems})
@@ -291,23 +464,29 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             raise HTTPException(502, str(e))
 
     @app.get("/api/site/programs", tags=["Сайт ИРНИТУ"], summary="Перечень ОП уровня и года набора")
-    def api_site_programs(level: str, year: int):
+    def api_site_programs(level: str, year: int | None = None, new_only: bool = False):
         try:
-            return [b.as_dict() for b in robot.programs(level, year)]
+            blocks = robot.programs(level, year if year is not None else robot.latest_year(level))
         except SiteError as e:
             raise HTTPException(502, str(e))
+        unavailable = unavailable_programs() if new_only else set()
+        return [b.as_dict() for b in blocks if b.key not in unavailable]
 
-    @app.post("/api/runs", tags=["Запуски"], summary="Запустить робота (последний год набора уровня)")
+    @app.post("/api/runs", tags=["Запуски"], summary="Загрузить новые программы последнего года набора")
     def api_start(payload: dict):
         level = payload.get("level")
-        if level not in LEVELS:
+        if not isinstance(level, str) or level not in LEVELS:
             raise HTTPException(400, "Нужен level: bachelor, specialist, master, spo или postgraduate")
+        requested = payload.get("programs", ["*"])
+        if not isinstance(requested, list) or any(not isinstance(key, str) for key in requested):
+            raise HTTPException(400, "programs должен быть списком идентификаторов программ")
         try:
             year = robot.latest_year(level)
+            run_id = submit_new_programs([{"level": level, "year": year, "programs": requested or ["*"]}])
         except SiteError as e:
             raise HTTPException(502, str(e))
-        run_id = robot.create_run(level, year, payload.get("programs") or ["*"], bool(payload.get("force")))
-        worker.submit(run_id)
+        if run_id is None:
+            raise HTTPException(409, "Нет выбранных программ, доступных для загрузки.")
         return {"id": run_id, "year": year}
 
     @app.get("/api/runs/{run_id}", tags=["Запуски"], summary="Состояние запуска")

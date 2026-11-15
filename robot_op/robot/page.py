@@ -26,6 +26,16 @@ def latest_final(ses, doc_id: int) -> dict | None:
     return v.data if v else None
 
 
+def gia_characteristic(summary: str | list[str] | None) -> list[str]:
+    """Отбрасывает служебные ответы модели, в том числе в сохранённых ОП."""
+    paragraphs = summary.split("\n\n") if isinstance(summary, str) else (summary or [])
+    boilerplate = re.compile(
+        r"генеративные языковые модели не обладают собственным мнением|"
+        r"разговоры на чувствительные темы могут быть ограничены", re.I
+    )
+    return [p.strip() for p in paragraphs if p.strip() and not boilerplate.search(" ".join(p.split()))][:2]
+
+
 def _key(name: str) -> str:
     name = discipline_name(name or "").lower().replace("ё", "е")
     return re.sub(r"[^а-яёa-z0-9]", "", name)
@@ -208,7 +218,7 @@ def build(ses, prog: Program) -> dict:
     gia_ctx = {
         "items": gia_items,
         # описание ГИА и ВКР — не больше двух абзацев: из программы ГИА, а если её описания нет — из ФОС ГИА
-        "summary": [p for p in ((gia or {}).get("summary") or (fos or {}).get("summary") or "").split("\n\n") if p][:2],
+        "summary": gia_characteristic((gia or {}).get("summary")) or gia_characteristic((fos or {}).get("summary")),
         # темы ВКР — только из таблицы тем программы ГИА; в тексте ФОС ГИА это обрывки абзацев, а не темы
         "vkr_topics": [t for t in vkr_topics([[t] for t in gd.get("vkr_topics") or []]) if len(t) < 200][:10],
         "criteria": gd.get("criteria") or fd.get("criteria") or "",

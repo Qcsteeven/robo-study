@@ -58,24 +58,27 @@
       <h2 class="section-title" id="h-up">Учебный план</h2>
       {%- if plan %}
       <h3 class="card-title app-subhead app-subhead--first">По семестрам</h3>
-      <p class="app-lead">В таблице показано среднее число пар за учебную неделю с округлением до 0,5 пары. В шапке указаны общая нагрузка и время занятий из расчёта 90 минут на пару. Название дисциплины открывает её рабочую программу или сведения из учебного плана.</p>
       {{ ui.plan_carousel(plan) }}
       <h3 class="card-title app-subhead">Из чего состоит программа</h3>
-      <p class="app-lead">Доля категорий в объёме программы ({{ plan.total_ze }} {{ plan.unit or "з. е." }} без факультативов).</p>
-      {{ ui.plan_shelves(plan) }}
+      {% for variant in plan.tracks or [plan] %}
+      <div{% if plan.tracks %} data-track-shelves="{{ loop.index0 }}"{% endif %}>
+        <p class="app-lead">Доля категорий в объёме программы ({{ variant.total_ze }} {{ variant.unit or "з. е." }} без факультативов).</p>
+        {{ ui.plan_shelves(variant) }}
+      </div>
+      {% endfor %}
       {%- else %}
-      {{ ui.empty('Не удалось разобрать учебный план. Исходный документ доступен ниже.' if unavailable and unavailable.up else 'Учебный план пока не опубликован.') }}
+      {{ ui.empty('Учебный план пока не опубликован.') }}
       {%- endif %}
     </section>
 
     <section class="app-section" id="kug" aria-labelledby="h-kug">
       <h2 class="section-title" id="h-kug">Календарный учебный график</h2>
       {%- if schedule %}
-      <p class="app-lead">На {{ schedule.academic_year }} учебный год. {% if schedule.mode == "weekly" %}Одна строка — учебная группа, колонки — недели. В ячейках указан вид деятельности на неделю.{% else %}У каждого курса строки по дням недели, колонки — недели, в ячейке — вид деятельности в этот день.{% endif %} Таблица прокручивается по горизонтали.</p>
+      <p class="app-lead">На {{ schedule.academic_year }} учебный год. {% if schedule.mode == "weekly" %}Одна строка — учебная группа, колонки — недели. В ячейках указан вид деятельности на неделю.{% else %}У каждого курса строки по дням недели, колонки — недели, в ячейке — вид деятельности в этот день.{% endif %}</p>
       {{ ui.schedule_grid(schedule) }}
       {% if schedule.needs_review %}<p class="app-llm-note">Некоторые ячейки или подписи не удалось уверенно распознать. Неопределённые ячейки отмечены тире; сверяйте их с исходным календарным графиком ниже.</p>{% endif %}
       {%- else %}
-      {{ ui.empty('Не удалось разобрать календарный учебный график. Исходный документ доступен ниже.' if unavailable and unavailable.kug else 'Календарный учебный график пока не опубликован.') }}
+      {{ ui.empty('Календарный учебный график пока не опубликован.') }}
       {%- endif %}
     </section>
 
@@ -91,7 +94,7 @@
               <td><a class="ir-link" href="{{ p.url }}">{{ p.name }}</a></td>
               <td class="ir-num">{{ p.semester }}</td>
               <td class="ir-num">{{ p.weeks }}</td>
-              <td class="ir-muted app-small">{{ p.summary or '—' }}</td>
+              <td class="ir-muted app-small">{{ p.summary or 'Краткое описание пока не опубликовано.' }}</td>
             </tr>
             {%- endfor %}
           </tbody>
@@ -107,17 +110,21 @@
       {%- for p in gia.summary %}
       <p class="app-prose">{{ p }}</p>
       {%- else %}
-      <p class="app-prose">—</p>
+      {{ ui.empty('Описание государственной итоговой аттестации пока не опубликовано.') }}
       {%- endfor %}
     </section>
 
     <section class="app-section" id="docs" aria-labelledby="h-docs">
       <h2 class="section-title" id="h-docs">Исходные документы</h2>
+      {%- if documents %}
       <ul class="app-docs">
         {%- for d in documents %}
         {{ ui.doc_row(d) }}
         {%- endfor %}
       </ul>
+      {%- else %}
+      {{ ui.empty('Исходные документы пока не опубликованы.') }}
+      {%- endif %}
     </section>
 
   </div>
@@ -165,38 +172,47 @@
     var slides = Array.prototype.slice.call(track.children);
     var tabs = Array.prototype.slice.call(root.querySelectorAll('[data-go]'));
     var bar = root.querySelector('[data-carousel-bar]');
+    if (!slides.length) return;
+    var prev = root.querySelector('[data-prev]');
+    var next = root.querySelector('[data-next]');
     var current = 0;
-    bar.hidden = false;
-    function show(i, smooth) {
+    function show(i) {
       current = Math.max(0, Math.min(slides.length - 1, i));
-      track.scrollTo({ left: slides[current].offsetLeft - track.offsetLeft, behavior: smooth === false ? 'auto' : 'smooth' });
-      mark();
-    }
-    // высота карусели — по текущему семестру, а не по самому длинному
-    function fit() { track.style.height = slides[current].offsetHeight + 'px'; }
-    window.addEventListener('resize', fit);
-    function mark() {
-      fit();
+      slides.forEach(function (slide, k) {
+        if (k !== current && slide.contains(document.activeElement)) track.focus({ preventScroll: true });
+        slide.hidden = k !== current;
+      });
       tabs.forEach(function (t, k) { if (k === current) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current'); });
-      root.querySelector('[data-prev]').disabled = current === 0;
-      root.querySelector('[data-next]').disabled = current === slides.length - 1;
+      prev.disabled = current === 0;
+      next.disabled = current === slides.length - 1;
     }
     tabs.forEach(function (t) { t.addEventListener('click', function () { show(+t.dataset.go); }); });
-    root.querySelector('[data-prev]').addEventListener('click', function () { show(current - 1); });
-    root.querySelector('[data-next]').addEventListener('click', function () { show(current + 1); });
+    prev.addEventListener('click', function () { show(current - 1); });
+    next.addEventListener('click', function () { show(current + 1); });
     track.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowLeft') { e.preventDefault(); show(current - 1); }
       if (e.key === 'ArrowRight') { e.preventDefault(); show(current + 1); }
     });
-    var timer;
-    track.addEventListener('scroll', function () {
-      clearTimeout(timer);
-      timer = setTimeout(function () {
-        var i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
-        if (i !== current) { current = i; mark(); }
-      }, 80);
-    });
-    mark();
+    track.classList.add('is-ready');
+    show(0);
+    bar.hidden = false;
+
+    var picker = root.querySelector('[data-track-picker]');
+    if (picker) {
+      var choices = picker.querySelectorAll('[data-track-choice]');
+      var panels = root.querySelectorAll('[data-track-plan]');
+      var shelves = document.querySelectorAll('[data-track-shelves]');
+      function selectTrack(index) {
+        choices.forEach(function (button) { button.setAttribute('aria-pressed', String(button.dataset.trackChoice === index)); });
+        panels.forEach(function (panel) { panel.hidden = panel.dataset.trackPlan !== index; });
+        shelves.forEach(function (shelf) { shelf.hidden = shelf.dataset.trackShelves !== index; });
+      }
+      choices.forEach(function (button) {
+        button.addEventListener('click', function () { selectTrack(button.dataset.trackChoice); });
+      });
+      selectTrack(choices[0].dataset.trackChoice);
+      picker.hidden = false;
+    }
 
     // фильтр категорий: скрывает дисциплины выключенных категорий во всех семестрах
     var filter = document.querySelector('[data-catfilter]');
@@ -207,7 +223,6 @@
         var on = b.getAttribute('aria-pressed') !== 'true';
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
         root.querySelectorAll('[data-cat="' + b.dataset.cat + '"]').forEach(function (c) { c.hidden = !on; });
-        fit();
       });
     });
   })();

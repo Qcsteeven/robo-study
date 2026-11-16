@@ -6,7 +6,7 @@ from collections import Counter
 from dataclasses import dataclass, field
 
 from . import pdf as pdfmod
-from .grid import FineRaster, Grid, Row, assign_words, binarize, detect_grid, rotate, skew_angle
+from .grid import Cell, FineRaster, Grid, Row, assign_words, binarize, detect_grid, rotate, skew_angle
 from .ocr import OcrConfig, ocr_cells, ocr_single
 from .util import discipline_name, clean_text, fix_index, norm, semesters_from_code, to_int
 
@@ -46,16 +46,27 @@ class NoTable(Exception):
 
 def find_layout(grid: Grid) -> Layout:
     lay = Layout()
-    sem_spans: list[tuple[int, int, int, int]] = []
+    sem_spans: list[tuple[int, float | None, int, int]] = []
+    course_spans = []
+    split_spans = set()
     last_header = -1
     for ri, row in enumerate(grid.rows[:8]):
-        for c in row.cells:
+        for ci, c in enumerate(row.cells):
             t = norm(c.text)
             if not t:
                 continue
+            if c.col0 < c.col1 and re.match(r"^курс\s*\d", t):
+                course_spans.append((c.col0, c.col1))
             sem = _semester(t)
             if sem and c.col1 > c.col0:
-                sem_spans.append((*sem, c.col0, c.col1))
+                number, weeks = sem
+                end = c.col1
+                if weeks is None:
+                    fragment = _split_semester(row.cells, ci, course_spans)
+                    if fragment:
+                        weeks, end = fragment
+                        split_spans.add(c.col0)
+                sem_spans.append((number, weeks, c.col0, end))
                 last_header = max(last_header, ri)
                 continue
             if c.col0 != c.col1 and not t.startswith(("курс", "форма", "итого")):
@@ -88,11 +99,13 @@ def find_layout(grid: Grid) -> Layout:
         cols: dict[str, int] = {}
         for ri, row in enumerate(grid.rows[:last_header + 2]):
             for c in row.cells:
-                if a <= c.col0 <= b and c.col0 == c.col1:
+                if a <= c.col0 <= c.col1 <= b and (c.col0 == c.col1 or a in split_spans):
                     t = norm(c.text).replace(" ", "")
                     for key, pattern in SUB.items():
                         if key not in cols and re.search(pattern, t):
-                            cols[key] = c.col0
+                            # Ложная граница сетки делит листовую колонку на узкий край и основную часть.
+                            cols[key] = max(range(c.col0, c.col1 + 1),
+                                            key=lambda i: grid.columns[i][1] - grid.columns[i][0])
                             last_header = max(last_header, ri)
                             break
         # нераспознанные подписи подколонок восстанавливаются по стандартному порядку «Лек, Лаб, Пр, (ЭИОС), СР»
@@ -135,7 +148,20 @@ def _semester(t: str) -> tuple[int, float | None] | None:
     return (num, weeks) if 1 <= num <= 12 and 1 <= weeks <= 30 else None
 
 
-def _renumber(spans: list[tuple[int, int, int, int]]) -> list[tuple[int, int, int, int]]:
+def _split_semester(cells: list[Cell], pos: int, courses: list[tuple[int, int]]) -> tuple[int, int] | None:
+    """Вернуть недели и границу семестра, если OCR отделил «8 нед.» от номера."""
+    if pos + 1 == len(cells):
+        return None
+    semester, fragment = cells[pos:pos + 2]
+    weeks = re.fullmatch(r"[^\w\d]*(\d{1,2})\s*нед\w*[^\w\d]*", norm(fragment.text))
+    if not weeks or fragment.col0 != semester.col1 + 1 or not 1 <= int(weeks[1]) <= 30:
+        return None
+    right = next((b for a, b in courses if a <= semester.col0 <= b), fragment.col1)
+    next_start = next((c.col0 for c in cells[pos + 2:] if _semester(norm(c.text))), right + 1)
+    return int(weeks[1]), min(right, next_start - 1)
+
+
+def _renumber(spans: list[tuple[int, float | None, int, int]]) -> list[tuple[int, float | None, int, int]]:
     """Семестры идут слева направо подряд: номер, прочитанный с ошибкой, восстанавливается по порядку."""
     spans = sorted(spans, key=lambda s: s[2])
     if not spans:
@@ -187,7 +213,7 @@ def read_pages(data: bytes, scanned: bool, cfg: OcrConfig, dpi: int = 300) -> li
         arr = pdfmod.render_page(data, i, dpi)
         angle = skew_angle(arr) if scanned else 0.0
         arr = rotate(arr, angle)
-        grid = detect_grid(arr, min_row_px=12 if scanned else 2)
+        grid = detect_grid(arr, min_row_px=12 if scanned else 2, recover_faint_rules=scanned)
         if grid is None:
             continue
         fine = FineRaster.for_scan(data, i, dpi, angle) if scanned else None

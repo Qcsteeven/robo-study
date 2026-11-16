@@ -66,12 +66,25 @@ def test_every_curriculum_position_has_a_working_link(discipline_app):
         assert card.select_one('a[href="https://www.istu.edu/up.pdf"]') is not None
 
 
-def test_elective_card_lists_each_option(discipline_app):
+def test_elective_options_link_to_their_own_pages(discipline_app):
     with TestClient(discipline_app) as client:
         page = BeautifulSoup(client.get("/op/test-op").text, "html.parser")
-        choice = next(n.find("a") for n in page.select(".app-semtable__name") if "На выбор:" in n.get_text())
-        assert parse_qs(urlparse(choice["href"]).query)["index"] == ["Б1.В.ДВ.01"]
-        card = BeautifulSoup(client.get(choice["href"]).text, "html.parser")
+        choice = next(n for n in page.select(".app-semtable__name") if "Обработка данных" in n.get_text())
+        label = choice.select_one(".app-chip__tag")
+        assert label is not None and label.get_text(strip=True) == "по выбору"
+        label.extract()
+        assert choice.get_text(strip=True) == "Обработка данных/Математика"
+        options = choice.select("a")
+        assert [a.get_text(strip=True) for a in options] == ["Обработка данных", "Математика"]
+        assert parse_qs(urlparse(options[0]["href"]).query)["index"] == ["Б1.В.ДВ.01.01"]
+        assert options[1]["href"] == "/op/test-op/doc/2"
+        assert all(client.get(a["href"]).status_code == 200 for a in options)
+
+
+def test_elective_card_lists_each_option(discipline_app):
+    with TestClient(discipline_app) as client:
+        response = client.get("/op/test-op/discipline", params={"index": "Б1.В.ДВ.01"})
+        card = BeautifulSoup(response.text, "html.parser")
         options = card.select(".app-discipline-options a")
         assert [a.get_text(strip=True) for a in options] == ["Обработка данных", "Математика"]
         assert options[1]["href"] == "/op/test-op/doc/2"

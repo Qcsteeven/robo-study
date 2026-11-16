@@ -73,16 +73,17 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
 
     catalog_lock = Lock()
     catalog_path = settings.data_path / "program-catalog.json"
-    catalog_state: tuple[list[dict], dict[str, list[int]]] = ([], {})
-    catalog_checks: dict[int | None, tuple[float, bool]] = {}
+    catalog_state: tuple[list[dict], dict[str, list[int]], dict[int | None, tuple[float, bool]]] = ([], {}, {})
 
-    def refresh_catalog(cohort: int | None = None) -> tuple[list[dict], dict[str, list[int]], bool]:
+    def fresh(check: tuple[float, bool] | None, now: float) -> bool:
+        return bool(check is not None and now - check[0] < (30 if check[1] else 600))
+
+    def refresh_catalog(cohort: int | None = None):
         nonlocal catalog_state
         with catalog_lock:
-            previous, previous_years = catalog_state
-            checked_at, incomplete = catalog_checks.get(cohort, (float("-inf"), True))
-            if time.monotonic() - checked_at < (30 if incomplete else 600):
-                return previous, previous_years, incomplete
+            previous, previous_years, checks = catalog_state
+            if fresh(checks.get(cohort), time.monotonic()):
+                return catalog_state
             try:
                 remote, years, incomplete = robot.catalog(cohort)
             except SiteError as exc:
@@ -96,16 +97,32 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                 rows[block.key] = dict(block.as_dict(), level=level, level_title=block.level_title, year=block.year or year)
             updated = list(rows.values())
             years = years or previous_years
-            if (updated, years) != catalog_state:
+            if (updated, years) != (previous, previous_years):
                 temporary = catalog_path.with_suffix(".tmp")
                 try:
                     temporary.write_text(json.dumps({"rows": updated, "years": years}, ensure_ascii=False), encoding="utf-8")
                     temporary.replace(catalog_path)
                 except OSError:
                     log.warning("Не удалось сохранить каталог ИРНИТУ", exc_info=True)
-            catalog_state = (updated, years)
-            catalog_checks[cohort] = (time.monotonic(), incomplete)
-            return updated, years, incomplete
+            check = (time.monotonic(), incomplete)
+            checks = {**checks, cohort: check}
+            if cohort is None and not incomplete:
+                # Последний набор может отличаться у бакалавриата и магистратуры.
+                latest = {level: max(available) for level, available in years.items() if available}
+                for year in set(latest.values()):
+                    if all(year not in available or latest[level] == year for level, available in years.items()):
+                        checks[year] = check
+            catalog_state = (updated, years, checks)
+            return catalog_state
+
+    def catalog_cache(checks: dict, cohort: int | None, *, has_snapshot: bool) -> dict:
+        initial = checks.get(None)
+        request = checks.get(cohort)
+        # Истечение срока повторного запроса не делает сохранённые данные недоступными для чтения.
+        ready = has_snapshot or bool(initial and (not initial[1] or fresh(initial, time.monotonic())))
+        return {"ready": ready,
+                "years": sorted(year for year, check in checks.items() if year is not None and not check[1]),
+                "incomplete": bool(request and request[1])}
 
     @asynccontextmanager
     async def lifespan(_app: FastAPI):
@@ -118,7 +135,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
                 years = saved.get("years", {}) if isinstance(saved, dict) else {}
                 required = {"key", "title", "level", "level_title", "year", "code", "direction", "form"}
                 if isinstance(rows, list) and all(isinstance(row, dict) and required <= row.keys() for row in rows):
-                    catalog_state = (rows, years if isinstance(years, dict) else {})
+                    catalog_state = (rows, years if isinstance(years, dict) else {}, {})
             except FileNotFoundError:
                 pass
             except (OSError, ValueError):
@@ -331,21 +348,23 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
 
     @app.get("/run", response_class=HTMLResponse, include_in_schema=False)
     @app.get("/programs", response_class=HTMLResponse, include_in_schema=False)
-    def programs_page(request: Request, level: str = "", message: str = ""):
-        remote, years = catalog_state
+    def programs_page(request: Request, level: str = "", message: str = "", year: int | None = None):
+        remote, years, checks = catalog_state
         return render(request, "programs.html", page_title="Образовательные программы",
                       crumbs=crumbs(("Программы", "/programs" if level else None)) +
                       ([{"label": LEVELS[level], "href": None}] if level in LEVELS else []),
-                      active_nav="programs", groups=catalog_groups(level, remote), tones=LEVEL_TONE,
-                      level=level, level_title=LEVELS.get(level, ""), message=message,
-                      catalog_years=catalog_availability(remote, years))
+                      active_nav="programs", groups=catalog_groups("", remote), tones=LEVEL_TONE,
+                      level=level, level_title=LEVELS.get(level, ""), message=message, selected_year=year,
+                      catalog_years=catalog_availability(remote, years), catalog_cache=catalog_cache(checks, year, has_snapshot=bool(remote)))
 
     @app.get("/programs/catalog", response_class=HTMLResponse, include_in_schema=False)
-    def programs_catalog(request: Request, level: str = "", year: int | None = None):
-        remote, years, incomplete = refresh_catalog(year)
-        return render(request, "program_cards.html", groups=catalog_groups(level, remote, year), tones=LEVEL_TONE,
-                      catalog_years=catalog_availability(remote, years),
-                      catalog_empty="Список программ за этот год пока недоступен." if year is not None and incomplete else "")
+    def programs_catalog(request: Request, level: str = "", year: int | None = None, all_years: bool = False):
+        remote, years, checks = refresh_catalog(year)
+        cache = catalog_cache(checks, year, has_snapshot=bool(remote))
+        groups = catalog_groups(level, remote, None if all_years else year)
+        return render(request, "program_cards.html", groups=groups, tones=LEVEL_TONE,
+                      catalog_years=catalog_availability(remote, years), catalog_cache=cache,
+                      catalog_empty="Список программ за этот год пока недоступен." if year is not None and cache["incomplete"] else "")
 
     def program_destination(program_id: str) -> str | None:
         with db.Session() as ses:
@@ -384,7 +403,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             prog = ses.get(Program, program_id)
             if prog is None or not prog.page:
                 return not_found(request, "Образовательная программа не найдена или её страница ещё не сформирована роботом.")
-            ctx = dict(prog.page)
+            ctx = dict(pagebuilder.saved_context(ses, prog))
             ctx["op"] = dict(ctx["op"], updated_at=prog.page_updated_at.strftime("%d.%m.%Y") if prog.page_updated_at else "")
             gia = ctx.get("gia") or {}
             ctx["gia"] = dict(gia, summary=pagebuilder.gia_characteristic(gia.get("summary")))
@@ -425,10 +444,10 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             if row is None:
                 return not_found(request, "Дисциплина не найдена в учебном плане.")
             links = pagebuilder.discipline_links(program_id, rows, docs, finals)
-            options = [{"name": discipline_name(r["name"]), "url": links[pagebuilder._key(r["name"])]}
+            options = [{"name": discipline_name(r["name"]), "url": links[r["index"]]}
                        for r in rows if r.get("index", "").startswith(index + ".")
                        and (not r.get("is_module") or plan_view.is_choice(r["index"]))]
-            target = links.get(pagebuilder._key(row["name"]))
+            target = links[index]
             if not options and target and target.startswith(f"/op/{program_id}/doc/"):
                 return RedirectResponse(target, status_code=302)
             sems = sorted(set(int(s) for s in row.get("semesters", {})) |
@@ -523,7 +542,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
             prog = ses.get(Program, program_id)
             if prog is None or not prog.page:
                 raise HTTPException(404)
-            return prog.page
+            return pagebuilder.saved_context(ses, prog)
 
     @app.get("/api/programs/{program_id}/documents", tags=["ОП"], summary="Итоговые JSON-файлы документов ОП")
     def api_program_docs(program_id: str, type: str = ""):

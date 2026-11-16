@@ -59,18 +59,19 @@ TEMPLATES: dict[str, list[Spec]] = {
         Spec("conditions", "Условия реализации", r"условия\s+реализации", False),
     ],
     "gia": [
-        Spec("general", "Общие положения", r"общие\s+положения|цел\w+\s+(и\s+задачи\s+)?государственной", False),
+        Spec("general", "Общие положения", r"общие\s+положения|цели\s+и\s+задачи\s+государственной", False),
         Spec("forms", "Формы ГИА", r"форм\w+\s+(проведения\s+)?государственной\s+итоговой|формы\s+гиа"),
-        Spec("volume", "Объем ГИА", r"объ[её]м\s+государственной|объ[её]м\s+гиа|трудо[её]мкость"),
-        Spec("vkr", "Требования к ВКР", r"требования\s+к\s+выпускной|выпускн\w+\s+квалификационн\w+\s+работ"),
-        Spec("procedure", "Порядок проведения", r"порядок\s+(проведения|защиты)", False),
+        Spec("volume", "Объем ГИА", r"(?:объ[её]м|трудо[её]мкость)\s+(?:государственной|гиа)(?!\s+составля)"),
+        Spec("vkr", "Требования к ВКР", r"требования\s+к\s+выпускной|выпускная\s+квалификационная\s+работа\s*$"),
+        Spec("vkr_structure", "Структура и оформление ВКР", r"требования\s+к\s+объ[её]му,?\s+структуре", False),
+        Spec("procedure", "Порядок проведения", r"порядок\s+(проведения|защиты)|процедура\s+защиты", False),
         Spec("criteria", "Критерии оценивания", r"критери\w+\s+оценивания|критери\w+\s+оценки"),
     ],
     "fos_gia": [
         Spec("competencies", "Проверяемые компетенции", r"перечень\s+компетенций|компетенци\w+,?\s+(проверяемых|формирование)"),
-        Spec("indicators", "Показатели оценивания", r"показател\w+"),
+        Spec("indicators", "Показатели оценивания", r"(?:описание\s+)?показател\w+|индикатор\w+\s*\(показател\w+\)"),
         Spec("tasks", "Типовые задания и тематика ВКР", r"типовые\s+(контрольные\s+)?задания|тематик\w+|примерн\w+\s+перечень"),
-        Spec("criteria", "Критерии оценивания", r"критери\w+\s+оценивания|критери\w+\s+оценки|шкал\w+\s+оценивания"),
+        Spec("criteria", "Критерии оценивания", r"критери\w+\s+оценивания(?!\s+(?:способ|средств))|критери\w+\s+оценки|шкал\w+\s+оценивания"),
     ],
 }
 
@@ -109,11 +110,12 @@ def split_sections(text: str, specs: list[Spec]) -> dict[str, dict]:
     # OCR оглавления может потерять номера, точки-лидеры и границы строк.
     # Сохраняем границы страниц: страница содержания не является разделом ООП.
     pages = text.split("\f")
-    if len(pages) > 1 and any(spec.key == "activity" for spec in specs):
+    if len(pages) > 1 and any(spec.key in ("activity", "vkr", "indicators") for spec in specs):
         pages = [p for p in pages if not (re.search(r"(?im)^\s*(?:содержание|оглавление)\s*$", p)
-                 and not re.search(r"(?m)^\s*\d{1,2}\.\d{1,2}\s+", p))]
+                 and (TOC_LINE.search(p) or not re.search(r"(?m)^\s*\d{1,2}\.\d{1,2}\s+", p)))]
     lines = [ln.strip() for ln in "\n".join(pages).splitlines()]
     found: list[tuple[int, Spec, str]] = []
+    prefix = "" if specs in (TEMPLATES["gia"], TEMPLATES["fos_gia"]) else r"(?:[\w-]+\s+){0,3}?"
     used = set()
     for i, line in enumerate(lines):
         low = line.lower().replace("ё", "е")
@@ -128,7 +130,7 @@ def split_sections(text: str, specs: list[Spec]) -> dict[str, dict]:
                 continue
             if spec.key == "literature" and not quality.LITERATURE_HEADER.fullmatch(low):
                 continue
-            if re.match(NUM + r"(?:[\w-]+\s+){0,3}?(?:" + spec.pattern + ")", low):
+            if re.match(NUM + prefix + "(?:" + spec.pattern + ")", low):
                 found.append((i, spec, line))
                 used.add(spec.key)
                 break
@@ -148,8 +150,8 @@ def split_sections(text: str, specs: list[Spec]) -> dict[str, dict]:
 # ---------------------------------------------------------------- извлечение сведений
 
 COMP_RE = re.compile(r"\b((?:УК|ОПК|ПК|ПКС|ОК|ПКО|ПКР)-\d{1,2})\b\s*[—–\-:.]?\s*([^;]{0,400})")
-CODE_RE = re.compile(r"\b((?:УК|ОПК|ПК|ПКС|ОК|ПКО|ПКР)-\d{1,2})\b")
-ZE_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:зачетн\w+|зач\.?)\s*(?:единиц\w*|ед\.?)|(\d+(?:[.,]\d+)?)\s*(?:з\.\s*е\.?(?:\s*т\.?)?|ЗЕТ\b)", re.I)
+CODE_RE = re.compile(r"\b((?:УК|ОПК|ПК|ПКС|ОК|ПКО|ПКР)(?:[ \t]+ОС)?)[ \t]*[-–—][ \t]*(\d{1,2})\b")
+ZE_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:зач[её]тн\w+|зач\.?)\s*(?:единиц\w*|ед\.?)|(\d+(?:[.,]\d+)?)\s*(?:з\.\s*е\.?(?:\s*т\.?)?|ЗЕТ\b)", re.I)
 HOURS_RE = re.compile(r"(\d+)\s*(?:академическ\w+\s+)?час", re.I)
 WEEKS_RE = re.compile(r"(\d+)\s*недел", re.I)
 SEM_RE = re.compile(r"(\d{1,2}(?:\s*(?:,|и|-|–)\s*\d{1,2})*)\s*(?:-?м\s+)?семестр|семестр\w*\s*[:№]?\s*(\d{1,2}(?:\s*,\s*\d{1,2})*)", re.I)
@@ -176,7 +178,8 @@ def competencies(text: str) -> list[dict]:
 
 
 def _code_key(code: str) -> tuple:
-    group, num = code.split("-")
+    family, num = code.split("-")
+    group = family.split()[0]
     return (["УК", "ОПК", "ПК", "ПКС", "ПКО", "ПКР", "ОК"].index(group) if group in ("УК", "ОПК", "ПК", "ПКС", "ПКО", "ПКР", "ОК") else 9, int(num))
 
 
@@ -293,23 +296,36 @@ def extract(doc_type: str, text: str, tables: list | None = None, hyperlinks: li
             "ze_total": first(ZE_RE, re.sub(r"_+", " ", body("general") or text)),
             "areas": _oop_areas(act),
             "task_types": _oop_tasks(act),
-            "gia_forms": _oop_gia(body("general")),
+            "gia_forms": _attestation_forms(body("general")),
             "competencies": competencies(body("results")),
             "conditions": body("conditions")[:1000],
         })
     elif doc_type == "gia":
+        general = body("general")
+        form_text = body("forms")
+        forms = _attestation_forms(general) or numbered_items(form_text) or [s.strip() for s in form_text.splitlines() if s.strip()]
+        volume_lines = re.findall(
+            rf"(?:трудо[её]мкость|объ[её]м|продолжительность)\s+{GIA_NAME}\s+(.+?)(?=\.\s+(?-i:[А-ЯЁ])|$)",
+            unwrap_text(general), re.I,
+        )
+        volume = "\n".join([body("volume"), *volume_lines])
+        vkr_kind = re.search(r"\bвид\s+ВКР\s*[:—–-]\s*([^.?!]{2,80})", unwrap_text(general), re.I)
         data.update({
-            "forms": numbered_items(body("forms")) or [s.strip() for s in body("forms").split("\n") if s.strip()],
-            "ze": first(ZE_RE, body("volume")),
-            "weeks": first(WEEKS_RE, body("volume")),
-            "vkr_requirements": body("vkr")[:2000],
+            "forms": forms,
+            "ze": first(ZE_RE, volume),
+            "hours": first(HOURS_RE, volume),
+            "weeks": first(WEEKS_RE, volume),
+            "vkr_kind": vkr_kind[1] if vkr_kind else "",
+            "vkr_requirements": (body("vkr_structure") or body("vkr"))[:2000],
             "vkr_topics": tbl.vkr_topics(t["vkr_topics"]) if "vkr_topics" in t else [],
             "procedure": body("procedure")[:1500],
             "criteria": body("criteria")[:1500],
         })
     elif doc_type == "fos_gia":
+        codes = {f"{' '.join(family.split())}-{number}"
+                 for family, number in CODE_RE.findall(body("competencies") or text)}
         data.update({
-            "competencies": sorted(set(CODE_RE.findall(body("competencies") or text)), key=_code_key),
+            "competencies": sorted(codes, key=_code_key),
             "indicators": body("indicators")[:1500],
             "tasks": [x for x in numbered_items(body("tasks")) if 10 < len(x) < 250 and "компетенц" not in x.lower()][:40],
             "criteria": body("criteria")[:1500],
@@ -320,8 +336,14 @@ def extract(doc_type: str, text: str, tables: list | None = None, hyperlinks: li
         spo = spo_extract(text, tables or [])
         if spo:
             data.update({k: v for k, v in spo.items() if k != "_warnings"})
-    found = [s.key for s in specs if s.key in sec]
-    missing_required = [s.title for s in specs if s.required and s.key not in sec]
+    found_keys = set(sec)
+    if doc_type == "gia":
+        if data["forms"]:
+            found_keys.add("forms")
+        if data["ze"] or data["hours"] or data["weeks"]:
+            found_keys.add("volume")
+    found = [s.key for s in specs if s.key in found_keys]
+    missing_required = [s.title for s in specs if s.required and s.key not in found_keys]
     required_total = sum(1 for s in specs if s.required)
     data["template"] = {
         "found": found,
@@ -394,13 +416,19 @@ def _oop_tasks(text: str) -> list[str]:
     return [v for v in values if re.fullmatch(r"[а-яёА-ЯЁ-]{5,80}", v)][:5]
 
 
-def _oop_gia(text: str) -> list[str]:
-    m = re.search(r"форма\s+государственной\s+итоговой\s+аттестации\s*:\s*([^\n]+(?:\n(?!\s*(?:[А-ЯЁ][а-яё]+\s*[:,]|\d+\.))[^\n]+)?)", text, re.I)
-    if not m:
+GIA_NAME = r"(?:государственной\s+итоговой(?:\s+[—–-])?\s+аттестации|гиа)"
+
+
+def _attestation_forms(text: str) -> list[str]:
+    match = re.search(
+        rf"форм[аы]\s+(?:проведения\s+)?{GIA_NAME}\s*(?:[:—–-]|явля(?:ется|ются))\s*"
+        r"([^\n.!?;]+(?:\n[ \t]*(?=(?-i:[а-яё]))[^\n.!?;]+)*)",
+        text, re.I,
+    )
+    if not match:
         return []
-    value = re.sub(r"_+", " ", m.group(1))
-    value = re.sub(r"\s+", " ", value).strip(" .")
-    return [value] if len(value) < 250 else []
+    value = unwrap_text(re.sub(r"_+", " ", match[1]))
+    return [value[:1].upper() + value[1:]] if 0 < len(value) < 250 else []
 
 
 def _goal(text: str) -> str:

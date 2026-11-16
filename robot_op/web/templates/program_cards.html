@@ -1,5 +1,6 @@
 {% import "ui.html" as ui with context %}
 <script type="application/json" data-catalog-years data-live-catalog>{{ catalog_years | tojson }}</script>
+<script type="application/json" data-catalog-cache data-live-catalog>{{ catalog_cache | tojson }}</script>
 {% for g in groups %}
 <section class="app-cards-group" aria-labelledby="g-{{ loop.index }}"
          data-catalog-year="{{ g.year }}" data-catalog-level="{{ g.level }}" data-catalog-level-title="{{ g.level_title }}">

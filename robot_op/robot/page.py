@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+from collections import Counter
 from datetime import date, timedelta
 from urllib.parse import urlencode
 
@@ -15,6 +16,8 @@ from ..extract.schedule import LEGEND
 from ..extract.tables import vkr_topics
 from ..models import Document, JsonVersion, Program
 from . import plan_view, program_summary
+from .llm import gia_characteristic
+from .teachers import teacher_discipline_key
 
 QUALIFICATION = {"bachelor": "Бакалавр", "specialist": "Специалист", "master": "Магистр",
                  "spo": "Специалист среднего звена", "postgraduate": "Исследователь. Преподаватель-исследователь"}
@@ -26,36 +29,45 @@ def latest_final(ses, doc_id: int) -> dict | None:
     return v.data if v else None
 
 
-def gia_characteristic(summary: str | list[str] | None) -> list[str]:
-    """Отбрасывает служебные ответы модели, в том числе в сохранённых ОП."""
-    paragraphs = summary.split("\n\n") if isinstance(summary, str) else (summary or [])
-    boilerplate = re.compile(
-        r"генеративные языковые модели не обладают собственным мнением|"
-        r"разговоры на чувствительные темы могут быть ограничены", re.I
-    )
-    return [p.strip() for p in paragraphs if p.strip() and not boilerplate.search(" ".join(p.split()))][:2]
-
-
 def _key(name: str) -> str:
     name = discipline_name(name or "").lower().replace("ё", "е")
     return re.sub(r"[^а-яёa-z0-9]", "", name)
 
 
+def _matches_curriculum(row: dict, data: dict) -> bool | None:
+    hours = data.get("hours") or {}
+    planned = row.get("hours") or {}
+    facts = ((plan_view.semester_numbers(row), set(data.get("semesters") or [])),
+             (row.get("ze"), data.get("ze")),
+             (planned.get("plan"), hours.get("total")),
+             (planned.get("aud"), hours.get("aud")))
+    matches = [expected == actual for expected, actual in facts if expected and actual]
+    return all(matches) if matches else None
+
+
 def discipline_links(program_id: str, rows: list[dict], docs: list[Document], finals: dict) -> dict[str, str]:
-    """РПД по названию; для остальных позиций — карточка по индексу учебного плана."""
-    links = {}
+    """Связать одноимённые дисциплины с РПД по семестрам и часам, если есть несколько вариантов."""
+    candidates = {}
     for doc in docs:
         if doc.doc_type not in ("rpd", "practice"):
             continue
-        url = f"/op/{program_id}/doc/{doc.id}"
-        links.setdefault(_key(doc.title), url)
-        discipline = ((finals.get(doc.id) or {}).get("data") or {}).get("discipline")
-        if discipline:
-            links.setdefault(_key(discipline), url)
-    for row in rows:
-        if row.get("index") and (not row.get("is_module") or plan_view.is_choice(row["index"])):
-            url = f"/op/{program_id}/discipline?" + urlencode({"index": row["index"]})
-            links.setdefault(_key(row["name"]), url)
+        data = ((finals.get(doc.id) or {}).get("data") or {})
+        for name in {_key(doc.title), _key(data.get("discipline"))} - {""}:
+            candidates.setdefault(name, []).append((f"/op/{program_id}/doc/{doc.id}", data))
+    positions = [row for row in rows if row.get("index") and
+                 (not row.get("is_module") or plan_view.is_choice(row["index"]))]
+    counts = Counter(_key(row["name"]) for row in positions)
+    links = {name: entries[0][0] for name, entries in candidates.items() if len(entries) == 1}
+    for row in positions:
+        index, name = row["index"], _key(row["name"])
+        entries = candidates.get(name, [])
+        if len(entries) > 1:
+            entries = [(url, data) for url, data in entries if _matches_curriculum(row, data)]
+        elif entries and counts[name] > 1 and _matches_curriculum(row, entries[0][1]) is False:
+            entries = []
+        url = entries[0][0] if len(entries) == 1 else f"/op/{program_id}/discipline?" + urlencode({"index": index})
+        links[index] = url
+        links.setdefault(name, url)
     return links
 
 
@@ -136,7 +148,24 @@ def calendar_grid(kd: dict, fallback_year: int) -> dict:
             "week_numbers": [i + 1 if i < n_weeks else None for i in range(n_cols)], "courses": courses, "legend": legend, "needs_review": bool(kd.get("messages")), "mode": kd.get("mode", "daily")}
 
 
-def build(ses, prog: Program) -> dict:
+def saved_context(ses, prog: Program) -> dict:
+    """Дополнить ранее сохранённую страницу траекториями из уже разобранного УП."""
+    context = prog.page
+    plan = context.get("plan")
+    if not plan or "tracks" in plan:
+        return context
+    ids = ses.scalars(select(Document.id).where(Document.program_id == prog.id, Document.doc_type == "up")
+                     .order_by(Document.id))
+    for doc_id in ids:
+        data = (latest_final(ses, doc_id) or {}).get("data")
+        if data:
+            if plan_view.track_rows(data.get("rows") or []):
+                return dict(context, plan=build(ses, prog)["plan"])
+            break
+    return context
+
+
+def build(ses, prog: Program, *, teacher_directory: dict | None = None) -> dict:
     docs = ses.scalars(select(Document).where(Document.program_id == prog.id)).all()
     finals = {d.id: latest_final(ses, d.id) for d in docs}
     by_type: dict[str, list[Document]] = {}
@@ -211,6 +240,8 @@ def build(ses, prog: Program) -> dict:
         gia_items.append({"label": "Формы ГИА", "value": "; ".join(f.rstrip(".") for f in gd["forms"])})
     if gd.get("ze"):
         gia_items.append({"label": "Объём", "value": f"{gd['ze']} з. е."})
+    elif gd.get("hours"):
+        gia_items.append({"label": "Объём", "value": f"{gd['hours']} ч"})
     if gd.get("weeks"):
         gia_items.append({"label": "Продолжительность", "value": f"{gd['weeks']} нед."})
     if fd.get("competencies"):
@@ -242,6 +273,20 @@ def build(ses, prog: Program) -> dict:
     links = discipline_links(prog.id, up_data.get("rows", []), docs, finals)
     plan = plan_view.build(up_data, links, key=_key)
 
-    unavailable = {kind: bool(by_type.get(kind)) for kind in ("up", "kug")}
-    return {"unavailable": unavailable, "op": op, "plan": plan, "schedule": schedule, "disciplines": disciplines, "practices": practices,
+    if teacher_directory is None:
+        teacher_directory = (prog.page or {}).get("teacher_directory", {})
+    if plan and teacher_directory:
+        for track in plan["tracks"] or [plan]:
+            for semester in track["semesters"]:
+                for item in semester["items"]:
+                    names = [option["name"] for option in item["options"]] or [item["name"]]
+                    candidates = {}
+                    for name in names:
+                        for teacher in teacher_directory.get(teacher_discipline_key(name), []):
+                            candidates.setdefault(teacher["name"], teacher)
+                    if candidates:
+                        item["teachers"] = list(candidates.values())
+
+    return {"op": op, "plan": plan, "schedule": schedule, "disciplines": disciplines, "practices": practices,
+            "teacher_directory": teacher_directory,
             "gia": gia_ctx, "documents": documents}

@@ -68,7 +68,8 @@ def test_program_display_removes_area_codes_but_keeps_meaningful_numbers(tmp_pat
         ses.add(prog)
         ses.add_all([Document(id=1,program_id=prog.id,doc_type="oop",title="ООП",url="https://www.istu.edu/oop.pdf"),
                      Document(id=2,program_id=prog.id,doc_type="up",title="УП",url="https://www.istu.edu/up.pdf"),
-                     Document(id=3, program_id=prog.id, doc_type="gia", title="ГИА", url="https://www.istu.edu/gia.pdf")])
+                     Document(id=3, program_id=prog.id, doc_type="gia", title="ГИА", url="https://www.istu.edu/gia.pdf"),
+                     Document(id=4, program_id=prog.id, doc_type="kug", title="КУГ", url="https://www.istu.edu/kug.pdf")])
         ses.flush()
         areas=["16 Строительство (объек- тов, техниче- ской эксплуатации и ма- териалов)",
                "40. Сквозные виды профессиональной деятельности", "06 Связь и технологии 5G"]
@@ -81,7 +82,11 @@ def test_program_display_removes_area_codes_but_keeps_meaningful_numbers(tmp_pat
                          "summary": "Аттестация проходит в форме защиты выпускной работы.",
                          "data": {"forms": ["Защита ВКР"], "ze": 6}})])
         ses.flush()
-        prog.page=build(ses,prog)
+        prog.page = build(ses, prog, teacher_directory={
+            "web-программирование": [
+                {"name": "Иванов Иван Иванович", "url": "https://www.istu.edu/sveden/employees"},
+            ],
+        })
         assert prog.page["op"]["areas"] == ["Строительство (объектов, технической эксплуатации и материалов)",
             "Сквозные виды профессиональной деятельности","Связь и технологии 5G"]
         ses.commit()
@@ -92,6 +97,9 @@ def test_program_display_removes_area_codes_but_keeps_meaningful_numbers(tmp_pat
         assert "Пар за учебный год" in load and "246 ч" in load
         table = soup.select_one(".app-semtable")
         assert table.thead and table.tfoot.th.get_text(strip=True) == "Итого в неделю"
+        assert "Предполагаемый преподаватель" in table.thead.get_text()
+        teacher = table.select_one('tbody a[href="https://www.istu.edu/sveden/employees"]')
+        assert teacher.get_text(strip=True) == "Иванов Иван Иванович"
         assert table.select_one("tbody .app-semtable__sum").get_text(strip=True) == "10,5"
         assert table.select_one("tfoot .app-semtable__sum").get_text(strip=True) == "10,5"
         assert soup.select("tbody .app-semtable__sum")[1].get_text(strip=True) == "—"
@@ -100,21 +108,28 @@ def test_program_display_removes_area_codes_but_keeps_meaningful_numbers(tmp_pat
         assert gia.select_one(".app-prose").get_text(strip=True) == "Аттестация проходит в форме защиты выпускной работы."
         assert not gia.select("a, .ir-info")
         assert "Web-программирование" in soup.get_text() and "М/еБ" not in soup.get_text()
+        assert soup.select_one("#kug .app-empty").get_text(strip=True) == "Календарный учебный график пока не опубликован."
+        assert soup.select_one('#docs a[href="https://www.istu.edu/kug.pdf"]')
+        document = BeautifulSoup(client.get("/op/clean-op/doc/4").text, "html.parser")
+        assert document.select_one(".app-content .app-empty").get_text(strip=True) == "Сведения о документе пока не опубликованы."
+        assert document.select_one('.app-aside a[href="https://www.istu.edu/kug.pdf"]')
         card=BeautifulSoup(client.get('/op/clean-op/discipline?index=Б1.О.01').text,'html.parser')
         assert card.h1.get_text(strip=True)=="Web-программирование"
+        assert "Рабочая программа пока не опубликована." in card.select_one(".app-content").get_text()
         assert "Пар в неделю" in card.select_one("thead").get_text()
         assert card.select_one("tbody tr td").get_text(strip=True) == "10,5"
     with app.state.db.Session() as ses:
         prog = ses.get(Program, "clean-op")
-        prog.page = dict(prog.page, gia={"summary": [
+        prog.page = dict(prog.page, plan=None, gia={"summary": [
             "Генеративные языковые модели не обладают собственным мнением — их ответы являются обобщением информации.",
             "Чтобы избежать ошибок и неправильного толкования, разговоры на чувствительные темы могут быть ограничены .",
         ]})
         ses.commit()
     with TestClient(app) as client:
-        gia = BeautifulSoup(client.get("/op/clean-op").text, "html.parser").select_one("#gia")
-        assert gia.select_one(".app-prose").get_text(strip=True) == "—"
-        assert len(gia.select(".app-prose")) == 1
+        soup = BeautifulSoup(client.get("/op/clean-op").text, "html.parser")
+        assert soup.select_one("#up .app-empty").get_text(strip=True) == "Учебный план пока не опубликован."
+        gia = soup.select_one("#gia .app-empty")
+        assert gia.get_text(strip=True) == "Описание государственной итоговой аттестации пока не опубликовано."
 
 
 def test_text_cleanup_preserves_real_compounds_and_coordination():

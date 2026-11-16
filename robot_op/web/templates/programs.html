@@ -20,7 +20,7 @@
     <p class="app-small" data-catalog-no-results role="status" hidden>Подходящие программы не найдены.</p>
     <p class="app-small" data-live-catalog data-catalog-status role="status" hidden></p>
     <div data-catalog-url="/programs/catalog" data-selected-level="{{ level if level_title else '' }}"
-         data-selected-level-title="{{ level_title }}">
+         data-selected-level-title="{{ level_title }}" data-selected-year="{{ selected_year or '' }}">
       {% include "program_cards.html" %}
     </div>
   </div>
@@ -38,7 +38,7 @@
   const normalize = text => text.normalize('NFC').toLocaleLowerCase('ru').replace(/ё/g, 'е');
   let groups = [];
   let availability = {};
-  let year = '';
+  let year = catalog.dataset.selectedYear;
   let level = catalog.dataset.selectedLevel;
 
   function markSelection(container, selected) {
@@ -65,8 +65,13 @@
       options.set(key, title);
     }
     if (!options.has(level)) {
-      if (year) level = '';
-      else options.set(level, catalog.dataset.selectedLevelTitle);
+      const cache = catalog.querySelector('[data-catalog-cache]');
+      const awaitingCohort = cache && !JSON.parse(cache.textContent).years.includes(Number(year));
+      if (awaitingCohort && level === catalog.dataset.selectedLevel) {
+        options.set(level, catalog.dataset.selectedLevelTitle);
+      } else {
+        level = '';
+      }
     }
     renderChoices(levelChoices, options, level);
   }
@@ -96,6 +101,7 @@
     groups = Array.from(catalog.querySelectorAll('.app-cards-group'));
     const metadata = catalog.querySelector('[data-catalog-years]');
     availability = metadata ? JSON.parse(metadata.textContent) : {};
+    if (catalog.dataset.selectedYear) availability[catalog.dataset.selectedYear] ??= {};
     for (const group of groups) {
       const {catalogYear, catalogLevel, catalogLevelTitle} = group.dataset;
       (availability[catalogYear] ??= {})[catalogLevel] = catalogLevelTitle;
@@ -137,27 +143,50 @@
   const status = document.querySelector('[data-catalog-status]');
   let activeRequest;
 
-  async function loadCatalog(year) {
-    activeRequest?.abort();
-    const request = new AbortController();
+  function cacheState() {
+    return JSON.parse(catalog.querySelector('[data-catalog-cache]').textContent);
+  }
+
+  function showIncomplete() {
+    status.textContent = 'Не удалось получить полный список с сайта ИРНИТУ.';
+    status.hidden = false;
+  }
+
+  async function loadCatalog(year = '') {
+    if (activeRequest?.year === year) return;
+    activeRequest?.controller.abort();
+    activeRequest = undefined;
+    const cache = cacheState();
+    if (year ? cache.years.includes(Number(year)) : cache.ready) {
+      catalog.removeAttribute('aria-busy');
+      status.hidden = true;
+      if (!year && cache.incomplete) showIncomplete();
+      return;
+    }
+
+    const request = {year, controller: new AbortController()};
     activeRequest = request;
     const url = new URL(catalog.dataset.catalogUrl, location.origin);
-    if (year) url.searchParams.set('year', year);
+    if (year) {
+      url.searchParams.set('year', year);
+      url.searchParams.set('all_years', 'true');
+    }
     status.hidden = false;
     status.textContent = year ? `Загружаем программы набора ${year}…` : 'Получаем список программ с сайта ИРНИТУ…';
     catalog.setAttribute('aria-busy', 'true');
     try {
-      const response = await fetch(url, {signal: request.signal});
+      const response = await fetch(url, {signal: request.controller.signal});
       if (!response.ok) throw new Error();
       const html = await response.text();
       if (request !== activeRequest) return;
       catalog.innerHTML = html;
       status.hidden = true;
+      if (cacheState().incomplete) showIncomplete();
     } catch (error) {
-      if (request !== activeRequest) return;
-      status.textContent = 'Не удалось получить список с сайта ИРНИТУ.';
+      if (request === activeRequest) showIncomplete();
     } finally {
       if (request === activeRequest) {
+        activeRequest = undefined;
         catalog.removeAttribute('aria-busy');
         catalog.dispatchEvent(new Event('catalog:loaded'));
       }
@@ -165,7 +194,7 @@
   }
 
   catalog.addEventListener('catalog:year', event => loadCatalog(event.detail));
-  loadCatalog();
+  loadCatalog(catalog.dataset.selectedYear);
 })();
 </script>
 {% endblock %}

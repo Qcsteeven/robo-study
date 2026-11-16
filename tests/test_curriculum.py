@@ -1,5 +1,8 @@
+import numpy as np
+
+from robot_op.extract.grid import detect_grid
 from robot_op.extract.curriculum import _renumber, _semester, matrix, pairs_per_week, validate
-from robot_op.extract.util import fix_index, semesters_from_code
+from robot_op.extract.util import discipline_name, fix_index, semesters_from_code
 
 
 def test_pairs_per_week_formula():
@@ -79,3 +82,65 @@ def test_validation_eios_and_free_electives():
     validate([hist, module, pe, bad_kont])
     assert hist["checks"] == [] and module["checks"] == [] and pe["checks"] == []
     assert any("Конт. раб." in c for c in bad_kont["checks"])
+
+
+def test_scanned_grid_keeps_last_course_above_faint_dotted_footer_line():
+    raster = np.full((140, 400), 255, dtype=np.uint8)
+    raster[[15, 45, 115], 20:380] = 0
+    raster[15:116, [20, 160, 379]] = 0
+    for x in range(20, 378, 6):
+        raster[80, x:x + 4] = 195
+
+    grid = detect_grid(raster, recover_faint_rules=True)
+
+    assert [(row.y0, row.y1) for row in grid.rows] == [(16, 44), (46, 79), (81, 114)]
+    assert grid.rows[1].cell_at(1).y1 == 79
+
+
+def test_discipline_name_fixes_confirmed_ocr_of_preposition():
+    assert discipline_name("Подготовка к сдаче квалификационного экзамена NO иностранному языку") == (
+        "Подготовка к сдаче квалификационного экзамена по иностранному языку"
+    )
+
+
+def test_discipline_name_preserves_confirmed_latin_iiot_acronym():
+    titles = [
+        "Анализ и оптимизация сетей и протоколов связи в системах IIoT",
+        "Исследование и разработка методов защиты и обеспечения кибербезопасности в IIoT",
+        "Проектирование и оптимизация архитектуры систем IIoT",
+        "Промышленные протоколы и стандарты обмена данных в системах IIoT",
+        "Мониторинг систем IIoT",
+        "IIoT в интеллектуальной робототехнике",
+        "Построение цифровых двойников на основе IIoT",
+        "Социальные аспекты применениях технологии IIoT",
+    ]
+    for title in titles:
+        assert discipline_name(title.replace("IIoT", "Пот")) == title
+    assert discipline_name("Пот и секреты кожных желез") == "Пот и секреты кожных желез"
+
+
+def test_split_semester_header_recovers_practical_and_independent_hours():
+    from robot_op.extract.curriculum import find_layout, parse_grid
+    from robot_op.extract.grid import Cell, Grid, Row
+
+    widths = [35, 130, 40, 40, 40, 40, 40, 40, 40, 11, 30, 8, 32, 35]
+    starts = [sum(widths[:i]) for i in range(len(widths))]
+    columns = [(x, x + w) for x, w in zip(starts, widths)]
+
+    def line(*cells):
+        return Row(0, 20, [Cell(columns[a][0], columns[b][1], 0, 20, a, b, t) for a, b, t in cells])
+
+    grid = Grid([
+        line((6, 12, "Курс 2"), (13, 13, "Закрепленная")),
+        line((2, 5, "Семестр 3 [14 нед]"), (6, 8, "Семестр 4"), (9, 11, "8 нед.")),
+        line((0, 0, "Индекс"), (1, 1, "Наименование"),
+             (2, 2, "Лек"), (3, 3, "Лаб"), (4, 4, "Пр"), (5, 5, "СР"),
+             (6, 6, "Лек"), (7, 7, "Лаб"), (8, 9, "Пр"), (10, 12, "СР"), (13, 13, "Код")),
+        line((0, 0, "Б1.В.01"), (1, 1, "Промышленные сети"),
+             (6, 6, "8"), (8, 8, "16"), (12, 12, "48"), (13, 13, "121")),
+    ], columns)
+    layout = find_layout(grid)
+    sem = layout.semesters[4]
+    assert sem == {"weeks": 8, "cols": {"lec": 6, "lab": 7, "pr": 8, "sr": 12}}
+    row = parse_grid(grid, layout)[0]
+    assert row["semesters"]["4"] == {"lec": 8, "lab": 0, "pr": 16, "sr": 48}

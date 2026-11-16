@@ -50,8 +50,10 @@ def test_web_flow(tmp_path):
         # доли категорий — полоса и проценты, без раскрывающихся списков; отдельного перечня дисциплин нет
         assert "app-shares-legend" in op.text and "app-shelf" not in op.text and "Из чего состоит программа" in op.text
         assert 'id="discipliny"' not in op.text
-        gia = BeautifulSoup(op.text, "html.parser").select_one("#gia")
-        assert gia.select_one(".app-prose").get_text(strip=True) == "—"
+        program = BeautifulSoup(op.text, "html.parser")
+        assert program.select_one("#praktiki tbody tr td:last-child").get_text(strip=True) == "Краткое описание пока не опубликовано."
+        gia = program.select_one("#gia")
+        assert gia.select_one(".app-empty").get_text(strip=True) == "Описание государственной итоговой аттестации пока не опубликовано."
         assert not gia.select("a, .ir-info, ul")
         assert c.get(r.headers["location"], follow_redirects=False).headers["location"] == "/op/09.04.01-iiis-2026-och"
         catalog = BeautifulSoup(c.get("/programs/catalog?level=master").text, "html.parser")

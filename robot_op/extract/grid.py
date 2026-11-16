@@ -187,7 +187,8 @@ def _clusters(flags: np.ndarray, min_gap: int = 2) -> list[tuple[int, int]]:
     return out
 
 
-def detect_grid(arr: np.ndarray, min_row_px: int = 12, *, filter_short: bool = True) -> Grid | None:
+def detect_grid(arr: np.ndarray, min_row_px: int = 12, *, filter_short: bool = True,
+                recover_faint_rules: bool = False) -> Grid | None:
     dark = binarize(arr)
     h, w = dark.shape
     run = max(40, w // 60)
@@ -200,6 +201,25 @@ def detect_grid(arr: np.ndarray, min_row_px: int = 12, *, filter_short: bool = T
         return None
     cols_any = np.flatnonzero(hmask.any(axis=0))
     x_min, x_max = int(cols_any.min()), int(cols_any.max())
+    if recover_faint_rules:
+        y_min, y_max = hlines[0][0], hlines[-1][1]
+        # Светлые пунктирные линии теряются при обычной бинаризации.
+        # Соединяем штрихи через короткие разрывы и ищем линии не короче половины таблицы.
+        faint = arr[y_min:y_max + 1, x_min:x_max + 1] <= 200
+        bridged = faint.copy()
+        bridged[:, 1:-1] |= faint[:, :-2] & faint[:, 2:]
+        gap = faint[:, :-3] & faint[:, 3:]
+        bridged[:, 1:-2] |= gap
+        bridged[:, 2:-1] |= gap
+        wide = _runs_mask(bridged, run, axis=1).sum(axis=1) >= faint.shape[1] / 2
+        for a, b in hlines:
+            wide[max(0, a - y_min - 2):b - y_min + 3] = False
+        additions = _clusters(wide)
+        for a, b in additions:
+            # Линия также нужна при проверке, объединены ли ячейки по вертикали.
+            first, last = max(0, a - 6), b + 7
+            dark[y_min + first:y_min + last, x_min:x_max + 1] |= bridged[first:last]
+        hlines = sorted(hlines + [(y_min + a, y_min + b) for a, b in additions])
     line_px = max(2, int(np.median([b - a + 1 for a, b in hlines])))
 
     bands: list[tuple[int, int, tuple[int, int], list[tuple[int, int]]]] = []

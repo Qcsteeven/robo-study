@@ -105,9 +105,24 @@
     </div>
     <button type="button" class="app-carousel__arrow" data-next aria-label="Следующий семестр">&#8594;</button>
   </div>
+  {% if plan.tracks %}
+  <div class="app-track-picker" data-track-picker hidden role="group" aria-label="Образовательная траектория">
+    {% for variant in plan.tracks %}
+    <button type="button" class="app-carousel__tab app-track-picker__button" data-track-choice="{{ loop.index0 }}"
+            aria-pressed="{{ 'true' if loop.first else 'false' }}">{{ variant.name }}</button>
+    {% endfor %}
+  </div>
+  {% endif %}
   <div class="app-carousel__track app-scroll" data-track tabindex="0">
     {%- for s in plan.semesters %}
     <section class="app-carousel__slide" role="group" aria-roledescription="слайд" aria-label="{{ s.number }} семестр из {{ plan.semesters | length }}">
+      {% set semester_index = loop.index0 %}
+      {% for variant in plan.tracks or [plan] %}
+      {% set s = variant.semesters[semester_index] %}
+      {% if plan.tracks %}
+      <div data-track-plan="{{ loop.index0 }}">
+        <p class="item-title app-track-name" data-track-name>{{ variant.name }}</p>
+      {% endif %}
       <div class="app-course__head">
         <h4 class="item-title app-course__title">{{ s.number }} семестр</h4>
         <span class="app-course__meta">{{ s.course }} курс{% if s.weeks %} · {{ s.weeks }} учебных недел{{ s.weeks | plural('я', 'и', 'ь') }}{% endif %} · {{ s.count }} дисциплин{{ s.count | plural('а', 'ы', '') }} · {{ s.exams }} экзамен{{ s.exams | plural('', 'а', 'ов') }}</span>
@@ -117,7 +132,7 @@
         <div class="app-load--lec"><dt><span class="app-load__mark" aria-hidden="true"></span>Лекции</dt><dd>{{ num(s.lec) }} <span class="app-load__hours">({{ (s.lec * 1.5) | clock_hours }})</span></dd></div>
         <div class="app-load--pr"><dt><span class="app-load__mark" aria-hidden="true"></span>Практики</dt><dd>{{ num(s.pr) }} <span class="app-load__hours">({{ (s.pr * 1.5) | clock_hours }})</span></dd></div>
         <div class="app-load--lab"><dt><span class="app-load__mark" aria-hidden="true"></span>Лабораторные</dt><dd>{{ num(s.lab) }} <span class="app-load__hours">({{ (s.lab * 1.5) | clock_hours }})</span></dd></div>
-        {% set year_pairs = plan.semesters | selectattr('course', 'equalto', s.course) | sum(attribute='pairs') %}
+        {% set year_pairs = variant.semesters | selectattr('course', 'equalto', s.course) | sum(attribute='pairs') %}
         <div><dt>Пар за учебный год</dt><dd>{{ num(year_pairs) }} <span class="app-load__hours">({{ (year_pairs * 1.5) | clock_hours }})</span></dd></div>
       </dl>
       {%- if s.pairs %}
@@ -130,6 +145,7 @@
           <caption class="sr-only">{{ s.number }} семестр: дисциплины и число пар в неделю</caption>
           <thead><tr>
             <th scope="col">Дисциплина</th>
+            <th scope="col" class="app-semtable__teacher">Предполагаемый преподаватель</th>
             <th scope="col" class="ir-num" title="Лекции, пар в неделю">Лек</th>
             <th scope="col" class="ir-num" title="Практические занятия, пар в неделю">Пр</th>
             <th scope="col" class="ir-num" title="Лабораторные работы, пар в неделю">Лаб</th>
@@ -140,8 +156,20 @@
             {%- for d in s['items'] %}
             <tr class="app-semrow app-cat--{{ d.category }}{% if d.optional %} app-semtable__opt{% endif %}" data-cat="{{ d.category }}">
               <td><span class="app-semtable__name"><span class="app-cat__mark" aria-hidden="true"></span>
-                <span>{%- if d.url %}<a class="ir-link" href="{{ d.url }}">{{ d.name }}</a>{% else %}{{ d.name }}{% endif %}
-                {%- if d.optional %} <span class="app-chip__tag">факультатив</span>{% endif %}</span></span></td>
+                <span>{%- if d.options %}
+                  {%- for option in d.options %}
+                  {%- if not loop.first %} / {% endif %}
+                  {%- if option.url %}<a class="ir-link" href="{{ option.url }}">{{ option.name }}</a>{% else %}{{ option.name }}{% endif %}
+                  {%- endfor %}
+                {%- elif d.url %}<a class="ir-link" href="{{ d.url }}">{{ d.name }}</a>{% else %}{{ d.name }}{% endif %}
+                {%- if d.optional or d.elective %} <span class="app-chip__tag">{{ 'факультатив' if d.optional else 'по выбору' }}</span>{% endif %}</span></span></td>
+              <td class="app-semtable__teacher">
+                {%- for t in d.teachers -%}
+                <a class="ir-link" href="{{ t.url }}">{{ t.name }}</a>{% if not loop.last %}, {% endif %}
+                {%- else -%}
+                <span class="ir-muted" title="Нет совпадения в реестре ИРНИТУ">—</span>
+                {%- endfor -%}
+              </td>
               {%- if d.practice and not d.pairs %}
               <td colspan="4" class="app-semtable__practice">{{ 'практика' if d.category == 'prac' else 'без аудиторных занятий' }}{% if d.ze %} · {{ d.ze }} з. е.{% endif %}</td>
               {%- else %}
@@ -154,6 +182,7 @@
           </tbody>
           <tfoot><tr>
             <th scope="row">Итого в неделю{% if s['items'] | selectattr('optional') | list %} <span class="app-chip__tag">без факультативов</span>{% endif %}</th>
+            <td></td>
             <td class="ir-num">{{ weekly_pairs(s.lec, s.weeks, '—') }}</td>
             <td class="ir-num">{{ weekly_pairs(s.pr, s.weeks, '—') }}</td>
             <td class="ir-num">{{ weekly_pairs(s.lab, s.weeks, '—') }}</td>
@@ -162,6 +191,8 @@
           </tr></tfoot>
         </table>
       </div>
+      {% if plan.tracks %}</div>{% endif %}
+      {% endfor %}
     </section>
     {%- endfor %}
   </div>
@@ -199,9 +230,13 @@
 <td class="app-kug__cell app-kug--{{ KUG_CLASS.get(code, 't') }}">{% if code == 'unknown' %}—{% elif code not in ('', 'out') %}{{ code }}{% endif %}</td>
 {%- endmacro %}
 {% macro schedule_grid(kug) -%}
-<div class="ir-table-wrap app-scroll" tabindex="0" role="region" aria-label="Календарный учебный график {{ kug.academic_year }}">
-  <table class="app-kug">
+<div class="ir-table-wrap app-scroll app-kug-wrap" tabindex="0" role="region" aria-label="Календарный учебный график {{ kug.academic_year }}">
+  <table class="app-kug" style="--kug-weeks: {{ kug.week_numbers | length }}">
     <caption class="sr-only">Календарный учебный график на {{ kug.academic_year }} учебный год</caption>
+    <colgroup>
+      <col class="app-kug__course-col"><col class="app-kug__group-col"><col class="app-kug__day-col">
+    </colgroup>
+    {%- for month in kug.months %}<colgroup span="{{ month[1] }}"></colgroup>{% endfor %}
     <thead>
       <tr>
         <th scope="col" rowspan="{{ kug.header | length + 2 }}" class="app-kug__course"><span class="app-kug__vertical">Курс</span></th>

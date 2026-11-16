@@ -40,7 +40,8 @@ def test_plan_view_semesters_and_shelves():
         row("ФТД.01", "Образовательный форсайт", [2], ze=2),
         row("Б2.О.01(У)", "Учебная практика", [2], ze=3, hours={"sr": 108}),
     ]}
-    v = build(up, links={"математика": "/op/x/doc/1"}, key=str.lower)
+    v = build(up, links={"математика": "/op/x/doc/1", "нейронные сети": "/op/x/doc/2",
+                         "компьютерное зрение": "/op/x/doc/3"}, key=str.lower)
     assert [(s["number"], s["course"]) for s in v["semesters"]] == [(1, 1), (2, 1), (3, 2), (4, 2)]
     first = v["semesters"][0]
     assert [i["name"] for i in first["items"]] == ["Программирование", "Математика"]     # по порядку категорий
@@ -54,7 +55,12 @@ def test_plan_view_semesters_and_shelves():
     assert second["items"][-1]["practice"] and second["items"][-1]["name"] == "Учебная практика"
     names = {i["name"] for s in v["semesters"][2:] for i in s["items"]}
     assert "Модуль профильной подготовки" not in names                                   # модуль не дисциплина
-    assert "На выбор: Нейронные сети или компьютерное зрение" in names                   # блок по выбору — одна позиция
+    fourth = v["semesters"][3]
+    assert fourth["count"] == 1 and fourth["pairs"] == 8
+    assert fourth["items"][0]["options"] == [
+        {"name": "Нейронные сети", "url": "/op/x/doc/2"},
+        {"name": "Компьютерное зрение", "url": "/op/x/doc/3"},
+    ]
     shelves = {s["key"]: s for s in v["shelves"]}
     assert shelves["math"]["ze"] == 8 and v["total_ze"] == 21                             # факультатив в объём не входит
     assert sum(s["share"] for s in v["shelves"]) in (99, 100, 101)

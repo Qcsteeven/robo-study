@@ -65,10 +65,25 @@ def semesters_from_code(text: str) -> list[int]:
     return sorted(set(out))
 
 
+_IIOT_TITLES = {
+    "Анализ и оптимизация сетей и протоколов связи в системах IIoT",
+    "Исследование и разработка методов защиты и обеспечения кибербезопасности в IIoT",
+    "Проектирование и оптимизация архитектуры систем IIoT",
+    "Промышленные протоколы и стандарты обмена данных в системах IIoT",
+    "Мониторинг систем IIoT",
+    "IIoT в интеллектуальной робототехнике",
+    "Построение цифровых двойников на основе IIoT",
+    "Социальные аспекты применениях технологии IIoT",
+}
+
+
 def discipline_name(text: str) -> str:
-    """Исправление подтверждённой ошибки OCR латинского Web в учебном плане."""
+    """Исправление подтверждённых ошибок OCR в названиях дисциплин."""
     value = clean_text(text)
-    return re.sub(r"^м/еб(?=-программирование$)", "Web", value, flags=re.I)
+    value = re.sub(r"^м/еб(?=-программирование$)", "Web", value, flags=re.I)
+    value = re.sub(r"(?<=квалификационного экзамена )NO(?= иностранному языку$)", "по", value)
+    with_iiot = value.replace("Пот", "IIoT")
+    return with_iiot if with_iiot in _IIOT_TITLES else value
 
 
 def unwrap_text(text: str) -> str:

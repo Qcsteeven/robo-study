@@ -9,7 +9,7 @@
         <li><a class="ir-link" href="{{ option.url }}">{{ option.name }}</a></li>
       {% endfor %}</ul>
       {% else %}
-      <p class="app-prose">Рабочая программа для этой позиции пока не загружена. Ниже — сведения из учебного плана.</p>
+      <p class="app-prose">Рабочая программа пока не опубликована. Ниже приведены сведения из учебного плана.</p>
       {% endif %}
       <h2 class="section-title">Сведения</h2>
       <dl class="app-kv">{% for label, value in facts %}<dt>{{ label }}</dt><dd>{{ value }}</dd>{% endfor %}</dl>

@@ -27,10 +27,11 @@ from ..extract.ocr import OcrConfig, OcrUnavailable, ocr_page_text
 from ..models import Database, Document, JsonVersion, LogEntry, Program, Run, RunItem, now
 from . import page as pagebuilder, program_summary
 from .http import AuthRequired, SiteClient, SiteError
-from .llm import LlmClient, LlmError, too_long
+from .llm import ATTESTATION_FIELDS, LlmClient, LlmError, gia_characteristic, too_long
 from .site import LevelYears, ProgramBlock, parse_education, parse_op_list
+from .teachers import load_level_directory, match_program_teachers
 
-PARSER_VERSION = "1.7"   # 1.7 — шаблоны СПО/аспирантуры, результаты обучения и списки
+PARSER_VERSION = "1.9"   # 1.9 — УП с разорванными подписями семестров на сканах
 log = logging.getLogger("robot_op")
 
 
@@ -549,8 +550,12 @@ class Robot:
             return
         with self.db.Session() as ses:
             final = pagebuilder.latest_final(ses, doc_id)
-        if not final or not final.get("data") or (final.get("summary") and not too_long(doc_type, final["summary"])
-                and (doc_type != "oop" or program_summary.clean_summary(final["summary"]))):
+        if not final or not final.get("data"):
+            return
+        saved = final.get("summary")
+        if (saved and not too_long(doc_type, saved)
+                and (doc_type != "oop" or program_summary.clean_summary(saved))
+                and (doc_type not in ATTESTATION_FIELDS or gia_characteristic(saved))):
             return
         try:
             summary = self.llm.summarize(doc_type, {"program": final.get("program"), "document": final.get("document"), **final["data"]})
@@ -595,8 +600,21 @@ class Robot:
                 if extracted["messages"]:
                     return "needs_review", "; ".join(extracted["messages"])[:500], method, extracted, pages
                 return "processed", f"{'Скан, OCR' if scanned else 'Текстовый слой'}; курсов: {len(extracted['courses'])}", method, extracted, pages
-            # текстовые документы; отсканированные распознаются OCR постранично
-            if scanned:
+            # В смешанном PDF текстовая страница согласования может скрыть скан остальных страниц.
+            uses_text = not scanned
+            if doc.doc_type in ("oop", "gia", "fos_gia"):
+                page_text = pdfmod.page_texts(data)
+                raster_pages = [
+                    i for i, text in enumerate(page_text)
+                    if len(text.strip()) < self.s.ocr.min_text_chars_per_page
+                    and (scanned or pdfmod.scan_dpi(data, i) > 0)
+                ]
+                for i in raster_pages:
+                    page_text[i] = ocr_page_text(pdfmod.render_page(data, i, dpi), self.ocr)
+                full = "\f\n".join(page_text)
+                uses_text = len(raster_pages) < pages
+                method = "ocr" if raster_pages else "text"
+            elif scanned:
                 full = "\f\n".join(ocr_page_text(pdfmod.render_page(data, i, dpi), self.ocr) for i in range(pages))
             else:
                 full = "\f\n".join(pdfmod.page_texts(data))
@@ -605,7 +623,7 @@ class Robot:
                 self.journal(run_id, "WARNING", f"Содержимое не соответствует типу ({why}) — документ помечен и не обрабатывается",
                              program["id"], label)
                 return "skipped", why[:1].upper() + why[1:], method, {}, pages
-            extracted = sections.extract(doc.doc_type, full, None if scanned else pdfmod.page_tables(data),
+            extracted = sections.extract(doc.doc_type, full, pdfmod.page_tables(data) if uses_text else None,
                                          hyperlinks=pdfmod.resource_links(data))
             tpl = extracted["template"]
             if tpl["score"] < 0.5:
@@ -615,7 +633,8 @@ class Robot:
                 return "partial", f"Не найден раздел {missing}", method, extracted, pages
             if (extracted.get("extraction") or {}).get("warnings"):
                 return "needs_review", "Некоторые извлечённые поля требуют проверки по PDF", method, extracted, pages
-            return "processed", "Скан, OCR" if scanned else "Текстовый слой", method, extracted, pages
+            note = ("Текстовый слой и OCR" if uses_text else "Скан, OCR") if method == "ocr" else "Текстовый слой"
+            return "processed", note, method, extracted, pages
         except (curriculum.NoTable, schedule.NoSchedule) as e:
             return "unknown_template", f"{e} — структура таблицы не распознана", method, {}, pages
         except OcrUnavailable as e:
@@ -632,12 +651,32 @@ class Robot:
 
     # ------------------------------------------------------------------ шаг 12 — веб-страница ОП
 
+    def _teacher_directory(self, level: str):
+        def load():
+            settings = replace(self.s.site, timeout=min(self.s.site.timeout, 20), retries=min(self.s.site.retries, 1))
+            client = SiteClient(settings, transport=self.transport, sleep=self.sleep)
+            try:
+                return load_level_directory(client, level)
+            finally:
+                client.close()
+
+        return self._cached(f"teacher-directory:{level}", 600, load)
+
     def _update_page(self, run_id: int, program_id: str) -> None:
         with self.db.Session() as ses:
             prog = ses.get(Program, program_id)
             if prog is None:
                 return
-            prog.page = pagebuilder.build(ses, prog)
+            teacher_directory = None
+            if not self.s.app.demo:
+                try:
+                    directory = self._teacher_directory(prog.level)
+                    if directory is not None:
+                        teacher_directory = match_program_teachers(
+                            directory.text, directory.url, code=prog.code, profile=prog.profile)
+                except SiteError as exc:
+                    self.journal(run_id, "WARNING", f"Реестр преподавателей ИРНИТУ: {exc}", program_id, ses=ses)
+            prog.page = pagebuilder.build(ses, prog, teacher_directory=teacher_directory)
             prog.page_updated_at = now()
             ses.commit()
         self.journal(run_id, "INFO", "Веб-страница ОП обновлена", program_id)

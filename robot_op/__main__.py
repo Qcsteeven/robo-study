@@ -31,7 +31,8 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--force", action="store_true")
     rs = sub.add_parser("resume", help="продолжить прерванный запуск")
     rs.add_argument("run_id", type=int)
-    sub.add_parser("pages", help="пересобрать веб-страницы ОП по итоговым JSON-файлам, без скачивания")
+    pages = sub.add_parser("pages", help="пересобрать веб-страницы ОП по итоговым JSON-файлам, без скачивания PDF")
+    pages.add_argument("--refresh-teachers", action="store_true", help="обновить ссылки на персоналии ИРНИТУ")
     a = ap.parse_args(argv)
 
     if a.cmd == "serve":
@@ -64,7 +65,10 @@ def main(argv: list[str] | None = None) -> int:
         with db.Session() as ses:
             progs = ses.scalars(select(Program).where(Program.page.is_not(None))).all()
             for prog in progs:
-                prog.page = pagebuilder.build(ses, prog)
+                directory = None
+                if a.refresh_teachers:
+                    directory = robot.program_teacher_directory(prog, session=ses)
+                prog.page = pagebuilder.build(ses, prog, teacher_directory=directory)
                 prog.page_updated_at = now()
             ses.commit()
         print(f"Страниц ОП пересобрано: {len(progs)}")

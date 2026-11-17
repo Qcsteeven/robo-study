@@ -88,6 +88,13 @@ class SiteClient:
             self._last = time.monotonic()
 
     def get(self, url: str, headers: dict | None = None, max_bytes: int | None = None) -> Fetched:
+        return self._request("GET", url, headers=headers, max_bytes=max_bytes)
+
+    def post_form(self, url: str, data: dict[str, str], *, max_bytes: int | None = None) -> Fetched:
+        return self._request("POST", url, data=data, max_bytes=max_bytes)
+
+    def _request(self, method: str, url: str, *, headers: dict | None = None,
+                 data: dict[str, str] | None = None, max_bytes: int | None = None) -> Fetched:
         self.check_url(url)
         attempts = max(1, self.s.retries + 1)
         last_error = ""
@@ -98,7 +105,7 @@ class SiteClient:
                 self._sleep(pause)
             self._throttle()
             try:
-                with self._client.stream("GET", url, headers=headers or {}) as r:
+                with self._client.stream(method, url, headers=headers or {}, data=data) as r:
                     if r.status_code == 304:
                         return Fetched(str(r.url), 304, b"", dict(r.headers), not_modified=True)
                     if r.status_code == 404:

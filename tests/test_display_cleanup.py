@@ -84,7 +84,11 @@ def test_program_display_removes_area_codes_but_keeps_meaningful_numbers(tmp_pat
         ses.flush()
         prog.page = build(ses, prog, teacher_directory={
             "web-программирование": [
-                {"name": "Иванов Иван Иванович", "url": "https://www.istu.edu/sveden/employees"},
+                {"name": "Власов В.Г.", "url": "https://www.istu.edu/person/19281"},
+                {"name": "Иванов И.И.", "url": "https://www.istu.edu/raspisanie/prepodavatel/5585/"},
+                {"name": "Петров П.П.", "url": "https://example.org/person/123"},
+                {"name": "Сидоров С.С.", "url": "http://www.istu.edu/person/321"},
+                {"name": "Орлов О.О.", "url": ""},
             ],
         })
         assert prog.page["op"]["areas"] == ["Строительство (объектов, технической эксплуатации и материалов)",
@@ -98,8 +102,14 @@ def test_program_display_removes_area_codes_but_keeps_meaningful_numbers(tmp_pat
         table = soup.select_one(".app-semtable")
         assert table.thead and table.tfoot.th.get_text(strip=True) == "Итого в неделю"
         assert "Предполагаемый преподаватель" in table.thead.get_text()
-        teacher = table.select_one('tbody a[href="https://www.istu.edu/sveden/employees"]')
-        assert teacher.get_text(strip=True) == "Иванов Иван Иванович"
+        teacher_cell = table.select_one("tbody td.app-semtable__teacher")
+        assert [(a.get_text(strip=True), a["href"]) for a in teacher_cell.select("a[href]")] == [
+            ("Власов В.Г.", "https://www.istu.edu/person/19281"),
+            ("Иванов И.И.", "https://www.istu.edu/raspisanie/prepodavatel/5585/"),
+            ("Петров П.П.", "https://www.istu.edu/raspisanie/poisk"),
+            ("Сидоров С.С.", "https://www.istu.edu/raspisanie/poisk"),
+            ("Орлов О.О.", "https://www.istu.edu/raspisanie/poisk"),
+        ]
         assert table.select_one("tbody .app-semtable__sum").get_text(strip=True) == "10,5"
         assert table.select_one("tfoot .app-semtable__sum").get_text(strip=True) == "10,5"
         assert soup.select("tbody .app-semtable__sum")[1].get_text(strip=True) == "—"

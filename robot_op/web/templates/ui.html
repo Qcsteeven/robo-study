@@ -165,7 +165,9 @@
                 {%- if d.optional or d.elective %} <span class="app-chip__tag">{{ 'факультатив' if d.optional else 'по выбору' }}</span>{% endif %}</span></span></td>
               <td class="app-semtable__teacher">
                 {%- for t in d.teachers -%}
-                <a class="ir-link" href="{{ t.url }}">{{ t.name }}</a>{% if not loop.last %}, {% endif %}
+                {%- set href = (t.url | default(none)) | teacher_link -%}
+                  <a class="ir-link" href="{{ href }}"{% if href.endswith('/raspisanie/poisk') %} title="Поиск в расписании ИРНИТУ"{% endif %}>{{ t.name }}</a>
+                {%- if not loop.last %}, {% endif %}
                 {%- else -%}
                 <span class="ir-muted" title="Нет совпадения в реестре ИРНИТУ">—</span>
                 {%- endfor -%}

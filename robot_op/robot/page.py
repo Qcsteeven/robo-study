@@ -283,7 +283,7 @@ def build(ses, prog: Program, *, teacher_directory: dict | None = None) -> dict:
                     candidates = {}
                     for name in names:
                         for teacher in teacher_directory.get(teacher_discipline_key(name), []):
-                            candidates.setdefault(teacher["name"], teacher)
+                            candidates.setdefault((teacher["name"], teacher.get("url")), teacher)
                     if candidates:
                         item["teachers"] = list(candidates.values())
 

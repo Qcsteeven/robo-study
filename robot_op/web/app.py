@@ -27,6 +27,7 @@ from ..extract import curriculum
 from ..extract.util import discipline_name
 from ..robot.page import latest_final
 from ..robot.pipeline import Robot
+from ..robot.teachers import teacher_link
 from ..robot.worker import Worker
 
 HERE = Path(__file__).parent
@@ -154,6 +155,7 @@ def create_app(settings: Settings | None = None, transport: httpx.BaseTransport 
     app.state.settings, app.state.db, app.state.robot, app.state.worker = settings, db, robot, worker
     app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
     templates = Jinja2Templates(directory=HERE / "templates")
+    templates.env.filters["teacher_link"] = teacher_link
     templates.env.filters["plural"] = plural
     templates.env.filters["clock_hours"] = clock_hours
     # версия стилей в адресе — после обновления приложения браузер не берёт старый CSS из кэша

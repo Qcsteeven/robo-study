@@ -29,7 +29,17 @@ from . import page as pagebuilder, program_summary
 from .http import AuthRequired, SiteClient, SiteError
 from .llm import ATTESTATION_FIELDS, LlmClient, LlmError, gia_characteristic, too_long
 from .site import LevelYears, ProgramBlock, parse_education, parse_op_list
-from .teachers import load_level_directory, match_program_teachers
+from .teachers import (
+    load_level_directory,
+    load_person_disciplines,
+    load_person_profiles,
+    load_teacher_schedules,
+    match_program_teachers,
+    resolve_teacher_profiles,
+    teacher_name_key,
+    teacher_profile_url,
+    teacher_schedule_url,
+)
 
 PARSER_VERSION = "1.9"   # 1.9 — УП с разорванными подписями семестров на сканах
 log = logging.getLogger("robot_op")
@@ -138,7 +148,7 @@ class Robot:
 
     def catalog(self, cohort: int | None = None) -> tuple[list[tuple[str, int, ProgramBlock]], dict[str, list[int]], bool]:
         """Доступные годы набора и перечни выбранного года либо последнего года каждого уровня."""
-        settings = replace(self.s.site, timeout=min(self.s.site.timeout, 8), retries=0)
+        settings = replace(self.s.site, timeout=min(self.s.site.timeout, 5), retries=0)
         client = SiteClient(settings, transport=self.transport, sleep=self.sleep)
         entries = []
         try:
@@ -662,20 +672,57 @@ class Robot:
 
         return self._cached(f"teacher-directory:{level}", 600, load)
 
+    def refresh_teacher_links(self, teacher_directory: dict, *, previous: dict | None = None) -> dict:
+        if not teacher_directory or self.s.app.demo:
+            return teacher_directory
+
+        settings = replace(self.s.site, timeout=min(self.s.site.timeout, 5), retries=0)
+        client = SiteClient(settings, transport=self.transport, sleep=self.sleep)
+        try:
+            profiles = self._cached("teacher-person-profiles", 3600, lambda: load_person_profiles(client))
+            saved_schedules = {
+                teacher_name_key(teacher["name"]): url
+                for entries in (previous or {}).values() for teacher in entries
+                if (url := teacher_schedule_url(teacher.get("url")))
+            }
+            names_without_profiles = {
+                teacher["name"] for entries in teacher_directory.values() for teacher in entries
+                if teacher_name_key(teacher["name"]) not in profiles
+                and not (teacher_profile_url(teacher.get("url")) or teacher_schedule_url(teacher.get("url")))
+            }
+            schedules = load_teacher_schedules(client, names_without_profiles, saved_schedules)
+
+            def disciplines_for(url: str) -> frozenset[str]:
+                return self._cached(f"teacher-person-disciplines:{url}", 3600,
+                                    lambda: load_person_disciplines(client, url))
+
+            return resolve_teacher_profiles(teacher_directory, profiles, disciplines_for=disciplines_for,
+                                            schedules=schedules, previous=previous)
+        finally:
+            client.close()
+
+    def program_teacher_directory(self, prog: Program, *, run_id: int | None = None, session=None) -> dict | None:
+        """Находит преподавателей и персональные ссылки при обработке любой программы."""
+        if self.s.app.demo:
+            return None
+        previous = (prog.page or {}).get("teacher_directory") or {}
+        try:
+            directory = self._teacher_directory(prog.level)
+        except SiteError as exc:
+            self.journal(run_id, "WARNING", f"Реестр преподавателей ИРНИТУ: {exc}", prog.id, ses=session)
+            directory = None
+        teachers = (
+            match_program_teachers(directory.text, directory.url, code=prog.code, profile=prog.profile)
+            if directory is not None else previous
+        )
+        return self.refresh_teacher_links(teachers, previous=previous)
+
     def _update_page(self, run_id: int, program_id: str) -> None:
         with self.db.Session() as ses:
             prog = ses.get(Program, program_id)
             if prog is None:
                 return
-            teacher_directory = None
-            if not self.s.app.demo:
-                try:
-                    directory = self._teacher_directory(prog.level)
-                    if directory is not None:
-                        teacher_directory = match_program_teachers(
-                            directory.text, directory.url, code=prog.code, profile=prog.profile)
-                except SiteError as exc:
-                    self.journal(run_id, "WARNING", f"Реестр преподавателей ИРНИТУ: {exc}", program_id, ses=ses)
+            teacher_directory = self.program_teacher_directory(prog, run_id=run_id, session=ses)
             prog.page = pagebuilder.build(ses, prog, teacher_directory=teacher_directory)
             prog.page_updated_at = now()
             ses.commit()

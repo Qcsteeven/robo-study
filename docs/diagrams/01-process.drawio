@@ -5,19 +5,19 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="n2" value="Ручное обновление" style="text;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontStyle=1;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n2" value="Получение сведений при работе с PDF" style="text;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontStyle=1;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="12" y="5" width="420" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="n3" value="Оператор находит&lt;br&gt;программу" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n3" value="Пользователь находит&lt;br&gt;программу" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="12" y="55" width="218" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="n4" value="Скачивает&lt;br&gt;PDF" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n4" value="Открывает нужный&lt;br&gt;документ" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="263" y="55" width="218" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="n5" value="Переносит данные&lt;br&gt;из PDF" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n5" value="Находит раздел&lt;br&gt;или таблицу" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="514" y="55" width="218" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="n6" value="Сверяет сведения&lt;br&gt;и ссылки" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n6" value="Считывает нужные&lt;br&gt;сведения" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="765" y="55" width="218" height="80" as="geometry" />
         </mxCell>
         <mxCell id="e7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#40586c;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Arial;fontSize=16;fontColor=#122333;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="n3" target="n4">
@@ -29,19 +29,19 @@
         <mxCell id="e9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#40586c;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Arial;fontSize=16;fontColor=#122333;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="n5" target="n6">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="n10" value="Обновление с Robo Study" style="text;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontStyle=1;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n10" value="Получение сведений через Robo Study" style="text;align=left;verticalAlign=middle;strokeColor=none;fillColor=none;fontStyle=1;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="12" y="170" width="420" height="34" as="geometry" />
         </mxCell>
-        <mxCell id="n11" value="Оператор выбирает&lt;br&gt;программу" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n11" value="Пользователь выбирает&lt;br&gt;программу" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="12" y="220" width="218" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="n12" value="Робот получает&lt;br&gt;и разбирает PDF" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n12" value="Робот загружает&lt;br&gt;и разбирает PDF" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="263" y="220" width="218" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="n13" value="Робот формирует&lt;br&gt;карточку и отчёт" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n13" value="Робот сохраняет JSON&lt;br&gt;и строит карточку" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="514" y="220" width="218" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="n14" value="Оператор сверяет&lt;br&gt;отмеченные поля" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
+        <mxCell id="n14" value="Пользователь открывает&lt;br&gt;карточку или PDF" style="rounded=1;arcSize=12;fillColor=#eaf3fa;strokeColor=#355d79;strokeWidth=1.5;html=1;whiteSpace=wrap;spacing=5;fontFamily=Arial;fontColor=#122333;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="765" y="220" width="218" height="80" as="geometry" />
         </mxCell>
         <mxCell id="e15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#40586c;strokeWidth=1.5;endArrow=block;endFill=1;fontFamily=Arial;fontSize=16;fontColor=#122333;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="n11" target="n12">
